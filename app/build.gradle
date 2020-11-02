@@ -35,5 +35,12 @@ dependencies {
 
     //MPAndroidChart
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.android.support:multidex:1.0.3'
+    //viewpager 2.0
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    //implemantation 'com.android.support:support-annotations:28.0.0'
+    //jbcrypt
+    implementation "org.mindrot:jbcrypt:0.4"
+
 }
 
