@@ -4,19 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#673AB7"
-    android:backgroundTint="#6D1EDD"
+    android:background="#4CAF50"
+    android:backgroundTint="#3F51B5"
     tools:context=".MainActivity">
 
+    //диаграмма
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/piechart"
         android:layout_width="411dp"
         android:layout_height="296dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="0dp"/>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints">
 
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp" />
+    </com.github.mikephil.charting.charts.PieChart>
+    //ввод с клавиатуры
+
+    <LinearLayout
+        android:id="@+id/activity_main"
+        android:layout_width="397dp"
+        android:layout_height="341dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Введите имя" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

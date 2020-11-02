@@ -1,9 +1,12 @@
 package com.example.myapplication;
 
-
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,29 +17,29 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
-public class MainActivity extends AppCompatActivity {
-    Scanner scan = new Scanner(System.in);
+
+
+
+public class MainActivity<s> extends AppCompatActivity {
     PieChart pieChart;
-    private Object CinCetnerValue;
+    private Object TextWatcher;
 
 
-    class CinCetnerValue {
-
-        float center = scan.nextFloat();
-
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
-        String users;
-
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_main);
-        pieChart=(PieChart) findViewById(R.id.piechart);
+
+
+
+
+
+                setContentView(R.layout.activity_main);
+        pieChart= findViewById(R.id.piechart);
         //процентные значения
         pieChart.setUsePercentValues(true);
         pieChart.getDescription().setEnabled(false);
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         //бул рисовать окно посередине или нет
         pieChart.setDrawHoleEnabled(true);
         //задаем текст в центре
-        pieChart.setCenterText("Sbor deneg");
+        pieChart.setCenterText("Сбор денег");
         //размер текста в центре
         pieChart.setCenterTextSize(10f);
         //шрифт текста в центре
@@ -64,19 +67,48 @@ public class MainActivity extends AppCompatActivity {
         //измменить шрифт юзеров
         pieChart.setDrawEntryLabels(true);
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-//        Float.valueOf(edittext.getText.toString())
-//        value = Float.valueOf(edittext.getText.toString())
+
+
 
 
 
 //список пользователей
-        ArrayList<PieEntry> yValues= new ArrayList<>();
+        final ArrayList<PieEntry> yValues= new ArrayList<>();
+        final EditText editText = findViewById(R.id.editText);
+        final TextView textView = findViewById(R.id.textView);
+        editText.addTextChangedListener(new  TextWatcher() {
 
-        yValues.add(new PieEntry(210f,"Ilushka"));
-        yValues.add(new PieEntry(359f,"Ura"));
-        yValues.add(new PieEntry(519f,"Danilka"));
-        yValues.add(new PieEntry(700f,"Misha"));
-        yValues.add(new PieEntry(315f,"Sasha"));
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                textView.setText(s);
+
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+
+        });
+
+
+        String s = String.valueOf(editText.getText().toString());
+        yValues.add(new PieEntry(210f, s));
+        yValues.add(new PieEntry(359f, s));
+        yValues.add(new PieEntry(519f, s));
+
+
+
 
 
         PieDataSet dataSet = new PieDataSet(yValues,"Users");
@@ -90,9 +122,15 @@ public class MainActivity extends AppCompatActivity {
         PieData data= new PieData((dataSet));
         data.setValueTextSize(10f);
         data.setValueTextColor(Color.DKGRAY);
-
-
+        dataSet.notifyDataSetChanged();
+        pieChart.invalidate();
+        pieChart.notifyDataSetChanged();
         pieChart.setData(data);
+
+
+
+
+
 
     }
 }
