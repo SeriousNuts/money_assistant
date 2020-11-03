@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#4CAF50"
+    android:backgroundTint="#3F51B5"
+    tools:context=".MainActivity">
+
+    //диаграмма
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/piechart"
+        android:layout_width="411dp"
+        android:layout_height="296dp"
+        android:layout_marginTop="4dp">
+
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:textSize="15dp" />
+    </com.github.mikephil.charting.charts.PieChart>
+    //ввод с клавиатуры
+
+    <LinearLayout
+        android:id="@+id/activity_main"
+        android:layout_width="397dp"
+        android:layout_height="341dp"
+        android:layout_marginBottom="4dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Введите имя" />
+
+    </LinearLayout>
+
+</RelativeLayout>

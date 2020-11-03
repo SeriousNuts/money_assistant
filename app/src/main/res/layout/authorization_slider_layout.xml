@@ -1,106 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linearLayout"
+    android:id="@+id/Relative_Layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/first_ico"
-        android:layout_width="210dp"
-        android:layout_height="210dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.175"
-        app:srcCompat="@drawable/authorization_first_ico" />
-
-    <TextView
-        android:id="@+id/Heading_text"
-        android:layout_width="182dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="80dp"
-        android:text="HEADING"
-        android:textSize="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/first_ico" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="121dp"
+        android:layout_marginEnd="114dp"
+        android:layout_marginBottom="531dp" />
 
     <TextView
         android:id="@+id/low_text"
         android:layout_width="395dp"
-        android:layout_height="0dp"
+        android:layout_height="60dp"
+        android:layout_alignTop="@+id/first_ico"
+        android:layout_alignParentStart="true"
         android:layout_marginStart="52dp"
-        android:layout_marginTop="359dp"
-        android:layout_marginBottom="45dp"
+        android:layout_marginTop="256dp"
         android:text="A lot of text for first slide page"
-        android:textSize="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/password_toggle"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="24dp" />
 
     <Button
         android:id="@+id/sign_up"
-        android:layout_width="121dp"
-        android:layout_height="53dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:contextClickable="true"
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="134dp"
+        android:layout_marginTop="542dp"
+        android:layout_marginEnd="135dp"
+        android:layout_marginBottom="320dp"
+        android:onClick="onClick"
         android:text="sign up"
-        android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.545"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/low_text"
-        app:layout_constraintVertical_bias="0.727" />
+        android:textSize="20dp" />
 
     <Button
         android:id="@+id/sign_in"
-        android:layout_width="161dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="96dp"
-        android:layout_marginBottom="121dp"
-        android:contextClickable="true"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="134dp"
+        android:layout_marginTop="479dp"
+        android:layout_marginEnd="138dp"
+        android:layout_marginBottom="330dp"
+        android:onClick="onClick"
         android:text="sign in"
         android:textSize="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.903"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password_toggle"
-        app:layout_constraintVertical_bias="0.452" />
+        tools:onClick="onClick" />
 
     <EditText
         android:id="@+id/phone_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="82dp"
+        android:layout_marginTop="342dp"
+        android:layout_marginEnd="111dp"
+        android:layout_marginBottom="338dp"
         android:ems="10"
-        android:inputType="phone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/low_text" />
+        android:inputType="phone" />
+
+    <TextView
+        android:id="@+id/Heading_text"
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:layout_below="@+id/first_ico"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="129dp"
+        android:layout_marginTop="51dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginBottom="455dp"
+        android:text="HEADING"
+        android:textSize="24dp" />
 
     <EditText
         android:id="@+id/password_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:layout_marginBottom="250dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="87dp"
+        android:layout_marginTop="417dp"
+        android:layout_marginEnd="110dp"
+        android:layout_marginBottom="350dp"
         android:ems="10"
-        android:inputType="textPassword"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/phone_toggle"
-        app:layout_constraintTop_toBottomOf="@+id/low_text" />
+        android:inputType="textPassword" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

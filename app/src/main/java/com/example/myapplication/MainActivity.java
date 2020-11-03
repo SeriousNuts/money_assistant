@@ -1,14 +1,24 @@
 package com.example.myapplication;
 
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -16,122 +26,105 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 
 
 
 
-public class MainActivity<s> extends AppCompatActivity {
-    PieChart pieChart;
-    private Object TextWatcher;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private ViewPager mSlidePageViewer;
+    private LinearLayout mDotsLayout;
+    private TextView[] mDots;
+    private authorization_slider_layout sliderAdapter;
+    private EditText Phone;
+    private EditText Password;
+    private Button SignInButton;
+    private Button SignUpButton;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
         setContentView(R.layout.activity_main);
 
 
+        mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
+        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);
+        SignInButton = (Button) findViewById(R.id.sign_in);
+        sliderAdapter = new authorization_slider_layout(this);
+        mSlidePageViewer.setAdapter(sliderAdapter);
+        addDotsInditcator(0);
+        mSlidePageViewer.addOnPageChangeListener(ViewListener);
 
-
-
-                setContentView(R.layout.activity_main);
-        pieChart= findViewById(R.id.piechart);
-        //процентные значения
-        pieChart.setUsePercentValues(true);
-        pieChart.getDescription().setEnabled(false);
-        pieChart.setDragDecelerationEnabled(true);
-        //коэф трения/торможения
-        pieChart.setDragDecelerationFrictionCoef(150f);
-        //прозрачный круг
-        pieChart.setTransparentCircleRadius(100f);
-        //бул рисовать окно посередине или нет
-        pieChart.setDrawHoleEnabled(true);
-        //задаем текст в центре
-        pieChart.setCenterText("Сбор денег");
-        //размер текста в центре
-        pieChart.setCenterTextSize(10f);
-        //шрифт текста в центре
-        pieChart.setCenterTextTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-        //радиус окна в центре
-        pieChart.setHoleRadius(30f);
-        //цвет текста в центре
-        pieChart.setCenterTextColor(Color.WHITE);
-        //цвет самого окна(может не работать)
-        pieChart.setHoleColor(Color.TRANSPARENT);
-        //закругленные концы
-        pieChart.setDrawRoundedSlices(false);
-        //измменить шрифт юзеров
-        pieChart.setDrawEntryLabels(true);
-        pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
-
-
-
-
-
-//список пользователей
-        final ArrayList<PieEntry> yValues= new ArrayList<>();
-        final EditText editText = findViewById(R.id.editText);
-        final TextView textView = findViewById(R.id.textView);
-        editText.addTextChangedListener(new  TextWatcher() {
-
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                textView.setText(s);
-
-
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-
-
-        });
-
-
-        String s = String.valueOf(editText.getText().toString());
-        yValues.add(new PieEntry(210f, s));
-        yValues.add(new PieEntry(359f, s));
-        yValues.add(new PieEntry(519f, s));
-
-
-
-
-
-        PieDataSet dataSet = new PieDataSet(yValues,"Users");
-        dataSet.setUsingSliceColorAsValueLineColor(true);
-        dataSet.setFormSize(8f);
-        dataSet.setValueLineColor(Color.DKGRAY);
-        dataSet.setSliceSpace(5f);
-        dataSet.setAutomaticallyDisableSliceSpacing(true);
-        dataSet.setSelectionShift(8f);
-        dataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-        PieData data= new PieData((dataSet));
-        data.setValueTextSize(10f);
-        data.setValueTextColor(Color.DKGRAY);
-        dataSet.notifyDataSetChanged();
-        pieChart.invalidate();
-        pieChart.notifyDataSetChanged();
-        pieChart.setData(data);
-
-
-
-
-
-
+        }
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.sign_in:
+                Intent intent;
+                intent = new Intent(MainActivity.this, MainWindow.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
     }
+
+    private void addDotsInditcator(int position) {
+        mDots = new TextView[3];
+        mDotsLayout.removeAllViews();
+        for (int i = 0; i < mDots.length; i++) {
+            mDots[i] = new TextView(this);
+            mDots[i].setText(Html.fromHtml("&#8226"));
+            mDots[i].setTextSize(35);
+            mDots[i].setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+
+            mDotsLayout.addView(mDots[i]);
+        }
+        if (mDots.length > 0) {
+            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+    }
+
+    private String to_hex(EditText password) {
+        //crypting password
+        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
+    }
+
+   /* public void onClickSignIn(View view) throws SQLException {ЭТОТ МЕТОД ДОЛЖЕН БЫТЬ ПЕРЕНЕСЁН В КНОПКУ SIGN IN
+        Phone = (EditText) findViewById(R.id.phone_toggle);
+        Password = (EditText) findViewById(R.id.password_toggle);
+        SignInButton = (Button) findViewById(R.id.sign_in);
+        DataBase date = new DataBase();
+        if (date.signIn_user(Password.toString(), Phone.toString())) {
+            //вход
+            openActivity2();
+            System.out.print("success");
+
+        } else
+            System.out.printf("wrong");
+    }*/
+
+    ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            addDotsInditcator(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
 }
 

@@ -8,14 +8,17 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
 
 public class authorization_slider_layout extends PagerAdapter {
     Context context;
     LayoutInflater layoutInflater;
 
-    public void Authorization_Slider_Layout(Context context)
+    public authorization_slider_layout(Context context) {
+        this.context = context;
+    }
+
+    public void SliderAdapter(Context context)
     {
         this.context = context;
 
@@ -42,14 +45,14 @@ public class authorization_slider_layout extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+    public boolean isViewFromObject(View view, Object object) {
         return view == (RelativeLayout) object;
     }
 
-    @NonNull
+
     @Override
-    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-        layoutInflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
+    public Object instantiateItem(ViewGroup container, int position) {
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.authorization_slider_layout,container,false);
 
         ImageView slideImageView = (ImageView) view.findViewById(R.id.first_ico);
@@ -65,7 +68,7 @@ public class authorization_slider_layout extends PagerAdapter {
     }
 
     @Override
-    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+    public void destroyItem(ViewGroup container, int position,Object object) {
 
         container.removeView((RelativeLayout) object);
 
