@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class SQL_Connection {
     private String driver   = "com.mysql.jdbc.Driver";
-    private String url      = "jdbc:mysql://localhost:3306/money_assistant";
+    private String url      = "localhost";
     private String dbName   = "money_assistant";
-    private String userName = "root";
+    private String userName = "root@localhost";
     private String password = "";
     private Connection conn;
 

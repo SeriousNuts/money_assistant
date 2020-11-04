@@ -41,7 +41,7 @@
         android:layout_marginTop="542dp"
         android:layout_marginEnd="135dp"
         android:layout_marginBottom="320dp"
-        android:onClick="onClick"
+        android:onClick="onClickSignUp"
         android:text="sign up"
         android:textSize="20dp" />
 
@@ -58,7 +58,7 @@
         android:layout_marginTop="479dp"
         android:layout_marginEnd="138dp"
         android:layout_marginBottom="330dp"
-        android:onClick="onClick"
+        android:onClick="onClickSignUp"
         android:text="sign in"
         android:textSize="20dp"
         tools:onClick="onClick" />

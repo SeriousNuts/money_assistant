@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,8 +32,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
-
+import static com.example.myapplication.R.id.sign_in;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText Password;
     private Button SignInButton;
     private Button SignUpButton;
+    static final String TAG = "success";
 
 
     @Override
@@ -55,20 +56,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
         mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);
         SignInButton = (Button) findViewById(R.id.sign_in);
+        SignUpButton = (Button) findViewById(R.id.sign_up);
         sliderAdapter = new authorization_slider_layout(this);
         mSlidePageViewer.setAdapter(sliderAdapter);
         addDotsInditcator(0);
         mSlidePageViewer.addOnPageChangeListener(ViewListener);
 
         }
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.sign_in:
-                Intent intent;
-                intent = new Intent(MainActivity.this, MainWindow.class);
-                startActivity(intent);
+                Phone = (EditText) findViewById(R.id.phone_toggle);
+                Password = (EditText) findViewById(R.id.password_toggle);
+                        //вход
+                        Intent intent = new Intent(MainActivity.this, MainWindow.class);
+                        startActivity(intent);
                 break;
+            case R.id.sign_up:
+                Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);
+                startActivity(intentSignUpActitvity);
+
             default:
                 break;
         }
@@ -95,19 +104,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
     }
 
-   /* public void onClickSignIn(View view) throws SQLException {ЭТОТ МЕТОД ДОЛЖЕН БЫТЬ ПЕРЕНЕСЁН В КНОПКУ SIGN IN
+    public void onClickSignIn(View view) throws SQLException {
         Phone = (EditText) findViewById(R.id.phone_toggle);
         Password = (EditText) findViewById(R.id.password_toggle);
-        SignInButton = (Button) findViewById(R.id.sign_in);
         DataBase date = new DataBase();
         if (date.signIn_user(Password.toString(), Phone.toString())) {
             //вход
-            openActivity2();
             System.out.print("success");
 
         } else
             System.out.printf("wrong");
-    }*/
+    }
 
     ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {
         @Override

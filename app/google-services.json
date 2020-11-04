@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "357625177618",
+    "firebase_url": "https://moneyassistant-1604315426885.firebaseio.com",
+    "project_id": "moneyassistant-1604315426885",
+    "storage_bucket": "moneyassistant-1604315426885.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:357625177618:android:1283547e9383df1f3a1acb",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "357625177618-arrrh5uqkunrm63h8rdccllqqqrl4ndd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapplication",
+            "certificate_hash": "dfc6db04033e4ee7c7788fee15a94365848a4a27"
+          }
+        },
+        {
+          "client_id": "357625177618-c9a735p7sk7k7ruepbvdpcjhndiq51ni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5dLyTu7G7MEUMOrZ8m_0kDfCFSaoSiWs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "357625177618-c9a735p7sk7k7ruepbvdpcjhndiq51ni.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
