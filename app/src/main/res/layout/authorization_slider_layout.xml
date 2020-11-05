@@ -5,29 +5,8 @@
     android:id="@+id/Relative_Layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:onClick="onClick"
     android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/first_ico"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="121dp"
-        android:layout_marginEnd="114dp"
-        android:layout_marginBottom="531dp" />
-
-    <TextView
-        android:id="@+id/low_text"
-        android:layout_width="395dp"
-        android:layout_height="60dp"
-        android:layout_alignTop="@+id/first_ico"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="256dp"
-        android:text="A lot of text for first slide page"
-        android:textSize="24dp" />
 
     <Button
         android:id="@+id/sign_up"
@@ -41,7 +20,7 @@
         android:layout_marginTop="542dp"
         android:layout_marginEnd="135dp"
         android:layout_marginBottom="320dp"
-        android:onClick="onClickSignUp"
+        android:onClick="onClick"
         android:text="sign up"
         android:textSize="20dp" />
 
@@ -78,6 +57,32 @@
         android:ems="10"
         android:inputType="phone" />
 
+    <EditText
+        android:id="@+id/password_toggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false"
+        android:layout_marginStart="87dp"
+        android:layout_marginTop="417dp"
+        android:layout_marginEnd="110dp"
+        android:layout_marginBottom="350dp"
+        android:ems="10"
+        android:inputType="textPassword" />
+
+    <ImageView
+        android:id="@+id/first_ico"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="121dp"
+        android:layout_marginEnd="114dp"
+        android:layout_marginBottom="531dp" />
+
     <TextView
         android:id="@+id/Heading_text"
         android:layout_width="wrap_content"
@@ -93,19 +98,15 @@
         android:text="HEADING"
         android:textSize="24dp" />
 
-    <EditText
-        android:id="@+id/password_toggle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <TextView
+        android:id="@+id/low_text"
+        android:layout_width="395dp"
+        android:layout_height="60dp"
+        android:layout_alignTop="@+id/first_ico"
         android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="false"
-        android:layout_marginStart="87dp"
-        android:layout_marginTop="417dp"
-        android:layout_marginEnd="110dp"
-        android:layout_marginBottom="350dp"
-        android:ems="10"
-        android:inputType="textPassword" />
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="256dp"
+        android:text="A lot of text for first slide page"
+        android:textSize="24dp" />
 
 </RelativeLayout>

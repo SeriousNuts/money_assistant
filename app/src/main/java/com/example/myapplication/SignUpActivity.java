@@ -13,7 +13,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import static com.example.myapplication.R.id.AddDataBase;
 
-public class SignUpActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
     EditText PhoneNumber;
     EditText Password;
     EditText ReplyPassword;
@@ -25,19 +25,20 @@ public class SignUpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         SignUpButton = findViewById(AddDataBase);
-        SignUpButton.setOnClickListener((View.OnClickListener) this);
     }
 
-    @SuppressLint("NonConstantResourceId")
-        public void onClickSignUp(View view){
+        @Override
+        public void onClick(View view){
             switch (view.getId()){
                 case AddDataBase:
                     PhoneNumber = findViewById(R.id.phoneSignUp);
                     Password = findViewById(R.id.passwordSignUp);
                     ReplyPassword = findViewById(R.id.passwordRepitSIgnUP);
                     Username = findViewById(R.id.usernameSignUp);
+                    String PasswordCheck = Password.getText().toString();
+                    String ReplyPasswordCheck = ReplyPassword.getText().toString();
 
-                    if (Password == ReplyPassword){
+                    if (PasswordCheck == ReplyPasswordCheck){
                         HashPassword = BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
                         User user = new User(Username.toString(), PhoneNumber.toString(), HashPassword);
                         user.SaveUser();
