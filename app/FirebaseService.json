@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "moneyassistant-1604315426885",
+  "private_key_id": "c9e9de0308e7f3a6495ec4369d7d644084b75731",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCu7y9rivmAh6wP\n5zgj4j7u2O5n7sdvxkIC66cZdIZ5sp/Z5VhBpGZH8kmwSthSv3cyMAkQQcnL/It+\newMUoL6twfKLrG69L6zpFVVA/8cOoUW4e75om8X7ebYNmWDjYdAjRtPvVsFl27sD\nls5wOH32q3e56d3HVTdhcj7VEYbGOAw2p6XqTabD7Y5z0x16xQ8huzWpCTV6Bv8s\n8yHh8CTnQ3r4rtERO/SDFO2BKoURgSvonHgU3dcn7P1P9ig6ycFWRwOA4ushhKn9\nQPuv/qkHULGhOHMob9bwT/YbCmSxjcrOJ2O5IHNZadYemBGSEb1JmVb5GJNZNRtc\nosOP1zIXAgMBAAECggEAF+NRoRM5PvPylbldUTPJTum7TzYBcKICIaP3DY17+je0\n3Gxqa4xSQJY1ZH1+oiNt2MyhGuHg90S6nRWZ4MHn8pJULKk/S1ZXUPzjchzQxzlT\n6/1POGRihL9PZ6FU5GKsVCTijAGs0dv6OGM/jX4pX/sfk6OmmrG9qPDmOPJLv9rC\ntoMfLbuM539eOY7HkyJX/n4hteviQRRHM2NTbb9IF7tfSdgmMFOg90+AG2JZ8aZO\nY5sXTNfrtbTwXxEfMloSfnkKAVwQsvZykU7VhXbYwygH2gIiF+c9fzm92OmT2bgA\nhx4FnnoeoBrWL8Vz7MR7+rkLnIp6vSPgAXvR9ySDAQKBgQDqeoWjh/nQEArlFYTE\nD4RqY5VcUB6GBZQDBqDrW2VGGaDX4GOktSMQ/ifhG0CKYzSVfVVA8BrH7UPA5M6p\nJq3D09DA6AQEHDEkLU7TxB2Os+njSyPBh1hNwl/Mnthen87hInJsdkwKeU+zoY/C\nYwd0MJbBXQ35eVTWl9OGdhbkowKBgQC+/ZFeqPZRlLd5qoU9Su4/HLbHE5HQCZ79\nwtq2zMvY9TPUEiGF0ve+5XwXrnakXllm11OQ7bWKuFqlHU396Ud8C3A4YhRkm4xs\nQ9p3SJaz+awPRQNpylJsUA7CH9XQ4hzAMus4DDhEuxBX4xGplv/3WMpCm7bw7B7m\now9ebVKf/QKBgDl4ZE7roggkFneFqa/gWcU1uUMSBBk3PsrrEf/9u7nNyEWBIwsY\ntoqQsLeU1WHV5OqK+J1c/ENqXQPnUNvWthpcTTsq4uka+9RxInP3CoOSh04FebMS\neEs+y/o8KK4wnyVBKyh4ajTa/PT7MWAko4wP6LNmGmm+GlQqjFbVlNDfAoGADaf3\n0vrl0eN+Uva8XCuVaXHWJ9ngXS2y7pYWKWfvU24E7K73MqhpCn9CJjdVSF9uqQnQ\ncdZtWqPf51p3Dya088ullIJ+zsrIeZ1Ia6sHC4tYoCbhHZlX12LKC1tXYH4qbBu3\n8eP9yfxOKNqVkri3SKpSm/yiUguwEfGq0aejdskCgYEA0mBGB0yBDT6b2fwpqN+G\nuADewf1oL1t0ClCZ4nY2GH5qhhQmCZyle9fF3tybbU8chO+HQmg9N1k/7WsQx/g3\nA5kPrppGHgCJ8iYNEWyASpxRTv4amy30CaqElwr0ifuJQ5RuH5w7lhcYjz8NV6qO\nqRiOTK0Mb2GK5EfHlu2INTg=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-3h7r4@moneyassistant-1604315426885.iam.gserviceaccount.com",
+  "client_id": "100064225157899606505",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-3h7r4%40moneyassistant-1604315426885.iam.gserviceaccount.com"
+}

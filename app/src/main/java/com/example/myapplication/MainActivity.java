@@ -17,7 +17,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -26,6 +28,11 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -37,15 +44,9 @@ import static com.example.myapplication.R.id.sign_up;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private ViewPager mSlidePageViewer;
     private LinearLayout mDotsLayout;
     private TextView[] mDots;
-    private authorization_slider_layout sliderAdapter;
-    private EditText Phone;
     private EditText Password;
-    private Button SignInButton;
-    private Button SignUpButton;
-    static final String TAG = "success";
 
 
     @Override
@@ -54,11 +55,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
 
-        mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
+        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
         mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);
-        SignInButton = (Button) findViewById(R.id.sign_in);
-        SignUpButton = (Button) findViewById(sign_up);
-        sliderAdapter = new authorization_slider_layout(this);
+        authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);
         mSlidePageViewer.setAdapter(sliderAdapter);
         addDotsInditcator(0);
         mSlidePageViewer.addOnPageChangeListener(ViewListener);
@@ -67,11 +66,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case sign_in:
-                Phone = (EditText) findViewById(R.id.phone_toggle);
+                EditText email = (EditText) findViewById(R.id.email_toggle);
                 Password = (EditText) findViewById(R.id.password_toggle);
                         //вход
-                        Intent intent = new Intent(MainActivity.this, MainWindow.class);
-                        startActivity(intent);
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),Password.getText().toString()).addOnCompleteListener(
+                        new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
+                            startActivity(intentMainWindows);
+                        }
+                        else{
+                            Toast.makeText(MainActivity.this,"Authentication failed."+ task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
                 break;
             case sign_up:
                 Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);
@@ -102,18 +115,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //crypting password
         return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
     }
-
-    /*public void onClickSignIn(View view) throws SQLException {
-        Phone = (EditText) findViewById(R.id.phone_toggle);
-        Password = (EditText) findViewById(R.id.password_toggle);
-        DataBase date = new DataBase();
-        if (date.signIn_user(Password.toString(), Phone.toString())) {
-            //вход
-            System.out.print("success");
-
-        } else
-            System.out.printf("wrong");
-    }*/
 
     ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {
         @Override
