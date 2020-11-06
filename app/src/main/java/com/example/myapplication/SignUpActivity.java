@@ -66,7 +66,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
-                                            Intent intentSignup = new Intent(SignUpActivity.this, MainWindow.class);
+                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);
                                             startActivity(intentSignup);
                                         } else {
                                             // If sign up fails, display a message to the user.

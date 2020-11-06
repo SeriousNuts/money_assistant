@@ -68,22 +68,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case sign_in:
                 EditText email = (EditText) findViewById(R.id.email_toggle);
                 Password = (EditText) findViewById(R.id.password_toggle);
-                        //вход
-                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-                firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),Password.getText().toString()).addOnCompleteListener(
-                        new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
-                            startActivity(intentMainWindows);
-                        }
-                        else{
-                            Toast.makeText(MainActivity.this,"Authentication failed."+ task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+                if((email.getText().toString().length()!=0) && (Password.getText().toString().length()!=0)) {
+                    //вход
+                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(
+                            new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        Intent intentMainWindows = new Intent(MainActivity.this, SettingsOfChart.class);
+                                        startActivity(intentMainWindows);
+                                    } else {
+                                        Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }
+                else
+                {
+                    Toast.makeText(MainActivity.this,"Поля логин и пароль должны быть заполнены", Toast.LENGTH_SHORT);
+                }
+
 
                 break;
             case sign_up:

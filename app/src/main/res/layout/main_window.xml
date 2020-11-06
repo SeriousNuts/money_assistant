@@ -10,26 +10,16 @@
 
     //диаграмма
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/piechart"
-        android:layout_width="411dp"
-        android:layout_height="296dp"
-        android:layout_marginTop="4dp">
-
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="251dp"
-            android:layout_height="wrap_content"
-            android:textSize="15dp" />
-    </com.github.mikephil.charting.charts.PieChart>
     //ввод с клавиатуры
 
     <LinearLayout
         android:id="@+id/activity_main"
-        android:layout_width="397dp"
-        android:layout_height="341dp"
-        android:layout_marginBottom="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="345dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="65dp"
         android:orientation="vertical"
         android:padding="16dp">
 
@@ -37,8 +27,28 @@
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Введите имя" />
+            android:hint="Введите имя"
+            android:inputType="textPersonName" />
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="251dp"
+            android:layout_height="wrap_content"
+            android:textSize="50dp" />
 
     </LinearLayout>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/piechart"
+        android:layout_width="match_parent"
+        android:layout_height="292dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="443dp">
+
+
+    </com.github.mikephil.charting.charts.PieChart>
+
 
 </RelativeLayout>
