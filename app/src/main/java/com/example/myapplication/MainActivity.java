@@ -1,21 +1,11 @@
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.Html;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,36 +13,45 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 import static com.example.myapplication.R.id.sign_in;
 import static com.example.myapplication.R.id.sign_up;
+import static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private LinearLayout mDotsLayout;
     private TextView[] mDots;
     private EditText Password;
-
-
+    private FirebaseAuth mAuth;
+    private static final int RC_SIGN_IN = 123456;
+    private GoogleSignInClient mGoogleSignInClient;
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mAuth = FirebaseAuth.getInstance();
+
 
 
         ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
@@ -62,13 +61,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addDotsInditcator(0);
         mSlidePageViewer.addOnPageChangeListener(ViewListener);
         }
+    private void createRequest() {
+        GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN);
+        builder.requestIdToken(getString(R.string.default_web_client_id));
+        builder.requestEmail();
+        GoogleSignInOptions gso = builder
+                .build();
+        mGoogleSignInClient = getClient(MainActivity.this, gso);
+    }
+
+    private void signIn() {
+        createRequest();
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent,
+                RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Toast.makeText(MainActivity.this, "Firebase with google succes",
+                        Toast.LENGTH_SHORT).show();
+                firebaseAuthWithGoogle(account.getIdToken());
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+                        Toast.LENGTH_SHORT).show();
+                // ...
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Toast.makeText(MainActivity.this, "Authentification succes",
+                                    Toast.LENGTH_SHORT).show();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
+                        // ...
+                    }
+                });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case sign_in:
                 EditText email = (EditText) findViewById(R.id.email_toggle);
                 Password = (EditText) findViewById(R.id.password_toggle);
-                if((email.getText().toString().length()!=0) && (Password.getText().toString().length()!=0)) {
+                if((email.getText().toString().length()!=0) || (Password.getText().toString().length()!=0)) {
                     //вход
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(
@@ -87,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 else
                 {
-                    Toast.makeText(MainActivity.this,"Поля логин и пароль должны быть заполнены", Toast.LENGTH_SHORT);
+                    Toast.makeText(MainActivity.this,"Поля логин и пароль должны быть заполнены", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -95,6 +153,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case sign_up:
                 Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);
                 startActivity(intentSignUpActitvity);
+            case R.id.googleSignIn:
+                signIn();
+                Intent intentGoogleSignUp = new Intent(MainActivity.this,SettingsOfChart.class);
+                startActivity(intentGoogleSignUp);
+                break;
 
             default:
                 break;
@@ -113,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mDotsLayout.addView(mDots[i]);
         }
         if (mDots.length > 0) {
-            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimary));
         }
     }
 

@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'// аналитика
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:18.1.0'
    // implementation 'com.google.firebase:firebase-admin:7.0.1'
 
 

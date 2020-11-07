@@ -8,9 +8,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.PagerAdapter;
 
-public class authorization_slider_layout extends PagerAdapter {
+public class authorization_slider_layout extends PagerAdapter{
     Context context;
     LayoutInflater layoutInflater;
 
@@ -46,7 +47,7 @@ public class authorization_slider_layout extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == (RelativeLayout) object;
+        return view == (ConstraintLayout) object;
     }
 
 
@@ -70,7 +71,7 @@ public class authorization_slider_layout extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position,Object object) {
 
-        container.removeView((RelativeLayout) object);
+        container.removeView((ConstraintLayout) object);
 
     }
 
