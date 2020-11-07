@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intentMainWindows = new Intent(MainActivity.this, SettingsOfChart.class);
+                                        Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);
                                         startActivity(intentMainWindows);
                                     } else {
                                         Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intentSignUpActitvity);
             case R.id.googleSignIn:
                 signIn();
-                Intent intentGoogleSignUp = new Intent(MainActivity.this,SettingsOfChart.class);
+                Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);
                 startActivity(intentGoogleSignUp);
                 break;
 
