@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
 
 import static com.example.myapplication.R.id.EnterName;
 
@@ -92,6 +93,12 @@ Name=(Button) findViewById(EnterName);
                 intent.putExtras(Value4);
                 intent.putExtras(Value5);
                 startActivity(intent);
+                break;
+            case R.id.logout:
+                FirebaseAuth.getInstance().signOut();
+                Intent intentLogout = new Intent(ChartGenerator.this, MainActivity.class);
+                startActivity(intentLogout);
+                finish();
                 break;
             default:
                 break;

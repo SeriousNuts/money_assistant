@@ -19,24 +19,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import static com.example.myapplication.R.id.AddDataBase;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final int RC_SIGN_IN = 123;
     EditText email;
     EditText Password;
     EditText ReplyPassword;
     EditText Username;
     Button SignUpButton;
     FirebaseAuth auth;
-    Button btnGoogle;
-    private GoogleSignInClient mGoogleSignInClient;
-    String TAG = "  ";
-    private static FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         SignUpButton = findViewById(AddDataBase);
-        mAuth = FirebaseAuth.getInstance();
     }
 
 
@@ -57,7 +51,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
-                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);
+                                            Intent intentSignup = new Intent(SignUpActivity.this, ChartGenerator.class);
                                             startActivity(intentSignup);
                                             finish();
                                         } else {
@@ -73,11 +67,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     }
 
                     break;
-                case R.id.googleSignUp:
-                    break;
-
-
-
                 default:
                     break;
             }
