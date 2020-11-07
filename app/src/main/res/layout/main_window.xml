@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4CAF50"
-    android:backgroundTint="#3F51B5"
+    android:background="#F4511E"
+    android:backgroundTint="@color/colorPrimary"
     tools:context=".MainActivity">
 
     //диаграмма
@@ -29,11 +29,67 @@
             android:layout_height="wrap_content"
             android:hint="Введите имя"
             android:inputType="textPersonName" />
+
         <TextView
             android:id="@+id/textView"
             android:layout_width="251dp"
             android:layout_height="wrap_content"
             android:textSize="50dp" />
+        <TextView
+            android:id="@+id/ChartName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/UserOne"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/UserTwo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/UserThree"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/UserFour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/UserFive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/ValueUs5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            /><TextView
+        android:id="@+id/ValueUs4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+        <TextView
+            android:id="@+id/ValueUs3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/ValueUs2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <TextView
+            android:id="@+id/ValueUs1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
 
     </LinearLayout>
 
