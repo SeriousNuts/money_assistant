@@ -14,10 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity
-            android:name=".SettingsOfChart"
-            android:label="@string/title_activity_settings_of_chart"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ChartGenerator"></activity>
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MainWindow" />
         <activity android:name=".MainActivity">
