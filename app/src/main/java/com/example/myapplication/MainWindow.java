@@ -98,11 +98,12 @@ public class MainWindow extends AppCompatActivity {
         Bundle user5=intentFive.getExtras();
         User5=user5.getString("User5");
         UserFive.setText(User5);
+
         //Value1
         ValueUs1=(TextView) findViewById(R.id.ValueUs1);
         Intent intentValue1=getIntent();
         Bundle value1= intentValue1.getExtras();
-        Value1=value1.getString("ValueOne");
+        Value1=value1.getString("Value");
         ValueUs1.setText(Value1);
         //Value2
         ValueUs2=(TextView) findViewById(R.id.ValueUs2);
@@ -163,14 +164,15 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 
         ArrayList<PieEntry> yValues= new ArrayList<>();
+        //users
             yValues.add(new PieEntry(Float.parseFloat(Value1), User1));
-            yValues.add(new PieEntry(Float.parseFloat(Value2), User2));
-            yValues.add(new PieEntry(Float.parseFloat(Value3), User3));
-            yValues.add(new PieEntry(Float.parseFloat(Value4), User4));
-            yValues.add(new PieEntry(Float.parseFloat(Value5), User5));
+            yValues.add(new PieEntry(Float.parseFloat(Value1), User2));
+            yValues.add(new PieEntry(Float.parseFloat(Value1), User3));
+            yValues.add(new PieEntry(Float.parseFloat(Value1), User4));
+            yValues.add(new PieEntry(Float.parseFloat(Value1), User5));
 
 
-
+//дата сеты
         PieDataSet dataSet = new PieDataSet(yValues,pieChartName);
         dataSet.setUsingSliceColorAsValueLineColor(true);
         dataSet.setFormSize(8f);

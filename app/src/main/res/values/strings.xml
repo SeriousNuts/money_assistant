@@ -91,4 +91,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="action_settings">Settings</string>
+    <string name="add_btn">Добавить</string>
+    <string name="Money">Сумма</string>
+    <string name="_0_0">0.0</string>
 </resources>

@@ -9,33 +9,6 @@
     tools:context=".ChartGenerator">
 
 
-    <EditText
-        android:id="@+id/Value5"
-        android:layout_width="101dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Сумма"
-        android:inputType="numberDecimal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/User5"
-        app:layout_constraintTop_toBottomOf="@+id/Value4" />
-
-    <EditText
-        android:id="@+id/Value4"
-        android:layout_width="110dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="303dp"
-        android:ems="10"
-        android:hint="Сумма"
-        android:inputType="numberDecimal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/User4"
-        app:layout_constraintTop_toBottomOf="@+id/Value3" />
-
     <TextView
         android:id="@+id/textview"
         android:layout_width="wrap_content"
@@ -46,6 +19,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/group" />
 
+
+    <EditText
+        android:id="@+id/User2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:hint="Пользователь 2"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/User3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/User1" />
 
     <EditText
         android:id="@+id/ChartName"
@@ -59,8 +45,8 @@
         android:text="Имя диаграммы"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/User1"
-        app:layout_constraintEnd_toStartOf="@+id/EnterName"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toStartOf="@+id/buttonAdd"
+        app:layout_constraintHorizontal_bias="0.365"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -68,6 +54,7 @@
         android:id="@+id/User1"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="18dp"
         android:ems="10"
         android:hint="Пользователь 1"
@@ -75,155 +62,113 @@
         android:inputType="textPersonName"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/User2"
-        app:layout_constraintEnd_toStartOf="@+id/Value1"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ChartName" />
-
-    <Button
-        android:id="@+id/EnterName"
-        android:layout_width="112dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="63dp"
-        android:layout_marginBottom="16dp"
-        android:onClick="onClick"
-        android:text="Старт!"
-        app:layout_constraintBottom_toTopOf="@+id/Value1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/ChartName"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/User2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:hint="Пользователь 2"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/User3"
-        app:layout_constraintEnd_toStartOf="@+id/Value2"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User1" />
-
-    <EditText
-        android:id="@+id/User3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:hint="Пользователь 3"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/User4"
-        app:layout_constraintEnd_toStartOf="@+id/Value3"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User2" />
-
-    <EditText
-        android:id="@+id/User5"
-        android:layout_width="202dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="241dp"
-        android:ems="10"
-        android:hint="Пользователь 5"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/Value5"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User4" />
 
     <EditText
         android:id="@+id/User4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:ems="10"
         android:hint="Пользователь 4"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/User5"
-        app:layout_constraintEnd_toStartOf="@+id/Value4"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/User3" />
 
     <EditText
-        android:id="@+id/Value1"
-        android:layout_width="110dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="17dp"
+        android:id="@+id/User5"
+        android:layout_width="209dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="241dp"
         android:ems="10"
-        android:hint="Сумма"
-        android:inputType="numberDecimal"
-        app:layout_constraintBottom_toTopOf="@+id/Value2"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/User1"
-        app:layout_constraintTop_toBottomOf="@+id/EnterName" />
+        android:hint="Пользователь 5"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/User4"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/User4" />
 
     <EditText
-        android:id="@+id/Value2"
-        android:layout_width="109dp"
-        android:layout_height="0dp"
+        android:id="@+id/User3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
         android:ems="10"
-        android:hint="Сумма"
-        android:inputType="numberDecimal"
-        app:layout_constraintBottom_toTopOf="@+id/Value3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/User2"
-        app:layout_constraintTop_toBottomOf="@+id/Value1" />
+        android:hint="Пользователь 3"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/User4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/User2" />
 
-    <EditText
-        android:id="@+id/Value3"
-        android:layout_width="110dp"
-        android:layout_height="0dp"
-        android:layout_marginBottom="17dp"
-        android:ems="10"
-        android:hint="Сумма"
-        android:inputType="numberDecimal"
-        app:layout_constraintBottom_toTopOf="@+id/Value4"
+    <Button
+        android:id="@+id/EnterName"
+        android:layout_width="113dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="60dp"
+        android:onClick="onClick"
+        android:text="Старт!"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/User3"
-        app:layout_constraintTop_toBottomOf="@+id/Value2" />
+        app:layout_constraintHorizontal_bias="0.478"
+        app:layout_constraintStart_toEndOf="@+id/ChartName"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_begin="20dp" />
+        app:layout_constraintGuide_begin="49dp" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="Value2,User2,User3,User5,EnterName,Value1,User1,Value3,ChartName,Value5,Value4,User4"
+        app:constraint_referenced_ids="User2,User3,User5,EnterName,User1,ChartName,User4"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="20dp" />
-
     <Button
         android:id="@+id/logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginEnd="304dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onClick"
         android:text="выйти"
-        app:layout_constraintTop_toBottomOf="@+id/Value5"
-        tools:layout_editor_absoluteX="307dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/buttonAdd"
+        android:layout_width="126dp"
+        android:layout_height="53dp"
+        android:onClick="onClick"
+        android:text="@string/add_btn"
+        tools:layout_editor_absoluteX="262dp"
+        tools:layout_editor_absoluteY="10dp" />
+
+    <LinearLayout
+        android:id="@+id/llMain"
+        android:layout_width="167dp"
+        android:layout_height="288dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.934"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.342"
+        tools:ignore="MissingConstraints" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
