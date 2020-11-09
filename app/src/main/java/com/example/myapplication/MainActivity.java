@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
-                Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+                Toast.makeText(MainActivity.this, "On activity result failed " + task.getException().getMessage(),
                         Toast.LENGTH_SHORT).show();
                 // ...
             }
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             startActivity(intentGoogleSignUp);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+                            Toast.makeText(MainActivity.this, "Firebase auth with google failed " + task.getException().getMessage(),
                                     Toast.LENGTH_SHORT).show();
                         }
 
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);
                                         startActivity(intentMainWindows);
                                     } else {
-                                        Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),
+                                        Toast.makeText(MainActivity.this, "onClick failed " + task.getException().getMessage(),
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 }
