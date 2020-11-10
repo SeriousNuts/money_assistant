@@ -1,54 +1,35 @@
 package com.example.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
-
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import static android.text.InputType.TYPE_CLASS_NUMBER;
-import static android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL;
-import static android.view.View.AUTOFILL_HINT_PHONE;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
-import static com.example.myapplication.R.id.text;
 
 
 public class ChartGenerator extends AppCompatActivity implements View.OnClickListener{
 LinearLayout llMain;
-ArrayList<String> editTexts = new ArrayList<String>();
+ArrayList<String>NumbersofEditText = new ArrayList<String>();
+ArrayList<String>EditTexts = new ArrayList<String>();
+int i = 0;
 
 public static String textAdder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_generator);
-        Button Add;
-        Add=(Button) findViewById(R.id.buttonAdd);
         llMain=(LinearLayout) findViewById(R.id.llMain);
-
-
-
-       // String crtN = String.valueOf(ChartName.getText().toString());
     }
 
 
@@ -88,35 +69,26 @@ public static String textAdder;
                 intent1.putExtras(User3);
                 intent1.putExtras(User4);
                 intent1.putExtras(User5);
-                if (editTexts.size() != 0){
-                    editTexts.add(textAdder);
-                        intent1.putExtra("list",editTexts);
-                }
+               for(int i = 0; i <NumbersofEditText.size();i++ ){
+                   EditText ed = (EditText) findViewById(i+1);
+                   if(!ed.getText().toString().equals("")) {
+                       EditTexts.add(ed.getText().toString());
+                   }
+               }
+                intent1.putExtra("list",EditTexts);
                 startActivity(intent1);
+                EditTexts.clear();
                 break;
             case buttonAdd:
-
+                i++;
                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 int valuePos= Gravity.CENTER_HORIZONTAL;
                 param.gravity=valuePos;
-                EditText Value = new EditText(this);
-                Value.setInputType(TYPE_CLASS_NUMBER);
-                llMain.addView(Value, param);
-                Value.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                         }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        textAdder = "";
-                        textAdder = s.toString();
-                    }
-                    });
-                editTexts.add(textAdder);
+                final EditText editText = new EditText(this);
+                editText.setId(i);
+                NumbersofEditText.add(Integer.toString(i));//запись id едиттекстов
+                editText.setInputType(TYPE_CLASS_NUMBER);
+                llMain.addView(editText, param);
                 break;
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
@@ -130,5 +102,4 @@ public static String textAdder;
 
 
     }
-
 }

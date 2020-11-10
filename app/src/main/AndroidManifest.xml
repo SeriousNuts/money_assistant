@@ -3,8 +3,6 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
-    <uses-permission android:name="android.permission.INTERNET" />
-    <dist:module dist:instant="true" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ChartGenerator"></activity>
+        <activity android:name=".QRScanner"></activity>
+        <activity android:name=".ChartGenerator" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MainWindow" />
         <activity android:name=".MainActivity">
@@ -25,5 +24,9 @@
             </intent-filter>
         </activity>
     </application>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <dist:module dist:instant="true" />
 
 </manifest>

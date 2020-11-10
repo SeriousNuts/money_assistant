@@ -1,31 +1,21 @@
 package com.example.myapplication;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.LegendEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 
 
@@ -137,7 +127,9 @@ public class MainWindow extends AppCompatActivity {
         //users
         for (int i =0; i < arrayFromIntent.size(); i++) {
             ValueUs1=(TextView) findViewById(R.id.ValueUs1);
-            if (arrayFromIntent.get(i) == null){i++;}
+            if (arrayFromIntent.get(i) == null){
+                i++;
+            }
             yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), User1));
             Toast.makeText(MainWindow.this, Value, Toast.LENGTH_SHORT).show();
         }
