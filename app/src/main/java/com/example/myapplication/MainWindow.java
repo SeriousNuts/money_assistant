@@ -49,7 +49,7 @@ public class MainWindow extends AppCompatActivity {
     String User3;
     String User4;
     String User5;
-    String Value1;
+    String Value;
     String Value2;
     String Value3;
     String Value4;
@@ -98,37 +98,6 @@ public class MainWindow extends AppCompatActivity {
         Bundle user5=intentFive.getExtras();
         User5=user5.getString("User5");
         UserFive.setText(User5);
-
-        //Value1
-        ValueUs1=(TextView) findViewById(R.id.ValueUs1);
-        Intent intentValue1=getIntent();
-        Bundle value1= intentValue1.getExtras();
-        Value1=value1.getString("Value");
-        ValueUs1.setText(Value1);
-        //Value2
-        ValueUs2=(TextView) findViewById(R.id.ValueUs2);
-        Intent intentValue2=getIntent();
-        Bundle value2= intentValue2.getExtras();
-        Value2=value2.getString("ValueTwo");
-        ValueUs2.setText(Value2);
-        //Value3
-        ValueUs3=(TextView) findViewById(R.id.ValueUs3);
-        Intent intentValue3=getIntent();
-        Bundle value3= intentValue3.getExtras();
-        Value3=value3.getString("ValueThree");
-        ValueUs3.setText(Value3);
-        //Value4
-        ValueUs4=(TextView) findViewById(R.id.ValueUs4);
-        Intent intentValue4=getIntent();
-        Bundle value4= intentValue4.getExtras();
-        Value4=value4.getString("ValueFour");
-        ValueUs4.setText(Value4);
-        //Value5
-        ValueUs5=(TextView) findViewById(R.id.ValueUs5);
-        Intent intentValue5=getIntent();
-        Bundle value5= intentValue5.getExtras();
-        Value5=value5.getString("ValueFive");
-        ValueUs5.setText(Value5);
 //////////////////////////////////////////////////////////
 
         setContentView(R.layout.main_window);
@@ -164,12 +133,14 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 
         ArrayList<PieEntry> yValues= new ArrayList<>();
+        ArrayList<String> arrayFromIntent = (ArrayList<String>) getIntent().getSerializableExtra("list");
         //users
-            yValues.add(new PieEntry(Float.parseFloat(Value1), User1));
-            yValues.add(new PieEntry(Float.parseFloat(Value1), User2));
-            yValues.add(new PieEntry(Float.parseFloat(Value1), User3));
-            yValues.add(new PieEntry(Float.parseFloat(Value1), User4));
-            yValues.add(new PieEntry(Float.parseFloat(Value1), User5));
+        for (int i =0; i < arrayFromIntent.size(); i++) {
+            ValueUs1=(TextView) findViewById(R.id.ValueUs1);
+            if (arrayFromIntent.get(i) == null){i++;}
+            yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), User1));
+            Toast.makeText(MainWindow.this, Value, Toast.LENGTH_SHORT).show();
+        }
 
 
 //дата сеты
