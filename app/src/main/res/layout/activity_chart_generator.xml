@@ -170,5 +170,15 @@
         app:layout_constraintVertical_bias="0.342"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/qr_scanner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="60dp"
+        android:onClick="onClick"
+        android:text="qr_scanner"
+        app:layout_constraintBottom_toTopOf="@+id/logout"
+        tools:layout_editor_absoluteX="16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

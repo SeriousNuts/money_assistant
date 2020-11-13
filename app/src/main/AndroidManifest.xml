@@ -3,7 +3,9 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
-
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera"/>
+    <uses-feature android:name="android.hardware.autofocus"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".QRScanner"></activity>
+        <activity android:name=".QRScanner"
+            android:screenOrientation="fullSensor"
+            android:stateNotNeeded="false"
+            android:windowSoftInputMode="stateAlwaysHidden"
+
+            />
         <activity android:name=".ChartGenerator" />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MainWindow" />

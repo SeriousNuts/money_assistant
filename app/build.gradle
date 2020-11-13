@@ -53,6 +53,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
    // implementation 'com.google.firebase:firebase-admin:7.0.1'
+    //qr codes
+    implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
 
 
 }
