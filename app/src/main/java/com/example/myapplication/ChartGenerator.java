@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,21 +21,22 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
+import static com.example.myapplication.R.*;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
 
 
 public class ChartGenerator extends AppCompatActivity implements View.OnClickListener{
 LinearLayout llMain;
-ArrayList<String>NumbersofEditText = new ArrayList<String>();
-ArrayList<String>EditTexts = new ArrayList<String>();
+ArrayList<String>NumbersofEditText = new ArrayList<>();
+ArrayList<String>EditTexts = new ArrayList<>();
 int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chart_generator);
-        llMain=(LinearLayout) findViewById(R.id.llMain);
+        setContentView(layout.activity_chart_generator);
+        llMain=(LinearLayout) findViewById(id.llMain);
     }
 
 
@@ -54,13 +56,13 @@ int i = 0;
             if(result.getContents() != null){
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setMessage(result.getContents());
-                builder.setTitle("Scanning result");
-                builder.setPositiveButton("Scan again", new DialogInterface.OnClickListener() {
+                builder.setTitle("Результат сканирования");
+                builder.setPositiveButton("Отсканировать ещё", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                             scanCode();
                     }
-                }).setNegativeButton("finish", new DialogInterface.OnClickListener() {
+                }).setNegativeButton("Закончить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         finish();
@@ -70,7 +72,7 @@ int i = 0;
                 dialog.show();
             }
             else{
-                Toast.makeText(this, "No results", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Ничего не отсканировано", Toast.LENGTH_SHORT).show();
             }
         }
         else{
@@ -78,17 +80,18 @@ int i = 0;
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
 
         switch (v.getId()){
             case EnterName:
-                EditText chartName = (EditText) findViewById(R.id.ChartName);
-                EditText UserOne = (EditText) findViewById(R.id.User1);
-                EditText UserTwo = (EditText) findViewById(R.id.User2);
-                EditText UserThree = (EditText) findViewById(R.id.User3);
-                EditText UserFour = (EditText) findViewById(R.id.User4);
-                EditText UserFive = (EditText) findViewById(R.id.User5);
+                EditText chartName = (EditText) findViewById(id.ChartName);
+                EditText UserOne = (EditText) findViewById(id.User1);
+                EditText UserTwo = (EditText) findViewById(id.User2);
+                EditText UserThree = (EditText) findViewById(id.User3);
+                EditText UserFour = (EditText) findViewById(id.User4);
+                EditText UserFive = (EditText) findViewById(id.User5);
                Intent intent1 = new Intent(ChartGenerator.this, MainWindow.class);
                 Bundle Name= new Bundle();
                 Bundle User1= new Bundle();
@@ -126,21 +129,20 @@ int i = 0;
             case buttonAdd:
                 i++;
                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                int valuePos= Gravity.CENTER_HORIZONTAL;
-                param.gravity=valuePos;
+                param.gravity= Gravity.CENTER_HORIZONTAL;
                 final EditText editText = new EditText(this);
                 editText.setId(i);
                 NumbersofEditText.add(Integer.toString(i));//запись id едиттекстов
                 editText.setInputType(TYPE_CLASS_NUMBER);
                 llMain.addView(editText, param);
                 break;
-            case R.id.logout:
+            case id.logout:
                 FirebaseAuth.getInstance().signOut();
                 Intent intentLogout = new Intent(ChartGenerator.this, MainActivity.class);
                 startActivity(intentLogout);
                 finish();
                 break;
-            case R.id.qr_scanner:
+            case id.qr_scanner:
                 scanCode();
             default:
                 break;
