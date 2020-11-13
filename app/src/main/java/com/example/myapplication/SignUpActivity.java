@@ -44,7 +44,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     Username = findViewById(R.id.usernameSignUp);
                     String PasswordCheck = Password.getText().toString();
                     String ReplyPasswordCheck = ReplyPassword.getText().toString();
-                    if (!PasswordCheck.equals(ReplyPasswordCheck)){
+                    if (PasswordCheck.equals(ReplyPasswordCheck)){
                         auth = FirebaseAuth.getInstance();
                         auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())
                                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
