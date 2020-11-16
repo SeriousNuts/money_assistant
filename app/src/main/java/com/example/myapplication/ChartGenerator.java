@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,35 +9,44 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import static android.text.InputType.TYPE_CLASS_NUMBER;
-import static com.example.myapplication.R.*;
+import static com.example.myapplication.R.id;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
+import static com.example.myapplication.R.layout;
 
 
 public class ChartGenerator extends AppCompatActivity implements View.OnClickListener{
 LinearLayout llMain;
 ArrayList<String>NumbersofEditText = new ArrayList<>();
 ArrayList<String>EditTexts = new ArrayList<>();
-int i = 0;
+    ArrayList<String>NumbersofEditText2 = new ArrayList<>();
+    ArrayList<String>EditTexts2 = new ArrayList<>();
 
+int i = 0;
+int d=0;
+    int x= 5;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_chart_generator);
         llMain=(LinearLayout) findViewById(id.llMain);
     }
+    protected void SetIDs(){
 
+
+
+    }
 
     private void scanCode(){
         IntentIntegrator integrator = new IntentIntegrator(this);
@@ -80,51 +88,38 @@ int i = 0;
         }
     }
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
 
         switch (v.getId()){
             case EnterName:
                 EditText chartName = (EditText) findViewById(id.ChartName);
-                EditText UserOne = (EditText) findViewById(id.User1);
-                EditText UserTwo = (EditText) findViewById(id.User2);
-                EditText UserThree = (EditText) findViewById(id.User3);
-                EditText UserFour = (EditText) findViewById(id.User4);
-                EditText UserFive = (EditText) findViewById(id.User5);
                Intent intent1 = new Intent(ChartGenerator.this, MainWindow.class);
                 Bundle Name= new Bundle();
-                Bundle User1= new Bundle();
-                Bundle User2= new Bundle();
-                Bundle User3= new Bundle();
-                Bundle User4= new Bundle();
-                Bundle User5= new Bundle();
                 //имя диаграммы
                 Name.putString("Chart Name",chartName.getText().toString());
-                //имена пользователей
-                User1.putString("User1",UserOne.getText().toString());
-                User2.putString("User2",UserTwo.getText().toString());
-                User3.putString("User3",UserThree.getText().toString());
-                User4.putString("User4",UserFour.getText().toString());
-                User5.putString("User5",UserFive.getText().toString());
-                //передача всех данных в MainWindows
-
-
                 intent1.putExtras(Name);
-                intent1.putExtras(User1);
-                intent1.putExtras(User2);
-                intent1.putExtras(User3);
-                intent1.putExtras(User4);
-                intent1.putExtras(User5);
+                for (int z=0; z<NumbersofEditText2.size();z++) {
+
+                        EditText ed2 = (EditText) findViewById(Integer.parseInt(NumbersofEditText2.get(z)));
+                        EditTexts2.add(ed2.getText().toString());
+                }
+
+                intent1.putExtra("users",EditTexts2);
+               // EditTexts2.clear();
+
                for(int i = 0; i <NumbersofEditText.size();i++ ){
-                   EditText ed = (EditText) findViewById(i+1);
+                   EditText ed = (EditText) findViewById(Integer.parseInt(NumbersofEditText.get(i)));
                    if(!ed.getText().toString().equals("")) {
                        EditTexts.add(ed.getText().toString());
                    }
+
                }
                 intent1.putExtra("list",EditTexts);
+              // EditTexts.clear();
                 startActivity(intent1);
-                EditTexts.clear();
+
+
                 break;
             case buttonAdd:
                 i++;
@@ -132,9 +127,18 @@ int i = 0;
                 param.gravity= Gravity.CENTER_HORIZONTAL;
                 final EditText editText = new EditText(this);
                 editText.setId(i);
-                NumbersofEditText.add(Integer.toString(i));//запись id едиттекстов
+                NumbersofEditText.add(Integer.toString(i));
+                //запись id едиттекстов
                 editText.setInputType(TYPE_CLASS_NUMBER);
+                d=d+x;
+                LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                param2.gravity = Gravity.CENTER_HORIZONTAL;
+                final EditText Users = new EditText(this);
+                Users.setId(d);
+                NumbersofEditText2.add(Integer.toString(d));
+                llMain.addView(Users, param2);
                 llMain.addView(editText, param);
+
                 break;
             case id.logout:
                 FirebaseAuth.getInstance().signOut();

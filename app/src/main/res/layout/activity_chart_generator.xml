@@ -21,103 +21,33 @@
 
 
     <EditText
-        android:id="@+id/User2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:hint="Пользователь 2"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/User3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User1" />
-
-    <EditText
         android:id="@+id/ChartName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:layout_marginBottom="16dp"
+        android:background="@android:drawable/title_bar"
         android:ems="10"
         android:importantForAutofill="no"
         android:inputType="textPersonName"
         android:text="Имя диаграммы"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/User1"
-        app:layout_constraintEnd_toStartOf="@+id/buttonAdd"
-        app:layout_constraintHorizontal_bias="0.365"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.079"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <EditText
-        android:id="@+id/User1"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="18dp"
-        android:ems="10"
-        android:hint="Пользователь 1"
-        android:importantForAutofill="no"
-        android:inputType="textPersonName"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/User2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ChartName" />
-
-    <EditText
-        android:id="@+id/User4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:hint="Пользователь 4"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/User5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User3" />
-
-    <EditText
-        android:id="@+id/User5"
-        android:layout_width="209dp"
-        android:layout_height="46dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="241dp"
-        android:ems="10"
-        android:hint="Пользователь 5"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/User4"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User4" />
-
-    <EditText
-        android:id="@+id/User3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
-        android:ems="10"
-        android:hint="Пользователь 3"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toTopOf="@+id/User4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/User2" />
 
     <Button
         android:id="@+id/EnterName"
-        android:layout_width="113dp"
-        android:layout_height="51dp"
-        android:layout_marginTop="60dp"
+        android:layout_width="128dp"
+        android:layout_height="61dp"
+        android:layout_marginStart="276dp"
+        android:background="@color/design_default_color_error"
         android:onClick="onClick"
         android:text="Старт!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.478"
-        app:layout_constraintStart_toEndOf="@+id/ChartName"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/buttonAdd"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -130,7 +60,7 @@
         android:id="@+id/group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:constraint_referenced_ids="User2,User3,User5,EnterName,User1,ChartName,User4"
+        app:constraint_referenced_ids="EnterName,ChartName"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -152,33 +82,40 @@
         android:id="@+id/buttonAdd"
         android:layout_width="126dp"
         android:layout_height="53dp"
+        android:background="@android:drawable/ic_input_add"
         android:onClick="onClick"
         android:text="@string/add_btn"
-        tools:layout_editor_absoluteX="262dp"
-        tools:layout_editor_absoluteY="10dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.992"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.1" />
 
     <LinearLayout
         android:id="@+id/llMain"
-        android:layout_width="167dp"
-        android:layout_height="288dp"
+        android:layout_width="409dp"
+        android:layout_height="331dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.934"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.342"
+        app:layout_constraintVertical_bias="0.346"
         tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/qr_scanner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="16dp"
         android:onClick="onClick"
         android:text="qr_scanner"
-        app:layout_constraintBottom_toTopOf="@+id/logout"
-        tools:layout_editor_absoluteX="16dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/logout" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

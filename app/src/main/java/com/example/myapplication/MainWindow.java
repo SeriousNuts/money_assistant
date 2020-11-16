@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -15,8 +17,6 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 
 
 
@@ -24,27 +24,8 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainWindow extends AppCompatActivity {
     PieChart pieChart;
     private TextView ChartName;
-    private TextView UserOne;
-    private TextView UserTwo;
-    private TextView UserThree;
-    private TextView UserFour;
-    private TextView UserFive;
-    private TextView ValueUs1;
-    private TextView ValueUs2;
-    private TextView ValueUs3;
-    private TextView ValueUs4;
-    private TextView ValueUs5;
-    String User1;
-    String User2;
-    String User3;
-    String User4;
-    String User5;
-    String Value;
-    String Value2;
-    String Value3;
-    String Value4;
-    String Value5;
     String pieChartName;
+    String Value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,36 +39,6 @@ public class MainWindow extends AppCompatActivity {
         pieChartName=name.getString("Chart Name");
         ChartName.setText(pieChartName);
         Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();
-        //User1
-        UserOne=(TextView) findViewById(R.id.UserOne);
-        Intent intentOne= getIntent();
-        Bundle user1=intentOne.getExtras();
-        User1=user1.getString("User1");
-        UserOne.setText(User1);
-        //User2
-        UserTwo=(TextView) findViewById(R.id.UserTwo);
-        Intent intentTwo= getIntent();
-        Bundle user2=intentTwo.getExtras();
-        User2=user2.getString("User2");
-        UserTwo.setText(User2);
-        //User3
-        UserThree=(TextView) findViewById(R.id.UserThree);
-        Intent intentThree= getIntent();
-        Bundle user3=intentThree.getExtras();
-        User3=user3.getString("User3");
-        UserThree.setText(User3);
-        //User4
-        UserFour=(TextView) findViewById(R.id.UserFour);
-        Intent intentFour= getIntent();
-        Bundle user4=intentFour.getExtras();
-        User4=user4.getString("User4");
-        UserFour.setText(User4);
-        //User5
-        UserFive=(TextView) findViewById(R.id.UserFive);
-        Intent intentFive= getIntent();
-        Bundle user5=intentFive.getExtras();
-        User5=user5.getString("User5");
-        UserFive.setText(User5);
 //////////////////////////////////////////////////////////
 
         setContentView(R.layout.main_window);
@@ -122,17 +73,18 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setDrawEntryLabels(true);
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 
-        ArrayList<PieEntry> yValues= new ArrayList<>();
-        ArrayList<String> arrayFromIntent = (ArrayList<String>) getIntent().getSerializableExtra("list");
+       // ArrayList<String> values = name.getStringArrayList("list");
+        ArrayList<String> arrayFrom;
+        arrayFrom = getIntent().getStringArrayListExtra("users");
+        //ArrayList<String>  arrayFromIntent=getIntent().getStringArrayListExtra("list");
+
+        ArrayList<String> arrayFromIntent = (ArrayList) getIntent().getStringArrayListExtra("list");
         //users
+        ArrayList<PieEntry> yValues= new ArrayList<>();
         for (int i =0; i < arrayFromIntent.size(); i++) {
-            ValueUs1=(TextView) findViewById(R.id.ValueUs1);
-            if (arrayFromIntent.get(i) == null){
-                i++;
-            }
-            yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), User1));
-            Toast.makeText(MainWindow.this, Value, Toast.LENGTH_SHORT).show();
-        }
+
+    yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), arrayFrom.get(i)));
+}
 
 
 //дата сеты
