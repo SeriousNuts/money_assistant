@@ -1,0 +1,1480 @@
+Index: app/src/main/java/com/example/myapplication/ChartGenerator.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.DialogInterface;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.Gravity;\r\nimport android.view.View;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.zxing.integration.android.IntentIntegrator;\r\nimport com.google.zxing.integration.android.IntentResult;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.AlertDialog;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport static android.text.InputType.TYPE_CLASS_NUMBER;\r\nimport static com.example.myapplication.R.*;\r\nimport static com.example.myapplication.R.id.EnterName;\r\nimport static com.example.myapplication.R.id.buttonAdd;\r\n\r\n\r\npublic class ChartGenerator extends AppCompatActivity implements View.OnClickListener{\r\nLinearLayout llMain;\r\nArrayList<String>NumbersofEditText = new ArrayList<>();\r\nArrayList<String>EditTexts = new ArrayList<>();\r\nint i = 0;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(layout.activity_chart_generator);\r\n        llMain=(LinearLayout) findViewById(id.llMain);\r\n    }\r\n\r\n\r\n    private void scanCode(){\r\n        IntentIntegrator integrator = new IntentIntegrator(this);\r\n        integrator.setCaptureActivity(QRScanner.class);\r\n        integrator.setOrientationLocked(false);\r\n        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);\r\n        integrator.setPrompt(\"Scanning code\");\r\n        integrator.initiateScan();\r\n    }\r\n\r\n    @Override\r\n    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);\r\n        if(result != null){\r\n            if(result.getContents() != null){\r\n                AlertDialog.Builder builder = new AlertDialog.Builder(this);\r\n                builder.setMessage(result.getContents());\r\n                builder.setTitle(\"Результат сканирования\");\r\n                builder.setPositiveButton(\"Отсканировать ещё\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                            scanCode();\r\n                    }\r\n                }).setNegativeButton(\"Закончить\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        finish();\r\n                    }\r\n                });\r\n                AlertDialog dialog = builder.create();\r\n                dialog.show();\r\n            }\r\n            else{\r\n                Toast.makeText(this, \"Ничего не отсканировано\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        }\r\n        else{\r\n            super.onActivityResult(requestCode,resultCode, data);\r\n        }\r\n    }\r\n\r\n    @SuppressLint(\"NonConstantResourceId\")\r\n    @Override\r\n    public void onClick(View v) {\r\n\r\n        switch (v.getId()){\r\n            case EnterName:\r\n                EditText chartName = (EditText) findViewById(id.ChartName);\r\n                EditText UserOne = (EditText) findViewById(id.User1);\r\n                EditText UserTwo = (EditText) findViewById(id.User2);\r\n                EditText UserThree = (EditText) findViewById(id.User3);\r\n                EditText UserFour = (EditText) findViewById(id.User4);\r\n                EditText UserFive = (EditText) findViewById(id.User5);\r\n               Intent intent1 = new Intent(ChartGenerator.this, MainWindow.class);\r\n                Bundle Name= new Bundle();\r\n                Bundle User1= new Bundle();\r\n                Bundle User2= new Bundle();\r\n                Bundle User3= new Bundle();\r\n                Bundle User4= new Bundle();\r\n                Bundle User5= new Bundle();\r\n                //имя диаграммы\r\n                Name.putString(\"Chart Name\",chartName.getText().toString());\r\n                //имена пользователей\r\n                User1.putString(\"User1\",UserOne.getText().toString());\r\n                User2.putString(\"User2\",UserTwo.getText().toString());\r\n                User3.putString(\"User3\",UserThree.getText().toString());\r\n                User4.putString(\"User4\",UserFour.getText().toString());\r\n                User5.putString(\"User5\",UserFive.getText().toString());\r\n                //передача всех данных в MainWindows\r\n\r\n\r\n                intent1.putExtras(Name);\r\n                intent1.putExtras(User1);\r\n                intent1.putExtras(User2);\r\n                intent1.putExtras(User3);\r\n                intent1.putExtras(User4);\r\n                intent1.putExtras(User5);\r\n               for(int i = 0; i <NumbersofEditText.size();i++ ){\r\n                   EditText ed = (EditText) findViewById(i+1);\r\n                   if(!ed.getText().toString().equals(\"\")) {\r\n                       EditTexts.add(ed.getText().toString());\r\n                   }\r\n               }\r\n                intent1.putExtra(\"list\",EditTexts);\r\n                startActivity(intent1);\r\n                EditTexts.clear();\r\n                break;\r\n            case buttonAdd:\r\n                i++;\r\n                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);\r\n                param.gravity= Gravity.CENTER_HORIZONTAL;\r\n                final EditText editText = new EditText(this);\r\n                editText.setId(i);\r\n                NumbersofEditText.add(Integer.toString(i));//запись id едиттекстов\r\n                editText.setInputType(TYPE_CLASS_NUMBER);\r\n                llMain.addView(editText, param);\r\n                break;\r\n            case id.logout:\r\n                FirebaseAuth.getInstance().signOut();\r\n                Intent intentLogout = new Intent(ChartGenerator.this, MainActivity.class);\r\n                startActivity(intentLogout);\r\n                finish();\r\n                break;\r\n            case id.qr_scanner:\r\n                scanCode();\r\n            default:\r\n                break;\r\n        }\r\n\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/ChartGenerator.java	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/src/main/java/com/example/myapplication/ChartGenerator.java	(date 1605470802811)
+@@ -144,6 +144,11 @@
+                 break;
+             case id.qr_scanner:
+                 scanCode();
++                break;
++            case id.progrss_bars:
++                Intent progresIntent = new Intent(this, ProgressBars.class);
++                startActivity(progresIntent);
++                break;
+             default:
+                 break;
+         }
+Index: app/src/main/res/layout/activity_chart_generator.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:id=\"@+id/relativeLayout2\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:background=\"@color/design_default_color_on_primary\"\r\n    tools:context=\".ChartGenerator\">\r\n\r\n\r\n    <TextView\r\n        android:id=\"@+id/textview\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:isScrollContainer=\"true\"\r\n        android:textSize=\"24px\"\r\n        app:layout_constraintEnd_toStartOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"@+id/group\" />\r\n\r\n\r\n    <EditText\r\n        android:id=\"@+id/User2\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 2\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User3\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User1\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/ChartName\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"60dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:importantForAutofill=\"no\"\r\n        android:inputType=\"textPersonName\"\r\n        android:text=\"Имя диаграммы\"\r\n        android:visibility=\"visible\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User1\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/buttonAdd\"\r\n        app:layout_constraintHorizontal_bias=\"0.365\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User1\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginBottom=\"18dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 1\"\r\n        android:importantForAutofill=\"no\"\r\n        android:inputType=\"textPersonName\"\r\n        android:visibility=\"visible\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User2\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/ChartName\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User4\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 4\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User3\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User5\"\r\n        android:layout_width=\"209dp\"\r\n        android:layout_height=\"46dp\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginEnd=\"16dp\"\r\n        android:layout_marginBottom=\"241dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 5\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"@+id/User4\"\r\n        app:layout_constraintHorizontal_bias=\"0.0\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User4\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User3\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 3\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User4\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User2\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/EnterName\"\r\n        android:layout_width=\"113dp\"\r\n        android:layout_height=\"51dp\"\r\n        android:layout_marginTop=\"60dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"Старт!\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.478\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/ChartName\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <androidx.constraintlayout.widget.Guideline\r\n        android:id=\"@+id/guideline\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"vertical\"\r\n        app:layout_constraintGuide_begin=\"49dp\" />\r\n\r\n    <androidx.constraintlayout.widget.Group\r\n        android:id=\"@+id/group\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        app:constraint_referenced_ids=\"User2,User3,User5,EnterName,User1,ChartName,User4\"\r\n        app:layout_constraintBottom_toTopOf=\"parent\"\r\n        app:layout_constraintEnd_toStartOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/logout\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginEnd=\"304dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"выйти\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        tools:ignore=\"MissingConstraints\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/buttonAdd\"\r\n        android:layout_width=\"126dp\"\r\n        android:layout_height=\"53dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"@string/add_btn\"\r\n        tools:layout_editor_absoluteX=\"262dp\"\r\n        tools:layout_editor_absoluteY=\"10dp\" />\r\n\r\n    <LinearLayout\r\n        android:id=\"@+id/llMain\"\r\n        android:layout_width=\"167dp\"\r\n        android:layout_height=\"288dp\"\r\n        android:orientation=\"vertical\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.934\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\"\r\n        app:layout_constraintVertical_bias=\"0.342\"\r\n        tools:ignore=\"MissingConstraints\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/qr_scanner\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginBottom=\"60dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"qr_scanner\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/logout\"\r\n        tools:layout_editor_absoluteX=\"16dp\" />\r\n\r\n\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_chart_generator.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/src/main/res/layout/activity_chart_generator.xml	(date 1605287770186)
+@@ -180,5 +180,17 @@
+         app:layout_constraintBottom_toTopOf="@+id/logout"
+         tools:layout_editor_absoluteX="16dp" />
+ 
++    <Button
++        android:id="@+id/progrss_bars"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginBottom="12dp"
++        android:onClick="onClick"
++        android:text="progress_bars"
++        app:layout_constraintBottom_toTopOf="@+id/logout"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintHorizontal_bias="0.058"
++        app:layout_constraintStart_toStartOf="parent" />
++
+ 
+ </androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Top-level build file where you can add configuration options common to all sub-projects/modules.\r\n\r\nbuildscript {\r\n    repositories {\r\n        google()\r\n        jcenter()\r\n\r\n        \r\n    }\r\n    dependencies {\r\n        classpath 'com.android.tools.build:gradle:4.1.0'\r\n        classpath 'com.google.gms:google-services:4.3.4'\r\n        \r\n        // NOTE: Do not place your application dependencies here; they belong\r\n        // in the individual module build.gradle files\r\n    }\r\n}\r\n\r\nallprojects {\r\n    repositories {\r\n        google()\r\n        jcenter()\r\n        maven { url 'https://jitpack.io'\r\n                }\r\n\r\n\r\n        maven { url 'https://maven.google.com' }\r\n    }\r\n}\r\n\r\ntask clean(type: Delete) {\r\n    delete rootProject.buildDir\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- build.gradle	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ build.gradle	(date 1605466812113)
+@@ -8,7 +8,7 @@
+         
+     }
+     dependencies {
+-        classpath 'com.android.tools.build:gradle:4.1.0'
++        classpath 'com.android.tools.build:gradle:4.1.1'
+         classpath 'com.google.gms:google-services:4.3.4'
+         
+         // NOTE: Do not place your application dependencies here; they belong
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.application'\r\napply plugin: 'com.google.gms.google-services'\r\n\r\n\r\nandroid {\r\n    compileSdkVersion 30\r\n    buildToolsVersion \"30.0.2\"\r\n    defaultConfig {\r\n        applicationId \"com.example.myapplication\"\r\n        minSdkVersion 28\r\n        targetSdkVersion 30\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n        multiDexEnabled true\r\n    }\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation fileTree(dir: 'libs', include: ['*.jar'])\r\n    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'\r\n    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'\r\n    implementation 'com.google.firebase:firebase-firestore:22.0.0'\r\n    implementation 'com.google.firebase:firebase-auth:20.0.0'\r\n    testImplementation 'junit:junit:4.12'\r\n    androidTestImplementation 'androidx.test:runner:1.3.1-alpha02'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha02'\r\n\r\n    implementation 'com.google.android.material:material:1.2.1'\r\n    implementation 'com.android.support:multidex:1.0.3'\r\n    //AnyChart\r\n    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'\r\n\r\n    //MPAndroidChart\r\n    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'\r\n    implementation 'com.android.support:multidex:1.0.3'\r\n    //viewpager 2.0\r\n    implementation \"androidx.viewpager2:viewpager2:1.0.0\"\r\n    //implemantation 'com.android.support:support-annotations:28.0.0'\r\n    //jbcrypt\r\n    implementation \"org.mindrot:jbcrypt:0.4\"\r\n    //firebase\r\n   implementation 'com.google.android.material:material:1.2.1'\r\n   implementation platform('com.google.firebase:firebase-bom:26.0.0')\r\n    implementation 'com.google.firebase:firebase-analytics'// аналитика\r\n    implementation 'com.google.firebase:firebase-database'\r\n    implementation 'com.google.firebase:firebase-auth'\r\n    implementation 'com.google.android.gms:play-services-auth:18.1.0'\r\n   // implementation 'com.google.firebase:firebase-admin:7.0.1'\r\n    //qr codes\r\n    implementation 'com.journeyapps:zxing-android-embedded:3.4.0'\r\n\r\n\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/build.gradle	(date 1605467326538)
+@@ -27,7 +27,8 @@
+     implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'
+     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+     implementation 'com.google.firebase:firebase-firestore:22.0.0'
+-    implementation 'com.google.firebase:firebase-auth:20.0.0'
++    implementation 'com.google.firebase:firebase-auth:20.0.1'
++    implementation 'com.google.firebase:firebase-database:19.5.1'
+     testImplementation 'junit:junit:4.12'
+     androidTestImplementation 'androidx.test:runner:1.3.1-alpha02'
+     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha02'
+@@ -49,13 +50,14 @@
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+     implementation 'com.google.firebase:firebase-analytics'// аналитика
+-    implementation 'com.google.firebase:firebase-database'
+     implementation 'com.google.firebase:firebase-auth'
+-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
++    implementation 'com.google.android.gms:play-services-auth:19.0.0'
++    implementation 'com.firebaseui:firebase-ui-database:7.0.0'
+    // implementation 'com.google.firebase:firebase-admin:7.0.1'
+     //qr codes
+     implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
+-
++    implementation 'androidx.paging:paging-runtime:2.1.2'
++    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+ 
+ }
+ 
+Index: app/src/main/java/com/example/myapplication/MainWindow.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.Typeface;\r\nimport android.os.Bundle;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport com.github.mikephil.charting.charts.PieChart;\r\nimport com.github.mikephil.charting.data.PieData;\r\nimport com.github.mikephil.charting.data.PieDataSet;\r\nimport com.github.mikephil.charting.data.PieEntry;\r\nimport com.github.mikephil.charting.utils.ColorTemplate;\r\n\r\nimport java.util.ArrayList;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\n\r\n\r\n\r\n\r\npublic class MainWindow extends AppCompatActivity {\r\n    PieChart pieChart;\r\n    private TextView ChartName;\r\n    private TextView UserOne;\r\n    private TextView UserTwo;\r\n    private TextView UserThree;\r\n    private TextView UserFour;\r\n    private TextView UserFive;\r\n    private TextView ValueUs1;\r\n    private TextView ValueUs2;\r\n    private TextView ValueUs3;\r\n    private TextView ValueUs4;\r\n    private TextView ValueUs5;\r\n    String User1;\r\n    String User2;\r\n    String User3;\r\n    String User4;\r\n    String User5;\r\n    String Value;\r\n    String Value2;\r\n    String Value3;\r\n    String Value4;\r\n    String Value5;\r\n    String pieChartName;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.main_window);\r\n//Добавление Пользовательских Данных\r\n        //Имя Диаграммы\r\n        ChartName = (TextView) findViewById(R.id.ChartName);\r\n        Intent intentReceived= getIntent();\r\n        Bundle name=intentReceived.getExtras();\r\n        pieChartName=name.getString(\"Chart Name\");\r\n        ChartName.setText(pieChartName);\r\n        Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();\r\n        //User1\r\n        UserOne=(TextView) findViewById(R.id.UserOne);\r\n        Intent intentOne= getIntent();\r\n        Bundle user1=intentOne.getExtras();\r\n        User1=user1.getString(\"User1\");\r\n        UserOne.setText(User1);\r\n        //User2\r\n        UserTwo=(TextView) findViewById(R.id.UserTwo);\r\n        Intent intentTwo= getIntent();\r\n        Bundle user2=intentTwo.getExtras();\r\n        User2=user2.getString(\"User2\");\r\n        UserTwo.setText(User2);\r\n        //User3\r\n        UserThree=(TextView) findViewById(R.id.UserThree);\r\n        Intent intentThree= getIntent();\r\n        Bundle user3=intentThree.getExtras();\r\n        User3=user3.getString(\"User3\");\r\n        UserThree.setText(User3);\r\n        //User4\r\n        UserFour=(TextView) findViewById(R.id.UserFour);\r\n        Intent intentFour= getIntent();\r\n        Bundle user4=intentFour.getExtras();\r\n        User4=user4.getString(\"User4\");\r\n        UserFour.setText(User4);\r\n        //User5\r\n        UserFive=(TextView) findViewById(R.id.UserFive);\r\n        Intent intentFive= getIntent();\r\n        Bundle user5=intentFive.getExtras();\r\n        User5=user5.getString(\"User5\");\r\n        UserFive.setText(User5);\r\n//////////////////////////////////////////////////////////\r\n\r\n        setContentView(R.layout.main_window);\r\n        pieChart= findViewById(R.id.piechart);\r\n        //процентные значения\r\n        pieChart.setUsePercentValues(false);\r\n        pieChart.getLegend().setEnabled(true);\r\n        pieChart.setSoundEffectsEnabled(true);\r\n        pieChart.getDescription().setEnabled(false);\r\n        pieChart.setDragDecelerationEnabled(true);\r\n        //коэф трения/торможения\r\n        pieChart.setDragDecelerationFrictionCoef(150f);\r\n        //прозрачный круг\r\n        pieChart.setTransparentCircleRadius(100f);\r\n        //бул рисовать окно посередине или нет\r\n        pieChart.setDrawHoleEnabled(true);\r\n        //задаем текст в центре\r\n        pieChart.setCenterText(pieChartName);\r\n        //размер текста в центре\r\n        pieChart.setCenterTextSize(10f);\r\n        //шрифт текста в центре\r\n        pieChart.setCenterTextTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));\r\n        //радиус окна в центре\r\n        pieChart.setHoleRadius(30f);\r\n        //цвет текста в центре\r\n        pieChart.setCenterTextColor(Color.WHITE);\r\n        //цвет самого окна(может не работать)\r\n        pieChart.setHoleColor(Color.TRANSPARENT);\r\n        //закругленные концы\r\n        pieChart.setDrawRoundedSlices(false);\r\n        //измменить шрифт юзеров\r\n        pieChart.setDrawEntryLabels(true);\r\n        pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));\r\n\r\n        ArrayList<PieEntry> yValues= new ArrayList<>();\r\n        ArrayList<String> arrayFromIntent = (ArrayList<String>) getIntent().getSerializableExtra(\"list\");\r\n        //users\r\n        for (int i =0; i < arrayFromIntent.size(); i++) {\r\n            ValueUs1=(TextView) findViewById(R.id.ValueUs1);\r\n            if (arrayFromIntent.get(i) == null){\r\n                i++;\r\n            }\r\n            yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), User1));\r\n            Toast.makeText(MainWindow.this, Value, Toast.LENGTH_SHORT).show();\r\n        }\r\n\r\n\r\n//дата сеты\r\n        PieDataSet dataSet = new PieDataSet(yValues,pieChartName);\r\n        dataSet.setUsingSliceColorAsValueLineColor(true);\r\n        dataSet.setFormSize(8f);\r\n        dataSet.setValueLineColor(Color.DKGRAY);\r\n        dataSet.setSliceSpace(5f);\r\n        dataSet.setAutomaticallyDisableSliceSpacing(true);\r\n        dataSet.setSelectionShift(8f);\r\n        dataSet.setColors(ColorTemplate.PASTEL_COLORS);\r\n        PieData data= new PieData((dataSet));\r\n        data.setValueTextSize(10f);\r\n        data.setValueTextColor(Color.DKGRAY);\r\n        dataSet.notifyDataSetChanged();\r\n        pieChart.invalidate();\r\n        pieChart.notifyDataSetChanged();\r\n        pieChart.setData(data);\r\n        pieChart.animateY(1500);\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/MainWindow.java	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/src/main/java/com/example/myapplication/MainWindow.java	(date 1605285259304)
+@@ -126,10 +126,10 @@
+         ArrayList<String> arrayFromIntent = (ArrayList<String>) getIntent().getSerializableExtra("list");
+         //users
+         for (int i =0; i < arrayFromIntent.size(); i++) {
+-            ValueUs1=(TextView) findViewById(R.id.ValueUs1);
+-            if (arrayFromIntent.get(i) == null){
++            /*ValueUs1=(TextView) findViewById(R.id.ValueUs1);
++            if (arrayFromIntent.get(i) == null){//дополнительная проврек на нули нули
+                 i++;
+-            }
++            }*/
+             yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), User1));
+             Toast.makeText(MainWindow.this, Value, Toast.LENGTH_SHORT).show();
+         }
+Index: app/src/main/java/com/example/myapplication/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.text.Html;\r\nimport android.view.View;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.viewpager.widget.ViewPager;\r\n\r\nimport com.google.android.gms.auth.api.signin.GoogleSignIn;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInAccount;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInClient;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInOptions;\r\nimport com.google.android.gms.common.api.ApiException;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthCredential;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.auth.GoogleAuthProvider;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport static com.example.myapplication.R.id.sign_in;\r\nimport static com.example.myapplication.R.id.sign_up;\r\nimport static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;\r\n\r\n\r\npublic class MainActivity extends AppCompatActivity implements View.OnClickListener {\r\n    private LinearLayout mDotsLayout;\r\n    private TextView[] mDots;\r\n    private EditText Password;\r\n    private FirebaseAuth mAuth;\r\n    private static final int RC_SIGN_IN = 123456;\r\n    private GoogleSignInClient mGoogleSignInClient;\r\n    @Override\r\n    public void onStart() {\r\n        super.onStart();\r\n        // Check if user is signed in (non-null) and update UI accordingly.\r\n        FirebaseUser currentUser = mAuth.getCurrentUser();\r\n        if (currentUser!=null){\r\n            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);\r\n            startActivity(intentGoogleSignUp);\r\n        }\r\n    }\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_main);\r\n        mAuth = FirebaseAuth.getInstance();\r\n\r\n\r\n\r\n        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);\r\n        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);\r\n        authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);\r\n        mSlidePageViewer.setAdapter(sliderAdapter);\r\n        addDotsInditcator(0);\r\n        mSlidePageViewer.addOnPageChangeListener(ViewListener);\r\n        }\r\n    private void createRequest() {\r\n        GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN);\r\n        builder.requestIdToken(getString(R.string.default_web_client_id));\r\n        builder.requestEmail();\r\n        GoogleSignInOptions gso = builder\r\n                .build();\r\n        mGoogleSignInClient = getClient(MainActivity.this, gso);\r\n    }\r\n\r\n    private void signIn() {\r\n        createRequest();\r\n        Intent signInIntent = mGoogleSignInClient.getSignInIntent();\r\n        startActivityForResult(signInIntent,\r\n                RC_SIGN_IN);\r\n    }\r\n\r\n    @Override\r\n    public void onActivityResult(int requestCode, int resultCode, Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);\r\n        if (requestCode == RC_SIGN_IN) {\r\n            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);\r\n            try {\r\n                // Google Sign In was successful, authenticate with Firebase\r\n                GoogleSignInAccount account = task.getResult(ApiException.class);\r\n                Toast.makeText(MainActivity.this, \"Firebase with google succes\",\r\n                        Toast.LENGTH_SHORT).show();\r\n                firebaseAuthWithGoogle(account.getIdToken());\r\n            } catch (ApiException e) {\r\n                // Google Sign In failed, update UI appropriately\r\n                Toast.makeText(MainActivity.this, \"Authentification failed\" + task.getException().getMessage(),\r\n                        Toast.LENGTH_SHORT).show();\r\n                // ...\r\n            }\r\n        }\r\n    }\r\n\r\n    private void firebaseAuthWithGoogle(String idToken) {\r\n        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);\r\n        mAuth.signInWithCredential(credential)\r\n                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                    @Override\r\n                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                        if (task.isSuccessful()) {\r\n                            // Sign in success, update UI with the signed-in user's information\r\n                            Toast.makeText(MainActivity.this, \"Authentification succes\",\r\n                                    Toast.LENGTH_SHORT).show();\r\n                            FirebaseUser user = mAuth.getCurrentUser();\r\n                            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);\r\n                            startActivity(intentGoogleSignUp);\r\n                        } else {\r\n                            // If sign in fails, display a message to the user.\r\n                            Toast.makeText(MainActivity.this, \"Authentification failed\" + task.getException().getMessage(),\r\n                                    Toast.LENGTH_SHORT).show();\r\n                        }\r\n\r\n                        // ...\r\n                    }\r\n                });\r\n    }\r\n\r\n    @Override\r\n    public void onClick(View v) {\r\n        switch (v.getId()){\r\n            case sign_in:\r\n                EditText email = (EditText) findViewById(R.id.email_toggle);\r\n                Password = (EditText) findViewById(R.id.password_toggle);\r\n                if((email.getText().toString().length()!=0) || (Password.getText().toString().length()!=0)) {\r\n                    //вход\r\n                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();\r\n                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(\r\n                            new OnCompleteListener<AuthResult>() {\r\n                                @Override\r\n                                public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                    if (task.isSuccessful()) {\r\n                                        Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);\r\n                                        startActivity(intentMainWindows);\r\n                                    } else {\r\n                                        Toast.makeText(MainActivity.this, \"Authentication failed.\" + task.getException().getMessage(),\r\n                                                Toast.LENGTH_SHORT).show();\r\n                                    }\r\n                                }\r\n                            });\r\n                }\r\n                else\r\n                {\r\n                    Toast.makeText(MainActivity.this,\"Поля логин и пароль должны быть заполнены\", Toast.LENGTH_SHORT).show();\r\n                }\r\n\r\n\r\n                break;\r\n            case sign_up:\r\n                Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);\r\n                startActivity(intentSignUpActitvity);\r\n                finish();\r\n            case R.id.googleSignIn:\r\n                signIn();\r\n\r\n                break;\r\n\r\n            default:\r\n                break;\r\n        }\r\n    }\r\n\r\n    private void addDotsInditcator(int position) {\r\n        mDots = new TextView[3];\r\n        mDotsLayout.removeAllViews();\r\n        for (int i = 0; i < mDots.length; i++) {\r\n            mDots[i] = new TextView(this);\r\n            mDots[i].setText(Html.fromHtml(\"&#8226\"));\r\n            mDots[i].setTextSize(35);\r\n            mDots[i].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n\r\n            mDotsLayout.addView(mDots[i]);\r\n        }\r\n        if (mDots.length > 0) {\r\n            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimary));\r\n        }\r\n    }\r\n\r\n    private String to_hex(EditText password) {\r\n        //crypting password\r\n        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));\r\n    }\r\n\r\n    ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {\r\n        @Override\r\n        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {\r\n\r\n        }\r\n\r\n        @Override\r\n        public void onPageSelected(int position) {\r\n            addDotsInditcator(position);\r\n        }\r\n\r\n        @Override\r\n        public void onPageScrollStateChanged(int state) {\r\n\r\n        }\r\n    };\r\n\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/MainActivity.java	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/src/main/java/com/example/myapplication/MainActivity.java	(date 1605282500972)
+@@ -186,11 +186,6 @@
+         }
+     }
+ 
+-    private String to_hex(EditText password) {
+-        //crypting password
+-        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
+-    }
+-
+     ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {
+         @Override
+         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_07_11_2020_21_55_[Default_Changelist]" date="1604760951705" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 07.11.2020 21:55 [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_09_11_2020_19_40_[Default_Changelist]" date="1604925682078" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 09.11.2020 19:40 [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_06_11_2020_20_10_[Default_Changelist]" date="1604668324259" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 06.11.2020 20:10 [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,62 +0,0 @@
+-Index: app/src/main/java/com/example/myapplication/SignUpActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInClient;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport static com.example.myapplication.R.id.AddDataBase;\r\n\r\npublic class SignUpActivity extends AppCompatActivity implements View.OnClickListener {\r\n    private static final int RC_SIGN_IN = 123;\r\n    EditText email;\r\n    EditText Password;\r\n    EditText ReplyPassword;\r\n    EditText Username;\r\n    Button SignUpButton;\r\n    FirebaseAuth auth;\r\n    Button btnGoogle;\r\n    private GoogleSignInClient mGoogleSignInClient;\r\n    String TAG = \"  \";\r\n    private static FirebaseAuth mAuth;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_sign_up);\r\n        SignUpButton = findViewById(AddDataBase);\r\n        mAuth = FirebaseAuth.getInstance();\r\n    }\r\n\r\n\r\n    @Override\r\n        public void onClick(View view){//произвести рефакторинг функции сделать доавбление в базу данных в отдельном методе\r\n            switch (view.getId()){\r\n                case AddDataBase:\r\n                    email = findViewById(R.id.emailSignUp);\r\n                    Password = findViewById(R.id.passwordSignUp);\r\n                    ReplyPassword = findViewById(R.id.passwordRepitSIgnUP);\r\n                    Username = findViewById(R.id.usernameSignUp);\r\n                    String PasswordCheck = Password.getText().toString();\r\n                    String ReplyPasswordCheck = ReplyPassword.getText().toString();\r\n                    if (!PasswordCheck.equals(ReplyPasswordCheck)){\r\n                        auth = FirebaseAuth.getInstance();\r\n                        auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())\r\n                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                                    @Override\r\n                                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                        if (task.isSuccessful()) {\r\n                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);\r\n                                            startActivity(intentSignup);\r\n                                            finish();\r\n                                        } else {\r\n                                            // If sign up fails, display a message to the user.\r\n                                            Toast.makeText(SignUpActivity.this, \"Authentication failed.\"+ task.getException().\r\n                                                    getMessage(), Toast.LENGTH_SHORT).show();\r\n                                        }\r\n                                    }\r\n                                });\r\n                    }\r\n                    else{\r\n                        Toast.makeText(SignUpActivity.this,\"Пароли не совпадают\",Toast.LENGTH_SHORT).show();\r\n                    }\r\n\r\n                    break;\r\n                case R.id.googleSignUp:\r\n                    break;\r\n\r\n\r\n\r\n                default:\r\n                    break;\r\n            }\r\n        }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/SignUpActivity.java	(revision 796ed143c9b2ebb111d0521756c21c01acc7ba5a)
+-+++ app/src/main/java/com/example/myapplication/SignUpActivity.java	(date 1604761473923)
+-@@ -7,7 +7,7 @@
+- import android.widget.EditText;
+- import android.widget.Toast;
+- 
+--import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+-+
+- import com.google.android.gms.tasks.OnCompleteListener;
+- import com.google.android.gms.tasks.Task;
+- import com.google.firebase.auth.AuthResult;
+-@@ -26,9 +26,7 @@
+-     EditText Username;
+-     Button SignUpButton;
+-     FirebaseAuth auth;
+--    Button btnGoogle;
+--    private GoogleSignInClient mGoogleSignInClient;
+--    String TAG = "  ";
+-+
+-     private static FirebaseAuth mAuth;
+- 
+-     @Override
+-@@ -57,7 +55,7 @@
+-                                     @Override
+-                                     public void onComplete(@NonNull Task<AuthResult> task) {
+-                                         if (task.isSuccessful()) {
+--                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);
+-+                                            Intent intentSignup = new Intent(SignUpActivity.this, ChartGenerator.class);
+-                                             startActivity(intentSignup);
+-                                             finish();
+-                                         } else {
+-Index: app/src/main/res/layout/content_scrolling.xml
+-===================================================================
+---- app/src/main/res/layout/content_scrolling.xml	(revision 796ed143c9b2ebb111d0521756c21c01acc7ba5a)
+-+++ app/src/main/res/layout/content_scrolling.xml	(revision 796ed143c9b2ebb111d0521756c21c01acc7ba5a)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="utf-8"?>
+--<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+--    xmlns:app="http://schemas.android.com/apk/res-auto"
+--    xmlns:tools="http://schemas.android.com/tools"
+--    android:layout_width="match_parent"
+--    android:layout_height="match_parent"
+--    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+--    tools:context=".SettingsOfChart"
+--    tools:showIn="@layout/activity_settings_of_chart">
+--
+--    <TextView
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_margin="@dimen/text_margin"
+--        android:text="@string/large_text" />
+--
+--</androidx.core.widget.NestedScrollView>
+-\ No newline at end of file
+-diff --git .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,77 +0,0 @@
+-Index: app/src/main/java/com/example/myapplication/SignUpActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.util.Log;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.database.DatabaseReference;\r\nimport com.google.firebase.database.FirebaseDatabase;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\nimport static com.example.myapplication.R.id.AddDataBase;\r\nimport static com.example.myapplication.R.id.password_toggle;\r\n\r\npublic class SignUpActivity extends AppCompatActivity implements View.OnClickListener {\r\n    EditText email;\r\n    EditText Password;\r\n    EditText ReplyPassword;\r\n    EditText Username;\r\n    Button SignUpButton;\r\n    String HashPassword;\r\n    TextView SignUpBar;\r\n    FirebaseAuth auth;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_sign_up);\r\n        SignUpButton = findViewById(AddDataBase);\r\n\r\n    }\r\n\r\n        @Override\r\n        public void onClick(View view){//произвести рефакторинг функции сделать доавбление в базу данных в отдельном методе\r\n            switch (view.getId()){\r\n                case AddDataBase:\r\n                    email = findViewById(R.id.emailSignUp);\r\n                    Password = findViewById(R.id.passwordSignUp);\r\n                    ReplyPassword = findViewById(R.id.passwordRepitSIgnUP);\r\n                    Username = findViewById(R.id.usernameSignUp);\r\n                    SignUpBar = findViewById(R.id.signUpBar);\r\n                    String PasswordCheck = Password.getText().toString();\r\n                    String ReplyPasswordCheck = ReplyPassword.getText().toString();\r\n                    if (PasswordCheck.equals(ReplyPasswordCheck)){\r\n                        auth = FirebaseAuth.getInstance();\r\n                        auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())\r\n                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                                    @Override\r\n                                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                        if (task.isSuccessful()) {\r\n                                            Intent intentSignup = new Intent(SignUpActivity.this, MainWindow.class);\r\n                                            startActivity(intentSignup);\r\n                                        } else {\r\n                                            // If sign up fails, display a message to the user.\r\n                                            Toast.makeText(SignUpActivity.this, \"Authentication failed.\"+ task.getException().getMessage(),\r\n                                                    Toast.LENGTH_SHORT).show();\r\n                                        }\r\n                                    }\r\n                                });\r\n                    }\r\n                    else{\r\n                        Toast.makeText(SignUpActivity.this,\"Пароли не совпадают\",Toast.LENGTH_SHORT).show();\r\n                    }\r\n\r\n                    break;\r\n                default:\r\n                    break;\r\n            }\r\n        }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/SignUpActivity.java	(revision b4131ed22564d124b3a90345dc81ee76e66d496f)
+-+++ app/src/main/java/com/example/myapplication/SignUpActivity.java	(date 1604667419110)
+-@@ -59,7 +59,7 @@
+-                     SignUpBar = findViewById(R.id.signUpBar);
+-                     String PasswordCheck = Password.getText().toString();
+-                     String ReplyPasswordCheck = ReplyPassword.getText().toString();
+--                    if (PasswordCheck.equals(ReplyPasswordCheck)){
+-+                    if (!PasswordCheck.equals(ReplyPasswordCheck)){
+-                         auth = FirebaseAuth.getInstance();
+-                         auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())
+-                                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+-@@ -68,6 +68,7 @@
+-                                         if (task.isSuccessful()) {
+-                                             Intent intentSignup = new Intent(SignUpActivity.this, MainWindow.class);
+-                                             startActivity(intentSignup);
+-+                                            finish();
+-                                         } else {
+-                                             // If sign up fails, display a message to the user.
+-                                             Toast.makeText(SignUpActivity.this, "Authentication failed."+ task.getException().getMessage(),
+-Index: app/src/main/java/com/example/myapplication/MainActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.Activity;\r\nimport android.content.DialogInterface;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.Typeface;\r\nimport android.os.Bundle;\r\nimport android.text.Editable;\r\nimport android.text.Html;\r\nimport android.text.TextWatcher;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.ListView;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.viewpager.widget.ViewPager;\r\n\r\nimport com.github.mikephil.charting.charts.PieChart;\r\nimport com.github.mikephil.charting.data.PieData;\r\nimport com.github.mikephil.charting.data.PieDataSet;\r\nimport com.github.mikephil.charting.data.PieEntry;\r\nimport com.github.mikephil.charting.utils.ColorTemplate;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport java.sql.SQLException;\r\nimport java.util.ArrayList;\r\n\r\nimport static com.example.myapplication.R.id.sign_in;\r\nimport static com.example.myapplication.R.id.sign_up;\r\n\r\n\r\npublic class MainActivity extends AppCompatActivity implements View.OnClickListener {\r\n    private LinearLayout mDotsLayout;\r\n    private TextView[] mDots;\r\n    private EditText Password;\r\n\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_main);\r\n\r\n\r\n        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);\r\n        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);\r\n        authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);\r\n        mSlidePageViewer.setAdapter(sliderAdapter);\r\n        addDotsInditcator(0);\r\n        mSlidePageViewer.addOnPageChangeListener(ViewListener);\r\n        }\r\n    @Override\r\n    public void onClick(View v) {\r\n        switch (v.getId()){\r\n            case sign_in:\r\n                EditText email = (EditText) findViewById(R.id.email_toggle);\r\n                Password = (EditText) findViewById(R.id.password_toggle);\r\n                        //вход\r\n                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();\r\n                firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),Password.getText().toString()).addOnCompleteListener(\r\n                        new OnCompleteListener<AuthResult>() {\r\n                    @Override\r\n                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                        if(task.isSuccessful()){\r\n                            Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);\r\n                            startActivity(intentMainWindows);\r\n                        }\r\n                        else{\r\n                            Toast.makeText(MainActivity.this,\"Authentication failed.\"+ task.getException().getMessage(),\r\n                                    Toast.LENGTH_SHORT).show();\r\n                        }\r\n                    }\r\n                });\r\n\r\n                break;\r\n            case sign_up:\r\n                Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);\r\n                startActivity(intentSignUpActitvity);\r\n\r\n            default:\r\n                break;\r\n        }\r\n    }\r\n\r\n    private void addDotsInditcator(int position) {\r\n        mDots = new TextView[3];\r\n        mDotsLayout.removeAllViews();\r\n        for (int i = 0; i < mDots.length; i++) {\r\n            mDots[i] = new TextView(this);\r\n            mDots[i].setText(Html.fromHtml(\"&#8226\"));\r\n            mDots[i].setTextSize(35);\r\n            mDots[i].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n\r\n            mDotsLayout.addView(mDots[i]);\r\n        }\r\n        if (mDots.length > 0) {\r\n            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n        }\r\n    }\r\n\r\n    private String to_hex(EditText password) {\r\n        //crypting password\r\n        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));\r\n    }\r\n\r\n    ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {\r\n        @Override\r\n        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {\r\n\r\n        }\r\n\r\n        @Override\r\n        public void onPageSelected(int position) {\r\n            addDotsInditcator(position);\r\n        }\r\n\r\n        @Override\r\n        public void onPageScrollStateChanged(int state) {\r\n\r\n        }\r\n    };\r\n\r\n}\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/MainActivity.java	(revision b4131ed22564d124b3a90345dc81ee76e66d496f)
+-+++ app/src/main/java/com/example/myapplication/MainActivity.java	(date 1604668011079)
+-@@ -68,22 +68,25 @@
+-             case sign_in:
+-                 EditText email = (EditText) findViewById(R.id.email_toggle);
+-                 Password = (EditText) findViewById(R.id.password_toggle);
+--                        //вход
+--                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+--                firebaseAuth.signInWithEmailAndPassword(email.getText().toString(),Password.getText().toString()).addOnCompleteListener(
+--                        new OnCompleteListener<AuthResult>() {
+--                    @Override
+--                    public void onComplete(@NonNull Task<AuthResult> task) {
+--                        if(task.isSuccessful()){
+--                            Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
+--                            startActivity(intentMainWindows);
+--                        }
+--                        else{
+--                            Toast.makeText(MainActivity.this,"Authentication failed."+ task.getException().getMessage(),
+--                                    Toast.LENGTH_SHORT).show();
+--                        }
+--                    }
+--                });
+-+                if((email.getText().toString().length() != 0) && (Password.getText().toString().length() != 0)){
+-+                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+-+                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(
+-+                            new OnCompleteListener<AuthResult>() {
+-+                                @Override
+-+                                public void onComplete(@NonNull Task<AuthResult> task) {
+-+                                    if (task.isSuccessful()) {
+-+                                        Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
+-+                                        startActivity(intentMainWindows);
+-+                                    } else {
+-+                                        Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().
+-+                                                getMessage(), Toast.LENGTH_SHORT).show();
+-+                                    }
+-+                                }
+-+                            });
+-+                }
+-+                else{
+-+                    Toast.makeText(MainActivity.this, "поля логин и пароль должны быть заполены", Toast.LENGTH_SHORT).show();
+-+                }
+- 
+-                 break;
+-             case sign_up:
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_19_40_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,612 +0,0 @@
+-Index: app/src/main/java/com/example/myapplication/SignUpActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInClient;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport static com.example.myapplication.R.id.AddDataBase;\r\n\r\npublic class SignUpActivity extends AppCompatActivity implements View.OnClickListener {\r\n    EditText email;\r\n    EditText Password;\r\n    EditText ReplyPassword;\r\n    EditText Username;\r\n    Button SignUpButton;\r\n    FirebaseAuth auth;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_sign_up);\r\n        SignUpButton = findViewById(AddDataBase);\r\n    }\r\n\r\n\r\n    @Override\r\n        public void onClick(View view){//произвести рефакторинг функции сделать доавбление в базу данных в отдельном методе\r\n            switch (view.getId()){\r\n                case AddDataBase:\r\n                    email = findViewById(R.id.emailSignUp);\r\n                    Password = findViewById(R.id.passwordSignUp);\r\n                    ReplyPassword = findViewById(R.id.passwordRepitSIgnUP);\r\n                    Username = findViewById(R.id.usernameSignUp);\r\n                    String PasswordCheck = Password.getText().toString();\r\n                    String ReplyPasswordCheck = ReplyPassword.getText().toString();\r\n                    if (!PasswordCheck.equals(ReplyPasswordCheck)){\r\n                        auth = FirebaseAuth.getInstance();\r\n                        auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())\r\n                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                                    @Override\r\n                                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                        if (task.isSuccessful()) {\r\n                                            Intent intentSignup = new Intent(SignUpActivity.this, ChartGenerator.class);\r\n                                            startActivity(intentSignup);\r\n                                            finish();\r\n                                        } else {\r\n                                            // If sign up fails, display a message to the user.\r\n                                            Toast.makeText(SignUpActivity.this, \"Authentication failed.\"+ task.getException().\r\n                                                    getMessage(), Toast.LENGTH_SHORT).show();\r\n                                        }\r\n                                    }\r\n                                });\r\n                    }\r\n                    else{\r\n                        Toast.makeText(SignUpActivity.this,\"Пароли не совпадают\",Toast.LENGTH_SHORT).show();\r\n                    }\r\n\r\n                    break;\r\n                default:\r\n                    break;\r\n            }\r\n        }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/SignUpActivity.java	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/java/com/example/myapplication/SignUpActivity.java	(date 1604764150108)
+-@@ -7,7 +7,7 @@
+- import android.widget.EditText;
+- import android.widget.Toast;
+- 
+--import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+-+
+- import com.google.android.gms.tasks.OnCompleteListener;
+- import com.google.android.gms.tasks.Task;
+- import com.google.firebase.auth.AuthResult;
+-Index: app/src/main/java/com/example/myapplication/MainActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.text.Html;\r\nimport android.view.View;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.viewpager.widget.ViewPager;\r\n\r\nimport com.google.android.gms.auth.api.signin.GoogleSignIn;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInAccount;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInClient;\r\nimport com.google.android.gms.auth.api.signin.GoogleSignInOptions;\r\nimport com.google.android.gms.common.api.ApiException;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthCredential;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.auth.GoogleAuthProvider;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport static com.example.myapplication.R.id.sign_in;\r\nimport static com.example.myapplication.R.id.sign_up;\r\nimport static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;\r\n\r\n\r\npublic class MainActivity extends AppCompatActivity implements View.OnClickListener {\r\n    private LinearLayout mDotsLayout;\r\n    private TextView[] mDots;\r\n    private EditText Password;\r\n    private FirebaseAuth mAuth;\r\n    private static final int RC_SIGN_IN = 123456;\r\n    private GoogleSignInClient mGoogleSignInClient;\r\n    @Override\r\n    public void onStart() {\r\n        super.onStart();\r\n        // Check if user is signed in (non-null) and update UI accordingly.\r\n        FirebaseUser currentUser = mAuth.getCurrentUser();\r\n        if (currentUser!=null){\r\n            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);\r\n            startActivity(intentGoogleSignUp);\r\n        }\r\n    }\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_main);\r\n        mAuth = FirebaseAuth.getInstance();\r\n\r\n\r\n\r\n        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);\r\n        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);\r\n        authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);\r\n        mSlidePageViewer.setAdapter(sliderAdapter);\r\n        addDotsInditcator(0);\r\n        mSlidePageViewer.addOnPageChangeListener(ViewListener);\r\n        }\r\n    private void createRequest() {\r\n        GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN);\r\n        builder.requestIdToken(getString(R.string.default_web_client_id));\r\n        builder.requestEmail();\r\n        GoogleSignInOptions gso = builder\r\n                .build();\r\n        mGoogleSignInClient = getClient(MainActivity.this, gso);\r\n    }\r\n\r\n    private void signIn() {\r\n        createRequest();\r\n        Intent signInIntent = mGoogleSignInClient.getSignInIntent();\r\n        startActivityForResult(signInIntent,\r\n                RC_SIGN_IN);\r\n    }\r\n\r\n    @Override\r\n    public void onActivityResult(int requestCode, int resultCode, Intent data) {\r\n        super.onActivityResult(requestCode, resultCode, data);\r\n        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);\r\n        if (requestCode == RC_SIGN_IN) {\r\n            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);\r\n            try {\r\n                // Google Sign In was successful, authenticate with Firebase\r\n                GoogleSignInAccount account = task.getResult(ApiException.class);\r\n                Toast.makeText(MainActivity.this, \"Firebase with google succes\",\r\n                        Toast.LENGTH_SHORT).show();\r\n                firebaseAuthWithGoogle(account.getIdToken());\r\n            } catch (ApiException e) {\r\n                // Google Sign In failed, update UI appropriately\r\n                Toast.makeText(MainActivity.this, \"Authentification failed\" + task.getException().getMessage(),\r\n                        Toast.LENGTH_SHORT).show();\r\n                // ...\r\n            }\r\n        }\r\n    }\r\n\r\n    private void firebaseAuthWithGoogle(String idToken) {\r\n        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);\r\n        mAuth.signInWithCredential(credential)\r\n                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                    @Override\r\n                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                        if (task.isSuccessful()) {\r\n                            // Sign in success, update UI with the signed-in user's information\r\n                            Toast.makeText(MainActivity.this, \"Authentification succes\",\r\n                                    Toast.LENGTH_SHORT).show();\r\n                            FirebaseUser user = mAuth.getCurrentUser();\r\n                            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);\r\n                            startActivity(intentGoogleSignUp);\r\n                        } else {\r\n                            // If sign in fails, display a message to the user.\r\n                            Toast.makeText(MainActivity.this, \"Authentification failed\" + task.getException().getMessage(),\r\n                                    Toast.LENGTH_SHORT).show();\r\n                        }\r\n\r\n                        // ...\r\n                    }\r\n                });\r\n    }\r\n\r\n    @Override\r\n    public void onClick(View v) {\r\n        switch (v.getId()){\r\n            case sign_in:\r\n                EditText email = (EditText) findViewById(R.id.email_toggle);\r\n                Password = (EditText) findViewById(R.id.password_toggle);\r\n                if((email.getText().toString().length()!=0) || (Password.getText().toString().length()!=0)) {\r\n                    //вход\r\n                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();\r\n                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(\r\n                            new OnCompleteListener<AuthResult>() {\r\n                                @Override\r\n                                public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                    if (task.isSuccessful()) {\r\n                                        Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);\r\n                                        startActivity(intentMainWindows);\r\n                                    } else {\r\n                                        Toast.makeText(MainActivity.this, \"Authentication failed.\" + task.getException().getMessage(),\r\n                                                Toast.LENGTH_SHORT).show();\r\n                                    }\r\n                                }\r\n                            });\r\n                }\r\n                else\r\n                {\r\n                    Toast.makeText(MainActivity.this,\"Поля логин и пароль должны быть заполнены\", Toast.LENGTH_SHORT).show();\r\n                }\r\n\r\n\r\n                break;\r\n            case sign_up:\r\n                Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);\r\n                startActivity(intentSignUpActitvity);\r\n                finish();\r\n            case R.id.googleSignIn:\r\n                signIn();\r\n\r\n                break;\r\n\r\n            default:\r\n                break;\r\n        }\r\n    }\r\n\r\n    private void addDotsInditcator(int position) {\r\n        mDots = new TextView[3];\r\n        mDotsLayout.removeAllViews();\r\n        for (int i = 0; i < mDots.length; i++) {\r\n            mDots[i] = new TextView(this);\r\n            mDots[i].setText(Html.fromHtml(\"&#8226\"));\r\n            mDots[i].setTextSize(35);\r\n            mDots[i].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n\r\n            mDotsLayout.addView(mDots[i]);\r\n        }\r\n        if (mDots.length > 0) {\r\n            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimary));\r\n        }\r\n    }\r\n\r\n    private String to_hex(EditText password) {\r\n        //crypting password\r\n        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));\r\n    }\r\n\r\n    ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {\r\n        @Override\r\n        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {\r\n\r\n        }\r\n\r\n        @Override\r\n        public void onPageSelected(int position) {\r\n            addDotsInditcator(position);\r\n        }\r\n\r\n        @Override\r\n        public void onPageScrollStateChanged(int state) {\r\n\r\n        }\r\n    };\r\n\r\n}\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/MainActivity.java	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/java/com/example/myapplication/MainActivity.java	(date 1604923456126)
+-@@ -95,7 +95,7 @@
+-                 firebaseAuthWithGoogle(account.getIdToken());
+-             } catch (ApiException e) {
+-                 // Google Sign In failed, update UI appropriately
+--                Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+-+                Toast.makeText(MainActivity.this, "On Activity Result " + task.getException().getMessage(),
+-                         Toast.LENGTH_SHORT).show();
+-                 // ...
+-             }
+-@@ -117,7 +117,7 @@
+-                             startActivity(intentGoogleSignUp);
+-                         } else {
+-                             // If sign in fails, display a message to the user.
+--                            Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
+-+                            Toast.makeText(MainActivity.this, "FireBase Auth With google" + task.getException().getMessage(),
+-                                     Toast.LENGTH_SHORT).show();
+-                         }
+- 
+-@@ -143,7 +143,7 @@
+-                                         Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);
+-                                         startActivity(intentMainWindows);
+-                                     } else {
+--                                        Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),
+-+                                        Toast.makeText(MainActivity.this, "On Click ." + task.getException().getMessage(),
+-                                                 Toast.LENGTH_SHORT).show();
+-                                     }
+-                                 }
+-Index: app/src/main/java/com/example/myapplication/MainWindow.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.content.Context;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.Typeface;\r\nimport android.os.Bundle;\r\nimport android.text.Editable;\r\nimport android.text.TextWatcher;\r\nimport android.view.LayoutInflater;\r\nimport android.view.Menu;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.TableRow;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport com.github.mikephil.charting.charts.PieChart;\r\nimport com.github.mikephil.charting.components.Legend;\r\nimport com.github.mikephil.charting.components.LegendEntry;\r\nimport com.github.mikephil.charting.data.PieData;\r\nimport com.github.mikephil.charting.data.PieDataSet;\r\nimport com.github.mikephil.charting.data.PieEntry;\r\nimport com.github.mikephil.charting.utils.ColorTemplate;\r\n\r\nimport java.util.ArrayList;\r\n\r\n\r\n\r\n\r\n\r\npublic class MainWindow extends AppCompatActivity {\r\n    PieChart pieChart;\r\n    private TextView ChartName;\r\n    private TextView UserOne;\r\n    private TextView UserTwo;\r\n    private TextView UserThree;\r\n    private TextView UserFour;\r\n    private TextView UserFive;\r\n    private TextView ValueUs1;\r\n    private TextView ValueUs2;\r\n    private TextView ValueUs3;\r\n    private TextView ValueUs4;\r\n    private TextView ValueUs5;\r\n    String User1;\r\n    String User2;\r\n    String User3;\r\n    String User4;\r\n    String User5;\r\n    String Value1;\r\n    String Value2;\r\n    String Value3;\r\n    String Value4;\r\n    String Value5;\r\n    String pieChartName;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.main_window);\r\n//Добавление Пользовательских Данных\r\n        //Имя Диаграммы\r\n        ChartName = (TextView) findViewById(R.id.ChartName);\r\n        Intent intentReceived= getIntent();\r\n        Bundle name=intentReceived.getExtras();\r\n        pieChartName=name.getString(\"Chart Name\");\r\n        ChartName.setText(pieChartName);\r\n        Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();\r\n        //User1\r\n        UserOne=(TextView) findViewById(R.id.UserOne);\r\n        Intent intentOne= getIntent();\r\n        Bundle user1=intentOne.getExtras();\r\n        User1=user1.getString(\"User1\");\r\n        UserOne.setText(User1);\r\n        //User2\r\n        UserTwo=(TextView) findViewById(R.id.UserTwo);\r\n        Intent intentTwo= getIntent();\r\n        Bundle user2=intentTwo.getExtras();\r\n        User2=user2.getString(\"User2\");\r\n        UserTwo.setText(User2);\r\n        //User3\r\n        UserThree=(TextView) findViewById(R.id.UserThree);\r\n        Intent intentThree= getIntent();\r\n        Bundle user3=intentThree.getExtras();\r\n        User3=user3.getString(\"User3\");\r\n        UserThree.setText(User3);\r\n        //User4\r\n        UserFour=(TextView) findViewById(R.id.UserFour);\r\n        Intent intentFour= getIntent();\r\n        Bundle user4=intentFour.getExtras();\r\n        User4=user4.getString(\"User4\");\r\n        UserFour.setText(User4);\r\n        //User5\r\n        UserFive=(TextView) findViewById(R.id.UserFive);\r\n        Intent intentFive= getIntent();\r\n        Bundle user5=intentFive.getExtras();\r\n        User5=user5.getString(\"User5\");\r\n        UserFive.setText(User5);\r\n        //Value1\r\n        ValueUs1=(TextView) findViewById(R.id.ValueUs1);\r\n        Intent intentValue1=getIntent();\r\n        Bundle value1= intentValue1.getExtras();\r\n        Value1=value1.getString(\"ValueOne\");\r\n        ValueUs1.setText(Value1);\r\n        //Value2\r\n        ValueUs2=(TextView) findViewById(R.id.ValueUs2);\r\n        Intent intentValue2=getIntent();\r\n        Bundle value2= intentValue2.getExtras();\r\n        Value2=value2.getString(\"ValueTwo\");\r\n        ValueUs2.setText(Value2);\r\n        //Value3\r\n        ValueUs3=(TextView) findViewById(R.id.ValueUs3);\r\n        Intent intentValue3=getIntent();\r\n        Bundle value3= intentValue3.getExtras();\r\n        Value3=value3.getString(\"ValueThree\");\r\n        ValueUs3.setText(Value3);\r\n        //Value4\r\n        ValueUs4=(TextView) findViewById(R.id.ValueUs4);\r\n        Intent intentValue4=getIntent();\r\n        Bundle value4= intentValue4.getExtras();\r\n        Value4=value4.getString(\"ValueFour\");\r\n        ValueUs4.setText(Value4);\r\n        //Value5\r\n        ValueUs5=(TextView) findViewById(R.id.ValueUs5);\r\n        Intent intentValue5=getIntent();\r\n        Bundle value5= intentValue5.getExtras();\r\n        Value5=value5.getString(\"ValueFive\");\r\n        ValueUs5.setText(Value5);\r\n//////////////////////////////////////////////////////////\r\n\r\n        setContentView(R.layout.main_window);\r\n        pieChart= findViewById(R.id.piechart);\r\n        //процентные значения\r\n        pieChart.setUsePercentValues(false);\r\n        pieChart.getLegend().setEnabled(true);\r\n        pieChart.setSoundEffectsEnabled(true);\r\n        pieChart.getDescription().setEnabled(false);\r\n        pieChart.setDragDecelerationEnabled(true);\r\n        //коэф трения/торможения\r\n        pieChart.setDragDecelerationFrictionCoef(150f);\r\n        //прозрачный круг\r\n        pieChart.setTransparentCircleRadius(100f);\r\n        //бул рисовать окно посередине или нет\r\n        pieChart.setDrawHoleEnabled(true);\r\n        //задаем текст в центре\r\n        pieChart.setCenterText(pieChartName);\r\n        //размер текста в центре\r\n        pieChart.setCenterTextSize(10f);\r\n        //шрифт текста в центре\r\n        pieChart.setCenterTextTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));\r\n        //радиус окна в центре\r\n        pieChart.setHoleRadius(30f);\r\n        //цвет текста в центре\r\n        pieChart.setCenterTextColor(Color.WHITE);\r\n        //цвет самого окна(может не работать)\r\n        pieChart.setHoleColor(Color.TRANSPARENT);\r\n        //закругленные концы\r\n        pieChart.setDrawRoundedSlices(false);\r\n        //измменить шрифт юзеров\r\n        pieChart.setDrawEntryLabels(true);\r\n        pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));\r\n\r\n        ArrayList<PieEntry> yValues= new ArrayList<>();\r\n            yValues.add(new PieEntry(Float.parseFloat(Value1), User1));\r\n            yValues.add(new PieEntry(Float.parseFloat(Value2), User2));\r\n            yValues.add(new PieEntry(Float.parseFloat(Value3), User3));\r\n            yValues.add(new PieEntry(Float.parseFloat(Value4), User4));\r\n            yValues.add(new PieEntry(Float.parseFloat(Value5), User5));\r\n\r\n\r\n\r\n        PieDataSet dataSet = new PieDataSet(yValues,pieChartName);\r\n        dataSet.setUsingSliceColorAsValueLineColor(true);\r\n        dataSet.setFormSize(8f);\r\n        dataSet.setValueLineColor(Color.DKGRAY);\r\n        dataSet.setSliceSpace(5f);\r\n        dataSet.setAutomaticallyDisableSliceSpacing(true);\r\n        dataSet.setSelectionShift(8f);\r\n        dataSet.setColors(ColorTemplate.PASTEL_COLORS);\r\n        PieData data= new PieData((dataSet));\r\n        data.setValueTextSize(10f);\r\n        data.setValueTextColor(Color.DKGRAY);\r\n        dataSet.notifyDataSetChanged();\r\n        pieChart.invalidate();\r\n        pieChart.notifyDataSetChanged();\r\n        pieChart.setData(data);\r\n        pieChart.animateY(1500);\r\n    }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/MainWindow.java	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/java/com/example/myapplication/MainWindow.java	(date 1604925043794)
+-@@ -98,11 +98,12 @@
+-         Bundle user5=intentFive.getExtras();
+-         User5=user5.getString("User5");
+-         UserFive.setText(User5);
+-+
+-         //Value1
+-         ValueUs1=(TextView) findViewById(R.id.ValueUs1);
+-         Intent intentValue1=getIntent();
+-         Bundle value1= intentValue1.getExtras();
+--        Value1=value1.getString("ValueOne");
+-+        Value1=value1.getString("Value");
+-         ValueUs1.setText(Value1);
+-         //Value2
+-         ValueUs2=(TextView) findViewById(R.id.ValueUs2);
+-@@ -163,14 +164,15 @@
+-         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
+- 
+-         ArrayList<PieEntry> yValues= new ArrayList<>();
+-+        //users
+-             yValues.add(new PieEntry(Float.parseFloat(Value1), User1));
+--            yValues.add(new PieEntry(Float.parseFloat(Value2), User2));
+--            yValues.add(new PieEntry(Float.parseFloat(Value3), User3));
+--            yValues.add(new PieEntry(Float.parseFloat(Value4), User4));
+--            yValues.add(new PieEntry(Float.parseFloat(Value5), User5));
+-+            yValues.add(new PieEntry(Float.parseFloat(Value1), User2));
+-+            yValues.add(new PieEntry(Float.parseFloat(Value1), User3));
+-+            yValues.add(new PieEntry(Float.parseFloat(Value1), User4));
+-+            yValues.add(new PieEntry(Float.parseFloat(Value1), User5));
+- 
+- 
+--
+-+//дата сеты
+-         PieDataSet dataSet = new PieDataSet(yValues,pieChartName);
+-         dataSet.setUsingSliceColorAsValueLineColor(true);
+-         dataSet.setFormSize(8f);
+-Index: app/src/main/java/com/example/myapplication/ChartGenerator.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.Switch;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.material.floatingactionbutton.FloatingActionButton;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\n\r\nimport static com.example.myapplication.R.id.EnterName;\r\n\r\n\r\n\r\npublic class ChartGenerator extends AppCompatActivity  implements View.OnClickListener{\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_chart_generator);\r\nButton Name;\r\nName=(Button) findViewById(EnterName);\r\n\r\n\r\n\r\n\r\n       // String crtN = String.valueOf(ChartName.getText().toString());\r\n    }\r\n    @Override\r\n    public void onClick(View v) {\r\n\r\n        switch (v.getId()){\r\n            case EnterName:\r\n                EditText chartName = (EditText) findViewById(R.id.ChartName);\r\n\r\n                EditText UserOne = (EditText) findViewById(R.id.User1);\r\n                EditText UserTwo = (EditText) findViewById(R.id.User2);\r\n                EditText UserThree = (EditText) findViewById(R.id.User3);\r\n                EditText UserFour = (EditText) findViewById(R.id.User4);\r\n                EditText UserFive = (EditText) findViewById(R.id.User5);\r\n\r\n                EditText ValueOne =(EditText) findViewById(R.id.Value1);\r\n                EditText ValueTwo =(EditText) findViewById(R.id.Value2);\r\n                EditText ValueThree =(EditText) findViewById(R.id.Value3);\r\n                EditText ValueFour =(EditText) findViewById(R.id.Value4);\r\n                EditText ValueFive =(EditText) findViewById(R.id.Value5);\r\n\r\n                //Toast.makeText(ChartGenerator.this, \"Имя вашей диаграммы: \"+ chartName.getText().toString(), Toast.LENGTH_SHORT).show();\r\n                Intent intent = new Intent(ChartGenerator.this, MainWindow.class);\r\n                Bundle Name= new Bundle();\r\n\r\n                Bundle User1= new Bundle();\r\n                Bundle User2= new Bundle();\r\n                Bundle User3= new Bundle();\r\n                Bundle User4= new Bundle();\r\n                Bundle User5= new Bundle();\r\n                Bundle Value1=new Bundle();\r\n                Bundle Value2=new Bundle();\r\n                Bundle Value3=new Bundle();\r\n                Bundle Value4=new Bundle();\r\n                Bundle Value5=new Bundle();\r\n\r\n                //значения пользователей\r\n                Value1.putString(\"ValueOne\",ValueOne.getText().toString());\r\n                Value2.putString(\"ValueTwo\",ValueTwo.getText().toString());\r\n                Value3.putString(\"ValueThree\",ValueThree.getText().toString());\r\n                Value4.putString(\"ValueFour\",ValueFour.getText().toString());\r\n                Value5.putString(\"ValueFive\",ValueFive.getText().toString());\r\n                //имя диаграммы\r\n                Name.putString(\"Chart Name\",chartName.getText().toString());\r\n                //имена пользователей\r\n                User1.putString(\"User1\",UserOne.getText().toString());\r\n                User2.putString(\"User2\",UserTwo.getText().toString());\r\n                User3.putString(\"User3\",UserThree.getText().toString());\r\n                User4.putString(\"User4\",UserFour.getText().toString());\r\n                User5.putString(\"User5\",UserFive.getText().toString());\r\n                //передача всех данных в MainWindows\r\n                intent.putExtras(Name);\r\n                intent.putExtras(User1);\r\n                intent.putExtras(User2);\r\n                intent.putExtras(User3);\r\n                intent.putExtras(User4);\r\n                intent.putExtras(User5);\r\n                intent.putExtras(Value1);\r\n                intent.putExtras(Value2);\r\n                intent.putExtras(Value3);\r\n                intent.putExtras(Value4);\r\n                intent.putExtras(Value5);\r\n                startActivity(intent);\r\n                break;\r\n            case R.id.logout:\r\n                FirebaseAuth.getInstance().signOut();\r\n                Intent intentLogout = new Intent(ChartGenerator.this, MainActivity.class);\r\n                startActivity(intentLogout);\r\n                finish();\r\n                break;\r\n            default:\r\n                break;\r\n        }\r\n\r\n\r\n    }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/ChartGenerator.java	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/java/com/example/myapplication/ChartGenerator.java	(date 1604925639609)
+-@@ -1,13 +1,19 @@
+- package com.example.myapplication;
+- 
+- import androidx.appcompat.app.AppCompatActivity;
+-+import androidx.fragment.app.FragmentActivity;
+- 
+- import android.annotation.SuppressLint;
+- import android.content.Intent;
+- import android.os.Bundle;
+-+import android.preference.EditTextPreference;
+-+import android.text.InputType;
+-+import android.view.Gravity;
+- import android.view.View;
+- import android.widget.Button;
+- import android.widget.EditText;
+-+import android.widget.LinearLayout;
+-+import android.widget.ScrollView;
+- import android.widget.Switch;
+- import android.widget.TextView;
+- import android.widget.Toast;
+-@@ -15,27 +21,47 @@
+- import com.google.android.material.floatingactionbutton.FloatingActionButton;
+- import com.google.firebase.auth.FirebaseAuth;
+- 
+-+import static android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL;
+-+import static android.view.View.AUTOFILL_HINT_PHONE;
+- import static com.example.myapplication.R.id.EnterName;
+-+import static com.example.myapplication.R.id.buttonAdd;
+- 
+- 
+- 
+--public class ChartGenerator extends AppCompatActivity  implements View.OnClickListener{
+-+public class ChartGenerator extends AppCompatActivity implements View.OnClickListener{
+-+LinearLayout llMain;
+-     @Override
+-     protected void onCreate(Bundle savedInstanceState) {
+-         super.onCreate(savedInstanceState);
+-         setContentView(R.layout.activity_chart_generator);
+--Button Name;
+--Name=(Button) findViewById(EnterName);
+--
+-+        Button Add;
+-+        Add=(Button) findViewById(R.id.buttonAdd);
+-+        llMain=(LinearLayout) findViewById(R.id.llMain);
+- 
+- 
+- 
+-        // String crtN = String.valueOf(ChartName.getText().toString());
+-     }
+-+
+-+
+-+
+-     @Override
+-     public void onClick(View v) {
+- 
+-         switch (v.getId()){
+-+            case buttonAdd:
+-+
+-+                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+-+                int valuePos= Gravity.CENTER_HORIZONTAL;
+-+                param.gravity=valuePos;
+-+                int ValueView = TYPE_NUMBER_FLAG_DECIMAL;
+-+                EditText Value = new EditText(this);
+-+                Value.setInputType(TYPE_NUMBER_FLAG_DECIMAL);
+-+
+-+                llMain.addView(Value,param);
+-+
+-+
+-+                break;
+-             case EnterName:
+-                 EditText chartName = (EditText) findViewById(R.id.ChartName);
+- 
+-@@ -44,15 +70,13 @@
+-                 EditText UserThree = (EditText) findViewById(R.id.User3);
+-                 EditText UserFour = (EditText) findViewById(R.id.User4);
+-                 EditText UserFive = (EditText) findViewById(R.id.User5);
+--
+--                EditText ValueOne =(EditText) findViewById(R.id.Value1);
+--                EditText ValueTwo =(EditText) findViewById(R.id.Value2);
+-+                /*EditText ValueTwo =(EditText) findViewById(R.id.Value2);
+-                 EditText ValueThree =(EditText) findViewById(R.id.Value3);
+-                 EditText ValueFour =(EditText) findViewById(R.id.Value4);
+--                EditText ValueFive =(EditText) findViewById(R.id.Value5);
+-+                EditText ValueFive =(EditText) findViewById(R.id.Value5);*/
+- 
+-                 //Toast.makeText(ChartGenerator.this, "Имя вашей диаграммы: "+ chartName.getText().toString(), Toast.LENGTH_SHORT).show();
+--                Intent intent = new Intent(ChartGenerator.this, MainWindow.class);
+-+               Intent intent1 = new Intent(ChartGenerator.this, MainWindow.class);
+-                 Bundle Name= new Bundle();
+- 
+-                 Bundle User1= new Bundle();
+-@@ -60,18 +84,34 @@
+-                 Bundle User3= new Bundle();
+-                 Bundle User4= new Bundle();
+-                 Bundle User5= new Bundle();
+--                Bundle Value1=new Bundle();
+--                Bundle Value2=new Bundle();
+--                Bundle Value3=new Bundle();
+--                Bundle Value4=new Bundle();
+--                Bundle Value5=new Bundle();
+-+                //Bundle Value1 = new Bundle();
+-+               // Bundle Value2=new Bundle();
+-+                //Bundle Value3=new Bundle();
+-+                //Bundle Value4=new Bundle();
+-+                //Bundle Value5=new Bundle();
+- 
+-                 //значения пользователей
+--                Value1.putString("ValueOne",ValueOne.getText().toString());
+--                Value2.putString("ValueTwo",ValueTwo.getText().toString());
+--                Value3.putString("ValueThree",ValueThree.getText().toString());
+--                Value4.putString("ValueFour",ValueFour.getText().toString());
+--                Value5.putString("ValueFive",ValueFive.getText().toString());
+-+               /* if (ValueOne.getText().toString().length() != 0) {
+-+                    Value1.putString("ValueOne", ValueOne.getText().toString());
+-+                }
+-+                else {Toast.makeText(ChartGenerator.this,"Ошибка.Введите значение для пользователя 1",Toast.LENGTH_SHORT).show();}
+-+                if(ValueTwo.getText().toString().length() != 0) {
+-+                    Value2.putString("ValueTwo", ValueTwo.getText().toString());
+-+                }
+-+                else {Toast.makeText(ChartGenerator.this,"Ошибка.Введите значение для пользователя 2",Toast.LENGTH_SHORT).show();}
+-+                if(ValueThree.getText().toString().length() != 0) {
+-+                    Value3.putString("ValueThree", ValueThree.getText().toString());
+-+                }
+-+                else {Toast.makeText(ChartGenerator.this,"Ошибка.Введите значение для пользователя 3",Toast.LENGTH_SHORT).show();}
+-+                if(ValueFour.getText().toString().length() != 0) {
+-+                    Value4.putString("ValueFour", ValueFour.getText().toString());
+-+                }
+-+                else {Toast.makeText(ChartGenerator.this,"Ошибка.Введите значение для пользователя 4",Toast.LENGTH_SHORT).show();}
+-+                if(ValueFive.getText().toString().length() != 0) {
+-+                    Value5.putString("ValueFive", ValueFive.getText().toString());
+-+                    
+-+                }
+-+                else {Toast.makeText(ChartGenerator.this,"Ошибка.Введите значение для пользователя 5",Toast.LENGTH_SHORT).show();}*/
+-                 //имя диаграммы
+-                 Name.putString("Chart Name",chartName.getText().toString());
+-                 //имена пользователей
+-@@ -81,18 +121,22 @@
+-                 User4.putString("User4",UserFour.getText().toString());
+-                 User5.putString("User5",UserFive.getText().toString());
+-                 //передача всех данных в MainWindows
+--                intent.putExtras(Name);
+--                intent.putExtras(User1);
+--                intent.putExtras(User2);
+--                intent.putExtras(User3);
+--                intent.putExtras(User4);
+--                intent.putExtras(User5);
+--                intent.putExtras(Value1);
+-+                Intent intent = new Intent(ChartGenerator.this, MainWindow.class);
+-+                Bundle value= new Bundle();
+-+                value.putString("Value", Value.getText().toString());
+-+                intent.putExtras(value);
+-+                intent1.putExtras(Name);
+-+                intent1.putExtras(User1);
+-+                intent1.putExtras(User2);
+-+                intent1.putExtras(User3);
+-+                intent1.putExtras(User4);
+-+                intent1.putExtras(User5);
+-+                /*
+-                 intent.putExtras(Value2);
+-                 intent.putExtras(Value3);
+-                 intent.putExtras(Value4);
+--                intent.putExtras(Value5);
+--                startActivity(intent);
+-+                intent.putExtras(Value5);*/
+-+                startActivity(intent1);
+-                 break;
+-             case R.id.logout:
+-                 FirebaseAuth.getInstance().signOut();
+-Index: app/src/main/res/layout/activity_chart_generator.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:id=\"@+id/relativeLayout2\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:background=\"@color/design_default_color_on_primary\"\r\n    tools:context=\".ChartGenerator\">\r\n\r\n\r\n    <EditText\r\n        android:id=\"@+id/Value5\"\r\n        android:layout_width=\"101dp\"\r\n        android:layout_height=\"52dp\"\r\n        android:layout_marginTop=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Сумма\"\r\n        android:inputType=\"numberDecimal\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/User5\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/Value4\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/Value4\"\r\n        android:layout_width=\"110dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"303dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Сумма\"\r\n        android:inputType=\"numberDecimal\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/User4\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/Value3\" />\r\n\r\n    <TextView\r\n        android:id=\"@+id/textview\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:isScrollContainer=\"true\"\r\n        android:textSize=\"24px\"\r\n        app:layout_constraintEnd_toStartOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"@+id/group\" />\r\n\r\n\r\n    <EditText\r\n        android:id=\"@+id/ChartName\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"60dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:importantForAutofill=\"no\"\r\n        android:inputType=\"textPersonName\"\r\n        android:text=\"Имя диаграммы\"\r\n        android:visibility=\"visible\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User1\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/EnterName\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User1\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"18dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 1\"\r\n        android:importantForAutofill=\"no\"\r\n        android:inputType=\"textPersonName\"\r\n        android:visibility=\"visible\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User2\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/Value1\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/ChartName\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/EnterName\"\r\n        android:layout_width=\"112dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginTop=\"63dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"Старт!\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/Value1\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/ChartName\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User2\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 2\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User3\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/Value2\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User1\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User3\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 3\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User4\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/Value3\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User2\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User5\"\r\n        android:layout_width=\"202dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"241dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 5\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toBottomOf=\"parent\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/Value5\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User4\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/User4\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Пользователь 4\"\r\n        android:inputType=\"textPersonName\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/User5\"\r\n        app:layout_constraintEnd_toStartOf=\"@+id/Value4\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/User3\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/Value1\"\r\n        android:layout_width=\"110dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"17dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Сумма\"\r\n        android:inputType=\"numberDecimal\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/Value2\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/User1\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/EnterName\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/Value2\"\r\n        android:layout_width=\"109dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"16dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Сумма\"\r\n        android:inputType=\"numberDecimal\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/Value3\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/User2\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/Value1\" />\r\n\r\n    <EditText\r\n        android:id=\"@+id/Value3\"\r\n        android:layout_width=\"110dp\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_marginBottom=\"17dp\"\r\n        android:ems=\"10\"\r\n        android:hint=\"Сумма\"\r\n        android:inputType=\"numberDecimal\"\r\n        app:layout_constraintBottom_toTopOf=\"@+id/Value4\"\r\n        app:layout_constraintEnd_toEndOf=\"parent\"\r\n        app:layout_constraintHorizontal_bias=\"0.5\"\r\n        app:layout_constraintStart_toEndOf=\"@+id/User3\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/Value2\" />\r\n\r\n    <androidx.constraintlayout.widget.Guideline\r\n        android:id=\"@+id/guideline\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"vertical\"\r\n        app:layout_constraintGuide_begin=\"20dp\" />\r\n\r\n    <androidx.constraintlayout.widget.Group\r\n        android:id=\"@+id/group\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        app:constraint_referenced_ids=\"Value2,User2,User3,User5,EnterName,Value1,User1,Value3,ChartName,Value5,Value4,User4\"\r\n        app:layout_constraintBottom_toTopOf=\"parent\"\r\n        app:layout_constraintEnd_toStartOf=\"parent\"\r\n        app:layout_constraintStart_toStartOf=\"parent\"\r\n        app:layout_constraintTop_toTopOf=\"parent\" />\r\n\r\n    <androidx.constraintlayout.widget.Guideline\r\n        android:id=\"@+id/guideline2\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"vertical\"\r\n        app:layout_constraintGuide_begin=\"20dp\" />\r\n\r\n    <Button\r\n        android:id=\"@+id/logout\"\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginTop=\"100dp\"\r\n        android:onClick=\"onClick\"\r\n        android:text=\"выйти\"\r\n        app:layout_constraintTop_toBottomOf=\"@+id/Value5\"\r\n        tools:layout_editor_absoluteX=\"307dp\" />\r\n\r\n</androidx.constraintlayout.widget.ConstraintLayout>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/res/layout/activity_chart_generator.xml	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/res/layout/activity_chart_generator.xml	(date 1604925196123)
+-@@ -9,33 +9,6 @@
+-     tools:context=".ChartGenerator">
+- 
+- 
+--    <EditText
+--        android:id="@+id/Value5"
+--        android:layout_width="101dp"
+--        android:layout_height="52dp"
+--        android:layout_marginTop="16dp"
+--        android:ems="10"
+--        android:hint="Сумма"
+--        android:inputType="numberDecimal"
+--        app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/User5"
+--        app:layout_constraintTop_toBottomOf="@+id/Value4" />
+--
+--    <EditText
+--        android:id="@+id/Value4"
+--        android:layout_width="110dp"
+--        android:layout_height="0dp"
+--        android:layout_marginBottom="303dp"
+--        android:ems="10"
+--        android:hint="Сумма"
+--        android:inputType="numberDecimal"
+--        app:layout_constraintBottom_toBottomOf="parent"
+--        app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/User4"
+--        app:layout_constraintTop_toBottomOf="@+id/Value3" />
+--
+-     <TextView
+-         android:id="@+id/textview"
+-         android:layout_width="wrap_content"
+-@@ -47,6 +20,19 @@
+-         app:layout_constraintTop_toTopOf="@+id/group" />
+- 
+- 
+-+    <EditText
+-+        android:id="@+id/User2"
+-+        android:layout_width="wrap_content"
+-+        android:layout_height="wrap_content"
+-+        android:layout_marginStart="16dp"
+-+        android:layout_marginBottom="16dp"
+-+        android:ems="10"
+-+        android:hint="Пользователь 2"
+-+        android:inputType="textPersonName"
+-+        app:layout_constraintBottom_toTopOf="@+id/User3"
+-+        app:layout_constraintStart_toStartOf="parent"
+-+        app:layout_constraintTop_toBottomOf="@+id/User1" />
+-+
+-     <EditText
+-         android:id="@+id/ChartName"
+-         android:layout_width="wrap_content"
+-@@ -59,8 +45,8 @@
+-         android:text="Имя диаграммы"
+-         android:visibility="visible"
+-         app:layout_constraintBottom_toTopOf="@+id/User1"
+--        app:layout_constraintEnd_toStartOf="@+id/EnterName"
+--        app:layout_constraintHorizontal_bias="0.5"
+-+        app:layout_constraintEnd_toStartOf="@+id/buttonAdd"
+-+        app:layout_constraintHorizontal_bias="0.365"
+-         app:layout_constraintStart_toStartOf="parent"
+-         app:layout_constraintTop_toTopOf="parent" />
+- 
+-@@ -68,6 +54,7 @@
+-         android:id="@+id/User1"
+-         android:layout_width="wrap_content"
+-         android:layout_height="0dp"
+-+        android:layout_marginStart="16dp"
+-         android:layout_marginBottom="18dp"
+-         android:ems="10"
+-         android:hint="Пользователь 1"
+-@@ -75,155 +62,113 @@
+-         android:inputType="textPersonName"
+-         android:visibility="visible"
+-         app:layout_constraintBottom_toTopOf="@+id/User2"
+--        app:layout_constraintEnd_toStartOf="@+id/Value1"
+--        app:layout_constraintHorizontal_bias="0.5"
+-         app:layout_constraintStart_toStartOf="parent"
+-         app:layout_constraintTop_toBottomOf="@+id/ChartName" />
+- 
+--    <Button
+--        android:id="@+id/EnterName"
+--        android:layout_width="112dp"
+--        android:layout_height="0dp"
+--        android:layout_marginTop="63dp"
+--        android:layout_marginBottom="16dp"
+--        android:onClick="onClick"
+--        android:text="Старт!"
+--        app:layout_constraintBottom_toTopOf="@+id/Value1"
+--        app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/ChartName"
+--        app:layout_constraintTop_toTopOf="parent" />
+--
+--    <EditText
+--        android:id="@+id/User2"
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_marginBottom="16dp"
+--        android:ems="10"
+--        android:hint="Пользователь 2"
+--        android:inputType="textPersonName"
+--        app:layout_constraintBottom_toTopOf="@+id/User3"
+--        app:layout_constraintEnd_toStartOf="@+id/Value2"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toStartOf="parent"
+--        app:layout_constraintTop_toBottomOf="@+id/User1" />
+--
+-     <EditText
+--        android:id="@+id/User3"
+-+        android:id="@+id/User4"
+-         android:layout_width="wrap_content"
+-         android:layout_height="wrap_content"
+-+        android:layout_marginStart="16dp"
+-         android:layout_marginBottom="16dp"
+-         android:ems="10"
+--        android:hint="Пользователь 3"
+-+        android:hint="Пользователь 4"
+-         android:inputType="textPersonName"
+--        app:layout_constraintBottom_toTopOf="@+id/User4"
+--        app:layout_constraintEnd_toStartOf="@+id/Value3"
+--        app:layout_constraintHorizontal_bias="0.5"
+-+        app:layout_constraintBottom_toTopOf="@+id/User5"
+-         app:layout_constraintStart_toStartOf="parent"
+--        app:layout_constraintTop_toBottomOf="@+id/User2" />
+-+        app:layout_constraintTop_toBottomOf="@+id/User3" />
+- 
+-     <EditText
+-         android:id="@+id/User5"
+--        android:layout_width="202dp"
+--        android:layout_height="0dp"
+-+        android:layout_width="209dp"
+-+        android:layout_height="46dp"
+-+        android:layout_marginStart="16dp"
+-+        android:layout_marginEnd="16dp"
+-         android:layout_marginBottom="241dp"
+-         android:ems="10"
+-         android:hint="Пользователь 5"
+-         android:inputType="textPersonName"
+-         app:layout_constraintBottom_toBottomOf="parent"
+--        app:layout_constraintEnd_toStartOf="@+id/Value5"
+--        app:layout_constraintHorizontal_bias="0.5"
+-+        app:layout_constraintEnd_toEndOf="@+id/User4"
+-+        app:layout_constraintHorizontal_bias="0.0"
+-         app:layout_constraintStart_toStartOf="parent"
+-         app:layout_constraintTop_toBottomOf="@+id/User4" />
+- 
+-     <EditText
+--        android:id="@+id/User4"
+-+        android:id="@+id/User3"
+-         android:layout_width="wrap_content"
+-         android:layout_height="wrap_content"
+-+        android:layout_marginStart="16dp"
+-         android:layout_marginBottom="16dp"
+-         android:ems="10"
+--        android:hint="Пользователь 4"
+-+        android:hint="Пользователь 3"
+-         android:inputType="textPersonName"
+--        app:layout_constraintBottom_toTopOf="@+id/User5"
+--        app:layout_constraintEnd_toStartOf="@+id/Value4"
+--        app:layout_constraintHorizontal_bias="0.5"
+-+        app:layout_constraintBottom_toTopOf="@+id/User4"
+-         app:layout_constraintStart_toStartOf="parent"
+--        app:layout_constraintTop_toBottomOf="@+id/User3" />
+--
+--    <EditText
+--        android:id="@+id/Value1"
+--        android:layout_width="110dp"
+--        android:layout_height="0dp"
+--        android:layout_marginBottom="17dp"
+--        android:ems="10"
+--        android:hint="Сумма"
+--        android:inputType="numberDecimal"
+--        app:layout_constraintBottom_toTopOf="@+id/Value2"
+--        app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/User1"
+--        app:layout_constraintTop_toBottomOf="@+id/EnterName" />
+-+        app:layout_constraintTop_toBottomOf="@+id/User2" />
+- 
+--    <EditText
+--        android:id="@+id/Value2"
+--        android:layout_width="109dp"
+--        android:layout_height="0dp"
+--        android:layout_marginBottom="16dp"
+--        android:ems="10"
+--        android:hint="Сумма"
+--        android:inputType="numberDecimal"
+--        app:layout_constraintBottom_toTopOf="@+id/Value3"
+--        app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/User2"
+--        app:layout_constraintTop_toBottomOf="@+id/Value1" />
+--
+--    <EditText
+--        android:id="@+id/Value3"
+--        android:layout_width="110dp"
+--        android:layout_height="0dp"
+--        android:layout_marginBottom="17dp"
+--        android:ems="10"
+--        android:hint="Сумма"
+--        android:inputType="numberDecimal"
+--        app:layout_constraintBottom_toTopOf="@+id/Value4"
+-+    <Button
+-+        android:id="@+id/EnterName"
+-+        android:layout_width="113dp"
+-+        android:layout_height="51dp"
+-+        android:layout_marginTop="60dp"
+-+        android:onClick="onClick"
+-+        android:text="Старт!"
+-         app:layout_constraintEnd_toEndOf="parent"
+--        app:layout_constraintHorizontal_bias="0.5"
+--        app:layout_constraintStart_toEndOf="@+id/User3"
+--        app:layout_constraintTop_toBottomOf="@+id/Value2" />
+-+        app:layout_constraintHorizontal_bias="0.478"
+-+        app:layout_constraintStart_toEndOf="@+id/ChartName"
+-+        app:layout_constraintTop_toTopOf="parent" />
+- 
+-     <androidx.constraintlayout.widget.Guideline
+-         android:id="@+id/guideline"
+-         android:layout_width="wrap_content"
+-         android:layout_height="wrap_content"
+-         android:orientation="vertical"
+--        app:layout_constraintGuide_begin="20dp" />
+-+        app:layout_constraintGuide_begin="49dp" />
+- 
+-     <androidx.constraintlayout.widget.Group
+-         android:id="@+id/group"
+-         android:layout_width="wrap_content"
+-         android:layout_height="wrap_content"
+--        app:constraint_referenced_ids="Value2,User2,User3,User5,EnterName,Value1,User1,Value3,ChartName,Value5,Value4,User4"
+-+        app:constraint_referenced_ids="User2,User3,User5,EnterName,User1,ChartName,User4"
+-         app:layout_constraintBottom_toTopOf="parent"
+-         app:layout_constraintEnd_toStartOf="parent"
+-         app:layout_constraintStart_toStartOf="parent"
+-         app:layout_constraintTop_toTopOf="parent" />
+- 
+--    <androidx.constraintlayout.widget.Guideline
+--        android:id="@+id/guideline2"
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:orientation="vertical"
+--        app:layout_constraintGuide_begin="20dp" />
+--
+-     <Button
+-         android:id="@+id/logout"
+-         android:layout_width="wrap_content"
+-         android:layout_height="wrap_content"
+--        android:layout_marginTop="100dp"
+-+        android:layout_marginEnd="304dp"
+-+        android:layout_marginBottom="16dp"
+-         android:onClick="onClick"
+-         android:text="выйти"
+--        app:layout_constraintTop_toBottomOf="@+id/Value5"
+--        tools:layout_editor_absoluteX="307dp" />
+-+        app:layout_constraintBottom_toBottomOf="parent"
+-+        app:layout_constraintEnd_toEndOf="parent"
+-+        tools:ignore="MissingConstraints" />
+-+
+-+    <Button
+-+        android:id="@+id/buttonAdd"
+-+        android:layout_width="126dp"
+-+        android:layout_height="53dp"
+-+        android:onClick="onClick"
+-+        android:text="@string/add_btn"
+-+        tools:layout_editor_absoluteX="262dp"
+-+        tools:layout_editor_absoluteY="10dp" />
+-+
+-+    <LinearLayout
+-+        android:id="@+id/llMain"
+-+        android:layout_width="167dp"
+-+        android:layout_height="288dp"
+-+        android:orientation="vertical"
+-+        app:layout_constraintBottom_toBottomOf="parent"
+-+        app:layout_constraintEnd_toEndOf="parent"
+-+        app:layout_constraintHorizontal_bias="0.934"
+-+        app:layout_constraintStart_toStartOf="parent"
+-+        app:layout_constraintTop_toTopOf="parent"
+-+        app:layout_constraintVertical_bias="0.342"
+-+        tools:ignore="MissingConstraints" />
+-+
+- 
+- </androidx.constraintlayout.widget.ConstraintLayout>
+-\ No newline at end of file
+-Index: app/src/main/res/layout/content_scrolling.xml
+-===================================================================
+---- app/src/main/res/layout/content_scrolling.xml	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/res/layout/content_scrolling.xml	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="utf-8"?>
+--<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+--    xmlns:app="http://schemas.android.com/apk/res-auto"
+--    xmlns:tools="http://schemas.android.com/tools"
+--    android:layout_width="match_parent"
+--    android:layout_height="match_parent"
+--    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+--    tools:context=".SettingsOfChart"
+--    tools:showIn="@layout/activity_settings_of_chart">
+--
+--    <TextView
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_margin="@dimen/text_margin"
+--        android:text="@string/large_text" />
+--
+--</androidx.core.widget.NestedScrollView>
+-\ No newline at end of file
+-Index: app/src/main/res/values/strings.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><resources>\r\n    <string name=\"app_name\">My Application</string>\r\n    <string name=\"title_activity_settings_of_chart\">ScrollingActivity</string>\r\n    <string name=\"large_text\">\r\n        \"Material is the metaphor.\\n\\n\"\r\n\r\n        \"A material metaphor is the unifying theory of a rationalized space and a system of motion.\"\r\n        \"The material is grounded in tactile reality, inspired by the study of paper and ink, yet \"\r\n        \"technologically advanced and open to imagination and magic.\\n\"\r\n        \"Surfaces and edges of the material provide visual cues that are grounded in reality. The \"\r\n        \"use of familiar tactile attributes helps users quickly understand affordances. Yet the \"\r\n        \"flexibility of the material creates new affordances that supercede those in the physical \"\r\n        \"world, without breaking the rules of physics.\\n\"\r\n        \"The fundamentals of light, surface, and movement are key to conveying how objects move, \"\r\n        \"interact, and exist in space and in relation to each other. Realistic lighting shows \"\r\n        \"seams, divides space, and indicates moving parts.\\n\\n\"\r\n\r\n        \"Bold, graphic, intentional.\\n\\n\"\r\n\r\n        \"The foundational elements of print based design typography, grids, space, scale, color, \"\r\n        \"and use of imagery guide visual treatments. These elements do far more than please the \"\r\n        \"eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge \"\r\n        \"imagery, large scale typography, and intentional white space create a bold and graphic \"\r\n        \"interface that immerse the user in the experience.\\n\"\r\n        \"An emphasis on user actions makes core functionality immediately apparent and provides \"\r\n        \"waypoints for the user.\\n\\n\"\r\n\r\n        \"Motion provides meaning.\\n\\n\"\r\n\r\n        \"Motion respects and reinforces the user as the prime mover. Primary user actions are \"\r\n        \"inflection points that initiate motion, transforming the whole design.\\n\"\r\n        \"All action takes place in a single environment. Objects are presented to the user without \"\r\n        \"breaking the continuity of experience even as they transform and reorganize.\\n\"\r\n        \"Motion is meaningful and appropriate, serving to focus attention and maintain continuity. \"\r\n        \"Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\\n\\n\"\r\n\r\n        \"3D world.\\n\\n\"\r\n\r\n        \"The material environment is a 3D space, which means all objects have x, y, and z \"\r\n        \"dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the \"\r\n        \"positive z-axis extending towards the viewer. Every sheet of material occupies a single \"\r\n        \"position along the z-axis and has a standard 1dp thickness.\\n\"\r\n        \"On the web, the z-axis is used for layering and not for perspective. The 3D world is \"\r\n        \"emulated by manipulating the y-axis.\\n\\n\"\r\n\r\n        \"Light and shadow.\\n\\n\"\r\n\r\n        \"Within the material environment, virtual lights illuminate the scene. Key lights create \"\r\n        \"directional shadows, while ambient light creates soft shadows from all angles.\\n\"\r\n        \"Shadows in the material environment are cast by these two light sources. In Android \"\r\n        \"development, shadows occur when light sources are blocked by sheets of material at \"\r\n        \"various positions along the z-axis. On the web, shadows are depicted by manipulating the \"\r\n        \"y-axis only. The following example shows the card with a height of 6dp.\\n\\n\"\r\n\r\n        \"Resting elevation.\\n\\n\"\r\n\r\n        \"All material objects, regardless of size, have a resting elevation, or default elevation \"\r\n        \"that does not change. If an object changes elevation, it should return to its resting \"\r\n        \"elevation as soon as possible.\\n\\n\"\r\n\r\n        \"Component elevations.\\n\\n\"\r\n\r\n        \"The resting elevation for a component type is consistent across apps (e.g., FAB elevation \"\r\n        \"does not vary from 6dp in one app to 16dp in another app).\\n\"\r\n        \"Components may have different resting elevations across platforms, depending on the depth \"\r\n        \"of the environment (e.g., TV has a greater depth than mobile or desktop).\\n\\n\"\r\n\r\n        \"Responsive elevation and dynamic elevation offsets.\\n\\n\"\r\n\r\n        \"Some component types have responsive elevation, meaning they change elevation in response \"\r\n        \"to user input (e.g., normal, focused, and pressed) or system events. These elevation \"\r\n        \"changes are consistently implemented using dynamic elevation offsets.\\n\"\r\n        \"Dynamic elevation offsets are the goal elevation that a component moves towards, relative \"\r\n        \"to the component’s resting state. They ensure that elevation changes are consistent \"\r\n        \"across actions and component types. For example, all components that lift on press have \"\r\n        \"the same elevation change relative to their resting elevation.\\n\"\r\n        \"Once the input event is completed or cancelled, the component will return to its resting \"\r\n        \"elevation.\\n\\n\"\r\n\r\n        \"Avoiding elevation interference.\\n\\n\"\r\n\r\n        \"Components with responsive elevations may encounter other components as they move between \"\r\n        \"their resting elevations and dynamic elevation offsets. Because material cannot pass \"\r\n        \"through other material, components avoid interfering with one another any number of ways, \"\r\n        \"whether on a per component basis or using the entire app layout.\\n\"\r\n        \"On a component level, components can move or be removed before they cause interference. \"\r\n        \"For example, a floating action button (FAB) can disappear or move off screen before a \"\r\n        \"user picks up a card, or it can move if a snackbar appears.\\n\"\r\n        \"On the layout level, design your app layout to minimize opportunities for interference. \"\r\n        \"For example, position the FAB to one side of stream of a cards so the FAB won’t interfere \"\r\n        \"when a user tries to pick up one of cards.\\n\\n\"\r\n    </string>\r\n    <string name=\"action_settings\">Settings</string>\r\n</resources>\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/res/values/strings.xml	(revision b6541777881e0d45b72add69df1ce8a35e7eaa54)
+-+++ app/src/main/res/values/strings.xml	(date 1604915807580)
+-@@ -91,4 +91,7 @@
+-         "when a user tries to pick up one of cards.\n\n"
+-     </string>
+-     <string name="action_settings">Settings</string>
+-+    <string name="add_btn">Добавить</string>
+-+    <string name="Money">Сумма</string>
+-+    <string name="_0_0">0.0</string>
+- </resources>
+-diff --git .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml .idea/shelf/Uncommitted_changes_before_Update_at_06_11_2020_20_10__Default_Changelist_.xml
+-diff --git .idea/shelf/Default_Changelist.xml .idea/shelf/Default_Changelist.xml
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,57 +0,0 @@
+-Index: app/src/main/res/layout/content_scrolling.xml
+-===================================================================
+---- app/src/main/res/layout/content_scrolling.xml	(revision c2c6a0373bddc1a4a140888f3a06c66462b7ee13)
+-+++ app/src/main/res/layout/content_scrolling.xml	(revision c2c6a0373bddc1a4a140888f3a06c66462b7ee13)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="utf-8"?>
+--<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+--    xmlns:app="http://schemas.android.com/apk/res-auto"
+--    xmlns:tools="http://schemas.android.com/tools"
+--    android:layout_width="match_parent"
+--    android:layout_height="match_parent"
+--    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+--    tools:context=".SettingsOfChart"
+--    tools:showIn="@layout/activity_settings_of_chart">
+--
+--    <TextView
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_margin="@dimen/text_margin"
+--        android:text="@string/large_text" />
+--
+--</androidx.core.widget.NestedScrollView>
+-\ No newline at end of file
+-Index: app/src/main/java/com/example/myapplication/FirebaseFirestoreConnection.java
+-===================================================================
+---- app/src/main/java/com/example/myapplication/FirebaseFirestoreConnection.java	(revision c2c6a0373bddc1a4a140888f3a06c66462b7ee13)
+-+++ app/src/main/java/com/example/myapplication/FirebaseFirestoreConnection.java	(revision c2c6a0373bddc1a4a140888f3a06c66462b7ee13)
+-@@ -1,29 +0,0 @@
+--/*package com.example.myapplication;
+--
+--import com.google.auth.oauth2.GoogleCredentials;
+--import com.google.firebase.FirebaseApp;
+--import com.google.firebase.FirebaseOptions;
+--
+--import java.io.FileInputStream;
+--
+--import javax.annotation.PostConstruct;
+--
+--public class FirebaseFirestoreConnection {
+--
+--    @PostConstruct
+--    public void initialize(){
+--        try {
+--            FileInputStream serviceAccount =
+--                    new FileInputStream("./app/FirebaseService.json");
+--
+--            FirebaseOptions options = new FirebaseOptions.Builder()
+--                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+--                    .setDatabaseUrl("https://moneyassistant-1604315426885.firebaseio.com")
+--                    .build();
+--
+--            FirebaseApp.initializeApp(options);
+--        } catch (Exception e){
+--            e.printStackTrace();
+--        }
+--    }
+--}*/
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_09_11_2020_20_45_[Default_Changelist]" date="1604929526581" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_09_11_2020_20_45_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 09.11.2020 20:45 [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55_[Default_Changelist]/shelved.patch
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_21_55_[Default_Changelist]/shelved.patch	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,152 +0,0 @@
+-Index: app/src/main/java/com/example/myapplication/MainActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.app.Activity;\r\nimport android.content.DialogInterface;\r\nimport android.content.Intent;\r\nimport android.graphics.Color;\r\nimport android.graphics.Typeface;\r\nimport android.os.Bundle;\r\nimport android.text.Editable;\r\nimport android.text.Html;\r\nimport android.text.TextWatcher;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.ListView;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.viewpager.widget.ViewPager;\r\n\r\nimport com.github.mikephil.charting.charts.PieChart;\r\nimport com.github.mikephil.charting.data.PieData;\r\nimport com.github.mikephil.charting.data.PieDataSet;\r\nimport com.github.mikephil.charting.data.PieEntry;\r\nimport com.github.mikephil.charting.utils.ColorTemplate;\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport java.sql.SQLException;\r\nimport java.util.ArrayList;\r\n\r\nimport static com.example.myapplication.R.id.sign_in;\r\nimport static com.example.myapplication.R.id.sign_up;\r\n\r\n\r\npublic class MainActivity extends AppCompatActivity implements View.OnClickListener {\r\n    private LinearLayout mDotsLayout;\r\n    private TextView[] mDots;\r\n    private EditText Password;\r\n\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_main);\r\n\r\n\r\n        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);\r\n        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);\r\n        authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);\r\n        mSlidePageViewer.setAdapter(sliderAdapter);\r\n        addDotsInditcator(0);\r\n        mSlidePageViewer.addOnPageChangeListener(ViewListener);\r\n        }\r\n    @Override\r\n    public void onClick(View v) {\r\n        switch (v.getId()){\r\n            case sign_in:\r\n                EditText email = (EditText) findViewById(R.id.email_toggle);\r\n                Password = (EditText) findViewById(R.id.password_toggle);\r\n                if((email.getText().toString().length()!=0) && (Password.getText().toString().length()!=0)) {\r\n                    //вход\r\n                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();\r\n                    firebaseAuth.signInWithEmailAndPassword(email.getText().toString(), Password.getText().toString()).addOnCompleteListener(\r\n                            new OnCompleteListener<AuthResult>() {\r\n                                @Override\r\n                                public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                    if (task.isSuccessful()) {\r\n                                        Intent intentMainWindows = new Intent(MainActivity.this, SettingsOfChart.class);\r\n                                        startActivity(intentMainWindows);\r\n                                    } else {\r\n                                        Toast.makeText(MainActivity.this, \"Authentication failed.\" + task.getException().getMessage(),\r\n                                                Toast.LENGTH_SHORT).show();\r\n                                    }\r\n                                }\r\n                            });\r\n                }\r\n                else\r\n                {\r\n                    Toast.makeText(MainActivity.this,\"Поля логин и пароль должны быть заполнены\", Toast.LENGTH_SHORT);\r\n                }\r\n\r\n\r\n                break;\r\n            case sign_up:\r\n                Intent intentSignUpActitvity = new Intent(MainActivity.this,SignUpActivity.class);\r\n                startActivity(intentSignUpActitvity);\r\n\r\n            default:\r\n                break;\r\n        }\r\n    }\r\n\r\n    private void addDotsInditcator(int position) {\r\n        mDots = new TextView[3];\r\n        mDotsLayout.removeAllViews();\r\n        for (int i = 0; i < mDots.length; i++) {\r\n            mDots[i] = new TextView(this);\r\n            mDots[i].setText(Html.fromHtml(\"&#8226\"));\r\n            mDots[i].setTextSize(35);\r\n            mDots[i].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n\r\n            mDotsLayout.addView(mDots[i]);\r\n        }\r\n        if (mDots.length > 0) {\r\n            mDots[position].setTextColor(getResources().getColor(R.color.colorPrimaryDark));\r\n        }\r\n    }\r\n\r\n    private String to_hex(EditText password) {\r\n        //crypting password\r\n        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));\r\n    }\r\n\r\n    ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {\r\n        @Override\r\n        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {\r\n\r\n        }\r\n\r\n        @Override\r\n        public void onPageSelected(int position) {\r\n            addDotsInditcator(position);\r\n        }\r\n\r\n        @Override\r\n        public void onPageScrollStateChanged(int state) {\r\n\r\n        }\r\n    };\r\n\r\n}\r\n\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/MainActivity.java	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-+++ app/src/main/java/com/example/myapplication/MainActivity.java	(date 1604670707480)
+-@@ -76,7 +76,7 @@
+-                                 @Override
+-                                 public void onComplete(@NonNull Task<AuthResult> task) {
+-                                     if (task.isSuccessful()) {
+--                                        Intent intentMainWindows = new Intent(MainActivity.this, SettingsOfChart.class);
+-+                                        Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);
+-                                         startActivity(intentMainWindows);
+-                                     } else {
+-                                         Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),
+-Index: app/src/main/java/com/example/myapplication/SignUpActivity.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package com.example.myapplication;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.util.Log;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport com.google.android.gms.tasks.OnCompleteListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.android.gms.tasks.Task;\r\nimport com.google.firebase.auth.AuthResult;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.database.DatabaseReference;\r\nimport com.google.firebase.database.FirebaseDatabase;\r\n\r\nimport org.mindrot.jbcrypt.BCrypt;\r\n\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\nimport static com.example.myapplication.R.id.AddDataBase;\r\nimport static com.example.myapplication.R.id.password_toggle;\r\n\r\npublic class SignUpActivity extends AppCompatActivity implements View.OnClickListener {\r\n    EditText email;\r\n    EditText Password;\r\n    EditText ReplyPassword;\r\n    EditText Username;\r\n    Button SignUpButton;\r\n    String HashPassword;\r\n    TextView SignUpBar;\r\n    FirebaseAuth auth;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_sign_up);\r\n        SignUpButton = findViewById(AddDataBase);\r\n\r\n    }\r\n\r\n        @Override\r\n        public void onClick(View view){//произвести рефакторинг функции сделать доавбление в базу данных в отдельном методе\r\n            switch (view.getId()){\r\n                case AddDataBase:\r\n                    email = findViewById(R.id.emailSignUp);\r\n                    Password = findViewById(R.id.passwordSignUp);\r\n                    ReplyPassword = findViewById(R.id.passwordRepitSIgnUP);\r\n                    Username = findViewById(R.id.usernameSignUp);\r\n                    SignUpBar = findViewById(R.id.signUpBar);\r\n                    String PasswordCheck = Password.getText().toString();\r\n                    String ReplyPasswordCheck = ReplyPassword.getText().toString();\r\n                    if (PasswordCheck.equals(ReplyPasswordCheck)){\r\n                        auth = FirebaseAuth.getInstance();\r\n                        auth.createUserWithEmailAndPassword(email.getText().toString(), Password.getText().toString())\r\n                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {\r\n                                    @Override\r\n                                    public void onComplete(@NonNull Task<AuthResult> task) {\r\n                                        if (task.isSuccessful()) {\r\n                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);\r\n                                            startActivity(intentSignup);\r\n                                        } else {\r\n                                            // If sign up fails, display a message to the user.\r\n                                            Toast.makeText(SignUpActivity.this, \"Authentication failed.\"+ task.getException().getMessage(),\r\n                                                    Toast.LENGTH_SHORT).show();\r\n                                        }\r\n                                    }\r\n                                });\r\n                    }\r\n                    else{\r\n                        Toast.makeText(SignUpActivity.this,\"Пароли не совпадают\",Toast.LENGTH_SHORT).show();\r\n                    }\r\n\r\n                    break;\r\n                default:\r\n                    break;\r\n            }\r\n        }\r\n\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+---- app/src/main/java/com/example/myapplication/SignUpActivity.java	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-+++ app/src/main/java/com/example/myapplication/SignUpActivity.java	(date 1604670707475)
+-@@ -66,7 +66,7 @@
+-                                     @Override
+-                                     public void onComplete(@NonNull Task<AuthResult> task) {
+-                                         if (task.isSuccessful()) {
+--                                            Intent intentSignup = new Intent(SignUpActivity.this, SettingsOfChart.class);
+-+                                            Intent intentSignup = new Intent(SignUpActivity.this, ChartGenerator.class);
+-                                             startActivity(intentSignup);
+-                                         } else {
+-                                             // If sign up fails, display a message to the user.
+-Index: app/src/main/res/layout/content_scrolling.xml
+-===================================================================
+---- app/src/main/res/layout/content_scrolling.xml	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-+++ app/src/main/res/layout/content_scrolling.xml	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-@@ -1,17 +0,0 @@
+--<?xml version="1.0" encoding="utf-8"?>
+--<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+--    xmlns:app="http://schemas.android.com/apk/res-auto"
+--    xmlns:tools="http://schemas.android.com/tools"
+--    android:layout_width="match_parent"
+--    android:layout_height="match_parent"
+--    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+--    tools:context=".SettingsOfChart"
+--    tools:showIn="@layout/activity_settings_of_chart">
+--
+--    <TextView
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_margin="@dimen/text_margin"
+--        android:text="@string/large_text" />
+--
+--</androidx.core.widget.NestedScrollView>
+-\ No newline at end of file
+-Index: app/src/main/res/layout/activity_settings_of_chart.xml
+-===================================================================
+---- app/src/main/res/layout/activity_settings_of_chart.xml	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-+++ app/src/main/res/layout/activity_settings_of_chart.xml	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-@@ -1,47 +0,0 @@
+--<?xml version="1.0" encoding="utf-8"?>
+--<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+--    xmlns:app="http://schemas.android.com/apk/res-auto"
+--    xmlns:tools="http://schemas.android.com/tools"
+--    android:layout_width="match_parent"
+--    android:layout_height="match_parent"
+--    android:fitsSystemWindows="true"
+--    tools:context=".SettingsOfChart">
+--
+--    <com.google.android.material.appbar.AppBarLayout
+--        android:id="@+id/app_bar"
+--        android:layout_width="match_parent"
+--        android:layout_height="@dimen/app_bar_height"
+--        android:fitsSystemWindows="true"
+--        android:theme="@style/AppTheme.AppBarOverlay">
+--
+--        <com.google.android.material.appbar.CollapsingToolbarLayout
+--            android:id="@+id/toolbar_layout"
+--            android:layout_width="match_parent"
+--            android:layout_height="match_parent"
+--            android:fitsSystemWindows="true"
+--            app:contentScrim="?attr/colorPrimary"
+--            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+--            app:toolbarId="@+id/toolbar">
+--
+--            <androidx.appcompat.widget.Toolbar
+--                android:id="@+id/toolbar"
+--                android:layout_width="match_parent"
+--                android:layout_height="?attr/actionBarSize"
+--                app:layout_collapseMode="pin"
+--                app:popupTheme="@style/AppTheme.PopupOverlay" />
+--
+--        </com.google.android.material.appbar.CollapsingToolbarLayout>
+--    </com.google.android.material.appbar.AppBarLayout>
+--
+--    <include layout="@layout/content_scrolling" />
+--
+--    <com.google.android.material.floatingactionbutton.FloatingActionButton
+--        android:id="@+id/fab"
+--        android:layout_width="wrap_content"
+--        android:layout_height="wrap_content"
+--        android:layout_margin="@dimen/fab_margin"
+--        app:layout_anchor="@id/app_bar"
+--        app:layout_anchorGravity="bottom|end"
+--        app:srcCompat="@android:drawable/ic_dialog_email" />
+--
+--</androidx.coordinatorlayout.widget.CoordinatorLayout>
+-\ No newline at end of file
+-Index: app/src/main/java/com/example/myapplication/SettingsOfChart.java
+-===================================================================
+---- app/src/main/java/com/example/myapplication/SettingsOfChart.java	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-+++ app/src/main/java/com/example/myapplication/SettingsOfChart.java	(revision 9e8f37ad157756c4a774d69d23dc2dd8a52b9538)
+-@@ -1,34 +0,0 @@
+--package com.example.myapplication;
+--
+--import android.os.Bundle;
+--
+--import com.google.android.material.appbar.CollapsingToolbarLayout;
+--import com.google.android.material.floatingactionbutton.FloatingActionButton;
+--import com.google.android.material.snackbar.Snackbar;
+--
+--import androidx.appcompat.app.AppCompatActivity;
+--import androidx.appcompat.widget.Toolbar;
+--
+--import android.view.View;
+--
+--public class SettingsOfChart extends AppCompatActivity {
+--
+--    @Override
+--    protected void onCreate(Bundle savedInstanceState) {
+--        super.onCreate(savedInstanceState);
+--        setContentView(R.layout.activity_settings_of_chart);
+--        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+--        setSupportActionBar(toolbar);
+--        CollapsingToolbarLayout toolBarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+--        toolBarLayout.setTitle(getTitle());
+--
+--        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+--        fab.setOnClickListener(new View.OnClickListener() {
+--            @Override
+--            public void onClick(View view) {
+--                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+--                        .setAction("Action", null).show();
+--            }
+--        });
+--    }
+--}
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49__Default_Changelist_.xml
+===================================================================
+--- .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ .idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49__Default_Changelist_.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_07_11_2020_22_49_[Default_Changelist]" date="1604764150934" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_07_11_2020_22_49_[Default_Changelist]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 07.11.2020 22:49 [Default Changelist]" />
+-</changelist>
+\ No newline at end of file
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:dist=\"http://schemas.android.com/apk/distribution\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    package=\"com.example.myapplication\">\r\n    <uses-permission android:name=\"android.permission.CAMERA\"/>\r\n    <uses-feature android:name=\"android.hardware.camera\"/>\r\n    <uses-feature android:name=\"android.hardware.autofocus\"/>\r\n    <application\r\n        android:allowBackup=\"true\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"@string/app_name\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/AppTheme\"\r\n        tools:ignore=\"GoogleAppIndexingWarning\">\r\n        <activity android:name=\".QRScanner\"\r\n            android:screenOrientation=\"fullSensor\"\r\n            android:stateNotNeeded=\"false\"\r\n            android:windowSoftInputMode=\"stateAlwaysHidden\"\r\n\r\n            />\r\n        <activity android:name=\".ChartGenerator\" />\r\n        <activity android:name=\".SignUpActivity\" />\r\n        <activity android:name=\".MainWindow\" />\r\n        <activity android:name=\".MainActivity\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n    </application>\r\n\r\n    <uses-permission android:name=\"android.permission.INTERNET\" />\r\n\r\n    <dist:module dist:instant=\"true\" />\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 3b651e9e8fac11a3a59835fee4d8735c4229c5ec)
++++ app/src/main/AndroidManifest.xml	(date 1605284688614)
+@@ -3,9 +3,7 @@
+     xmlns:dist="http://schemas.android.com/apk/distribution"
+     xmlns:tools="http://schemas.android.com/tools"
+     package="com.example.myapplication">
+-    <uses-permission android:name="android.permission.CAMERA"/>
+-    <uses-feature android:name="android.hardware.camera"/>
+-    <uses-feature android:name="android.hardware.autofocus"/>
++
+     <application
+         android:allowBackup="true"
+         android:icon="@mipmap/ic_launcher"
+@@ -14,12 +12,12 @@
+         android:supportsRtl="true"
+         android:theme="@style/AppTheme"
+         tools:ignore="GoogleAppIndexingWarning">
+-        <activity android:name=".QRScanner"
++        <activity android:name=".ProgressBars"></activity>
++        <activity
++            android:name=".QRScanner"
+             android:screenOrientation="fullSensor"
+             android:stateNotNeeded="false"
+-            android:windowSoftInputMode="stateAlwaysHidden"
+-
+-            />
++            android:windowSoftInputMode="stateAlwaysHidden" />
+         <activity android:name=".ChartGenerator" />
+         <activity android:name=".SignUpActivity" />
+         <activity android:name=".MainWindow" />
+@@ -32,8 +30,13 @@
+         </activity>
+     </application>
+ 
++    <uses-feature android:name="android.hardware.autofocus" />
++    <uses-feature android:name="android.hardware.camera" />
++
+     <uses-permission android:name="android.permission.INTERNET" />
+ 
++    <uses-permission android:name="android.permission.CAMERA" />
++
+     <dist:module dist:instant="true" />
+ 
+ </manifest>
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/RecycleViewAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/RecycleViewAdapter.java	(date 1605472463600)
++++ app/src/main/java/com/example/myapplication/RecycleViewAdapter.java	(date 1605472463600)
+@@ -0,0 +1,45 @@
++package com.example.myapplication;
++
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.TextView;
++
++import com.firebase.ui.database.FirebaseRecyclerAdapter;
++import com.firebase.ui.database.FirebaseRecyclerOptions;
++
++import androidx.annotation.NonNull;
++import androidx.recyclerview.widget.RecyclerView;
++
++public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleViewAdapter.myviewholder> {
++
++    public RecycleViewAdapter(@NonNull FirebaseRecyclerOptions<Payment> options) {
++        super(options);
++    }
++
++    @Override
++    protected void onBindViewHolder(@NonNull myviewholder holder, int position, @NonNull Payment payment) {
++        holder.name.setText(payment.name);
++        holder.date.setText(payment.date);
++        holder.amount.setText(payment.amount);
++        holder.percent.setText(payment.percent);
++    }
++
++    @NonNull
++    @Override
++    public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
++        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_payment_row,parent,false);
++        return new myviewholder(view);
++    }
++
++    class myviewholder extends RecyclerView.ViewHolder{
++        TextView name, date, amount, percent;
++        public myviewholder(@NonNull View itemView) {
++            super(itemView);
++            name = itemView.findViewById(R.id.name);
++            date = itemView.findViewById(R.id.date);
++            amount = itemView.findViewById(R.id.amount);
++            percent = itemView.findViewById(R.id.percent);
++        }
++    }
++}
+Index: app/src/main/java/com/example/myapplication/ProgressBars.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/ProgressBars.java	(date 1605470233789)
++++ app/src/main/java/com/example/myapplication/ProgressBars.java	(date 1605470233789)
+@@ -0,0 +1,56 @@
++package com.example.myapplication;
++
++import android.os.Bundle;
++import android.widget.ArrayAdapter;
++
++import com.firebase.ui.database.FirebaseRecyclerOptions;
++import com.google.firebase.database.DataSnapshot;
++import com.google.firebase.database.DatabaseError;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++import com.google.firebase.database.ValueEventListener;
++
++import java.util.ArrayList;
++
++import androidx.annotation.NonNull;
++import androidx.appcompat.app.AppCompatActivity;
++import androidx.recyclerview.widget.LinearLayoutManager;
++import androidx.recyclerview.widget.RecyclerView;
++
++public class ProgressBars extends AppCompatActivity {
++    int i = 0;
++    ArrayList<Payment> listDataPayment = new ArrayList<>();
++    RecyclerView recyclerView;
++    RecycleViewAdapter recyclerViewAdapter;
++    private DatabaseReference mDataBase;
++    private String PAYMENT_KEY = "PAYMENT";
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_progress_bars);
++        init();
++
++        FirebaseRecyclerOptions<Payment> options =
++                new FirebaseRecyclerOptions.Builder<Payment>()
++                        .setQuery(mDataBase, Payment.class)
++                        .build();
++        recyclerViewAdapter = new RecycleViewAdapter(options);
++        recyclerView.setAdapter(recyclerViewAdapter);
++    }
++    @Override
++    protected void onStart(){
++        super.onStart();
++        recyclerViewAdapter.startListening();
++    }
++    @Override
++    protected void onStop(){
++        super.onStop();
++        recyclerViewAdapter.stopListening();
++    }
++    public void init(){
++        recyclerView = findViewById(R.id.PaymentResView);
++        recyclerView.setLayoutManager(new LinearLayoutManager(this));
++        listDataPayment = new ArrayList<>();
++        mDataBase = FirebaseDatabase.getInstance().getReference(PAYMENT_KEY);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_progress_bars.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_progress_bars.xml	(date 1605461959394)
++++ app/src/main/res/layout/activity_progress_bars.xml	(date 1605461959394)
+@@ -0,0 +1,24 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:id="@+id/RelativeLayout"
++    android:layout_width="wrap_content"
++    android:layout_height="wrap_content"
++    tools:context=".ProgressBars" >
++
++    <ScrollView
++        android:layout_width="410dp"
++        android:layout_height="656dp"
++        app:layout_constraintBottom_toBottomOf="parent"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintHorizontal_bias="1.0"
++        app:layout_constraintStart_toStartOf="parent"
++        app:layout_constraintTop_toTopOf="parent">
++
++        <androidx.recyclerview.widget.RecyclerView
++            android:id="@+id/PaymentResView"
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content" />
++    </ScrollView>
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/Payment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/Payment.java	(date 1605436694613)
++++ app/src/main/java/com/example/myapplication/Payment.java	(date 1605436694613)
+@@ -0,0 +1,15 @@
++package com.example.myapplication;
++
++public class Payment {
++    public String id, name, date, amount, percent;
++
++    Payment(){}
++
++    public Payment(String id, String name, String date, String amount, String percent) {
++        this.id = id;
++        this.name = name;
++        this.date = date;
++        this.amount = amount;
++        this.percent = percent;
++    }
++}
+Index: app/src/main/res/layout/one_payment_row.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/one_payment_row.xml	(date 1605468914556)
++++ app/src/main/res/layout/one_payment_row.xml	(date 1605468914556)
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent">
++
++    <androidx.cardview.widget.CardView
++        android:id="@+id/cardView"
++        android:layout_width="418dp"
++        android:layout_height="60dp"
++        app:layout_constraintBottom_toBottomOf="parent"
++        app:layout_constraintEnd_toEndOf="parent"
++        app:layout_constraintStart_toStartOf="parent"
++        app:layout_constraintTop_toTopOf="parent"
++        app:layout_constraintVertical_bias="0.001">
++
++        <RelativeLayout
++            android:layout_width="match_parent"
++            android:layout_height="59dp">
++
++            <TextView
++                android:id="@+id/name"
++                android:layout_width="105dp"
++                android:layout_height="37dp"
++                android:layout_alignParentBottom="true"
++                android:layout_marginBottom="0dp"
++                android:text="TextView"
++                android:textSize="22dp" />
++
++            <TextView
++                android:id="@+id/date"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="TextView"
++                android:textSize="16dp" />
++
++            <TextView
++                android:id="@+id/amount"
++                android:layout_width="100dp"
++                android:layout_height="35dp"
++                android:layout_alignParentEnd="true"
++                android:layout_alignParentBottom="true"
++                android:layout_marginEnd="84dp"
++                android:layout_marginBottom="-1dp"
++                android:text="TextView"
++                android:textSize="24dp" />
++
++            <TextView
++                android:id="@+id/percent"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:layout_alignParentEnd="true"
++                android:layout_alignParentBottom="true"
++                android:layout_marginEnd="9dp"
++                android:layout_marginBottom="1dp"
++                android:text="TextView"
++                android:textSize="18dp" />
++        </RelativeLayout>
++    </androidx.cardview.widget.CardView>
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+diff --git .idea/shelf/Default_Changelist.xml .idea/shelf/Default_Changelist.xml

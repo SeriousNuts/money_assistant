@@ -42,11 +42,6 @@ int d=0;
         setContentView(layout.activity_chart_generator);
         llMain=(LinearLayout) findViewById(id.llMain);
     }
-    protected void SetIDs(){
-
-
-
-    }
 
     private void scanCode(){
         IntentIntegrator integrator = new IntentIntegrator(this);
@@ -106,7 +101,7 @@ int d=0;
                 }
 
                 intent1.putExtra("users",EditTexts2);
-               // EditTexts2.clear();
+
 
                for(int i = 0; i <NumbersofEditText.size();i++ ){
                    EditText ed = (EditText) findViewById(Integer.parseInt(NumbersofEditText.get(i)));
@@ -116,8 +111,9 @@ int d=0;
 
                }
                 intent1.putExtra("list",EditTexts);
-              // EditTexts.clear();
                 startActivity(intent1);
+                EditTexts.clear();
+                EditTexts2.clear();
 
 
                 break;
@@ -127,6 +123,7 @@ int d=0;
                 param.gravity= Gravity.CENTER_HORIZONTAL;
                 final EditText editText = new EditText(this);
                 editText.setId(i);
+                editText.setHint("Сумма");
                 NumbersofEditText.add(Integer.toString(i));
                 //запись id едиттекстов
                 editText.setInputType(TYPE_CLASS_NUMBER);
@@ -135,6 +132,7 @@ int d=0;
                 param2.gravity = Gravity.CENTER_HORIZONTAL;
                 final EditText Users = new EditText(this);
                 Users.setId(d);
+                Users.setHint("Имя");
                 NumbersofEditText2.add(Integer.toString(d));
                 llMain.addView(Users, param2);
                 llMain.addView(editText, param);
@@ -148,6 +146,11 @@ int d=0;
                 break;
             case id.qr_scanner:
                 scanCode();
+                break;
+            case id.progress_bars:
+                Intent progresIntent = new Intent(this, ProgressBars.class);
+                startActivity(progresIntent);
+                break;
             default:
                 break;
         }

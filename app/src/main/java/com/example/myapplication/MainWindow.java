@@ -25,7 +25,6 @@ public class MainWindow extends AppCompatActivity {
     PieChart pieChart;
     private TextView ChartName;
     String pieChartName;
-    String Value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,7 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setDrawEntryLabels(true);
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 
-       // ArrayList<String> values = name.getStringArrayList("list");
+        // ArrayList<String> values = name.getStringArrayList("list");
         ArrayList<String> arrayFrom;
         arrayFrom = getIntent().getStringArrayListExtra("users");
         //ArrayList<String>  arrayFromIntent=getIntent().getStringArrayListExtra("list");
@@ -83,8 +82,8 @@ public class MainWindow extends AppCompatActivity {
         ArrayList<PieEntry> yValues= new ArrayList<>();
         for (int i =0; i < arrayFromIntent.size(); i++) {
 
-    yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), arrayFrom.get(i)));
-}
+            yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), arrayFrom.get(i)));
+        }
 
 
 //дата сеты

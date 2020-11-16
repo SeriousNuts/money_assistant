@@ -186,11 +186,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private String to_hex(EditText password) {
-        //crypting password
-        return BCrypt.hashpw(Password.toString(), BCrypt.gensalt(12));
-    }
-
     ViewPager.OnPageChangeListener ViewListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
