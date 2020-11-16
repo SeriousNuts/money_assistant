@@ -20,6 +20,7 @@ import com.google.zxing.integration.android.IntentResult;
 import java.util.ArrayList;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
+import static android.text.InputType.TYPE_TEXT_VARIATION_PERSON_NAME;
 import static com.example.myapplication.R.id;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
@@ -28,6 +29,7 @@ import static com.example.myapplication.R.layout;
 
 public class ChartGenerator extends AppCompatActivity implements View.OnClickListener{
 LinearLayout llMain;
+    LinearLayout llMain2;
 ArrayList<String>NumbersofEditText = new ArrayList<>();
 ArrayList<String>EditTexts = new ArrayList<>();
     ArrayList<String>NumbersofEditText2 = new ArrayList<>();
@@ -35,12 +37,13 @@ ArrayList<String>EditTexts = new ArrayList<>();
 
 int i = 0;
 int d=0;
-    int x= 5;
+    int x= 10;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_chart_generator);
         llMain=(LinearLayout) findViewById(id.llMain);
+        llMain2=(LinearLayout) findViewById(id.llMain2);
     }
 
     private void scanCode(){
@@ -133,8 +136,9 @@ int d=0;
                 final EditText Users = new EditText(this);
                 Users.setId(d);
                 Users.setHint("Имя");
+                Users.setInputType(TYPE_TEXT_VARIATION_PERSON_NAME);
                 NumbersofEditText2.add(Integer.toString(d));
-                llMain.addView(Users, param2);
+                llMain2.addView(Users, param2);
                 llMain.addView(editText, param);
 
                 break;

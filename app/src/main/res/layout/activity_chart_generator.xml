@@ -5,7 +5,7 @@
     android:id="@+id/relativeLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/design_default_color_on_primary"
+    android:background="@color/colorPrimary"
     tools:context=".ChartGenerator">
 
 
@@ -22,29 +22,30 @@
 
     <EditText
         android:id="@+id/ChartName"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:background="@android:drawable/title_bar"
+        android:layout_marginTop="84dp"
+        android:background="@color/zxing_viewfinder_mask"
         android:ems="10"
+        android:hint="Название События"
         android:importantForAutofill="no"
         android:inputType="textPersonName"
-        android:text="Имя диаграммы"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.079"
+        app:layout_constraintHorizontal_bias="0.009"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/EnterName"
-        android:layout_width="128dp"
-        android:layout_height="61dp"
-        android:layout_marginStart="276dp"
-        android:background="@color/design_default_color_error"
+        android:layout_width="81dp"
+        android:layout_height="39dp"
+        android:background="@android:color/holo_green_dark"
         android:onClick="onClick"
         android:text="Старт!"
-        app:layout_constraintBottom_toTopOf="@+id/buttonAdd"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
@@ -80,29 +81,24 @@
 
     <Button
         android:id="@+id/buttonAdd"
-        android:layout_width="126dp"
-        android:layout_height="53dp"
-        android:background="@android:drawable/ic_input_add"
+        android:layout_width="84dp"
+        android:layout_height="35dp"
+        android:background="@android:color/holo_green_dark"
         android:onClick="onClick"
         android:text="@string/add_btn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.992"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.1" />
+        tools:layout_editor_absoluteX="2dp" />
 
     <LinearLayout
         android:id="@+id/llMain"
-        android:layout_width="409dp"
-        android:layout_height="331dp"
+        android:layout_width="117dp"
+        android:layout_height="481dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.346"
+        app:layout_constraintVertical_bias="0.634"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -122,11 +118,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:onClick="onClick"
         android:text="progress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/qr_scanner"
         app:layout_constraintHorizontal_bias="0.52"
         app:layout_constraintStart_toEndOf="@+id/logout" />
+
+    <LinearLayout
+        android:id="@+id/llMain2"
+        android:layout_width="250dp"
+        android:layout_height="481dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.012"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.634"
+        tools:ignore="MissingConstraints"></LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
