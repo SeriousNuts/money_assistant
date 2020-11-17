@@ -32,7 +32,7 @@
         android:inputType="textPersonName"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.009"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -86,20 +86,8 @@
         android:background="@android:color/holo_green_dark"
         android:onClick="onClick"
         android:text="@string/add_btn"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="2dp" />
-
-    <LinearLayout
-        android:id="@+id/llMain"
-        android:layout_width="117dp"
-        android:layout_height="481dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.634"
-        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/qr_scanner"
@@ -125,18 +113,29 @@
         app:layout_constraintHorizontal_bias="0.52"
         app:layout_constraintStart_toEndOf="@+id/logout" />
 
-    <LinearLayout
-        android:id="@+id/llMain2"
-        android:layout_width="250dp"
-        android:layout_height="481dp"
-        android:orientation="vertical"
+    <ScrollView
+        android:layout_width="253dp"
+        android:layout_height="475dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.012"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.634"
-        tools:ignore="MissingConstraints"></LinearLayout>
+        app:layout_constraintVertical_bias="0.62"
+        tools:ignore="MissingConstraints">
 
+        <LinearLayout
+            android:id="@+id/llMain2"
+            android:layout_width="250dp"
+            android:layout_height="481dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.012"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.634"
+            tools:ignore="MissingConstraints"></LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
