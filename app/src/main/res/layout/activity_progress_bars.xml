@@ -8,8 +8,8 @@
     tools:context=".ProgressBars" >
 
     <ScrollView
-        android:layout_width="410dp"
-        android:layout_height="656dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -18,7 +18,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/PaymentResView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

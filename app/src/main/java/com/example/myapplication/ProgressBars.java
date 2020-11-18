@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,24 +20,30 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ProgressBars extends AppCompatActivity {
-    int i = 0;
     ArrayList<Payment> listDataPayment = new ArrayList<>();
     RecyclerView recyclerView;
     RecycleViewAdapter recyclerViewAdapter;
-    private DatabaseReference mDataBase;
-    private String PAYMENT_KEY = "PAYMENT";
+    FirebaseUser payment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        listDataPayment = new ArrayList<>();
+
+        payment = FirebaseAuth.getInstance().getCurrentUser();
+        String PaymentKey = payment.getUid();
+
         setContentView(R.layout.activity_progress_bars);
-        init();
+        recyclerView = findViewById(R.id.PaymentResView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         FirebaseRecyclerOptions<Payment> options =
                 new FirebaseRecyclerOptions.Builder<Payment>()
-                        .setQuery(mDataBase, Payment.class)
+                        .setQuery(FirebaseDatabase.getInstance().getReference(PaymentKey).child("Payments"), Payment.class)
                         .build();
+
         recyclerViewAdapter = new RecycleViewAdapter(options);
         recyclerView.setAdapter(recyclerViewAdapter);
+
     }
     @Override
     protected void onStart(){
@@ -47,10 +55,5 @@ public class ProgressBars extends AppCompatActivity {
         super.onStop();
         recyclerViewAdapter.stopListening();
     }
-    public void init(){
-        recyclerView = findViewById(R.id.PaymentResView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        listDataPayment = new ArrayList<>();
-        mDataBase = FirebaseDatabase.getInstance().getReference(PAYMENT_KEY);
-    }
+
 }

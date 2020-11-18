@@ -89,8 +89,8 @@
 
     <Button
         android:id="@+id/qr_scanner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="75dp"
+        android:layout_height="46dp"
         android:layout_marginBottom="16dp"
         android:onClick="onClick"
         android:text="qr_scanner"
@@ -108,7 +108,7 @@
         android:text="progress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/qr_scanner"
-        app:layout_constraintHorizontal_bias="0.52"
+        app:layout_constraintHorizontal_bias="0.214"
         app:layout_constraintStart_toEndOf="@+id/logout" />
 
     <ScrollView
@@ -136,5 +136,16 @@
             tools:ignore="MissingConstraints"></LinearLayout>
 
     </ScrollView>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:onClick="onClick"
+        android:text="save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/qr_scanner"
+        app:layout_constraintStart_toEndOf="@+id/progress_bars" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

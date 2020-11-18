@@ -16,10 +16,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
 import static android.text.InputType.TYPE_TEXT_VARIATION_PERSON_NAME;
@@ -29,8 +34,9 @@ import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
 import static com.example.myapplication.R.id.progress_bars;
 import static com.example.myapplication.R.id.qr_scanner;
+import static com.example.myapplication.R.id.save_button;
 
-public class AddUsers extends Fragment  {
+public class AddUsers extends Fragment {
 
 
     ArrayList<String> NumbersofNameEditText = new ArrayList<>();
@@ -43,65 +49,68 @@ public class AddUsers extends Fragment  {
     int buttonId;
     int Checkid = 0;
     int Checkid2 = 0;
-
+    private DatabaseReference mDataBase;
+    FirebaseUser payment;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View RootView = inflater.inflate(R.layout.fragment_add_users, container, false);
-        Button enterBut =(Button)RootView.findViewById(EnterName);
-        Button addBut= (Button)RootView.findViewById(buttonAdd);
-        Button qr=(Button)RootView.findViewById(qr_scanner);
-        Button logout= (Button)RootView.findViewById(R.id.logout);
-        Button progressBars= (Button) RootView.findViewById(progress_bars);
+        Button EnterBut = RootView.findViewById(EnterName);
+        Button addBut = RootView.findViewById(buttonAdd);
+        Button qr = RootView.findViewById(qr_scanner);
+        Button logout = RootView.findViewById(R.id.logout);
+        Button progressBars = RootView.findViewById(progress_bars);
+        Button SaveButton = RootView.findViewById(save_button);
 
-        enterBut.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                             EditText chartName = (EditText) RootView.findViewById(R.id.ChartName);
-                                            Intent intent1 = new Intent(getActivity(), MainWindow.class);
-                                            Bundle Name = new Bundle();
-                                            //имя диаграммы
-                                            Name.putString("Chart Name", chartName.getText().toString());
-                                            intent1.putExtras(Name);
-                                            //пользователи
-                                            for (int z = 0; z < NumbersofNameEditText.size(); z++) {
-                                                EditText ed2 = getView().findViewById(Integer.parseInt(NumbersofNameEditText.get(z)));
-                                                EditTexts2.add(ed2.getText().toString());
+        EnterBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText chartName = RootView.findViewById(R.id.ChartName);
+                Intent intent1 = new Intent(getActivity(), MainWindow.class);
+                Bundle Name = new Bundle();
+                //имя диаграммы
+                Name.putString("Chart Name", chartName.getText().toString());
+                intent1.putExtras(Name);
+                //пользователи
+                for (int z = 0; z < NumbersofNameEditText.size(); z++) {
+                    EditText ed2 = getView().findViewById(Integer.parseInt(NumbersofNameEditText.get(z)));
+                    EditTexts2.add(ed2.getText().toString());
+                }
 
-                                            }
+                intent1.putExtra("users", EditTexts2);
 
-                                            intent1.putExtra("users", EditTexts2);
+                //значения
+                for (int i = 0; i < NumbersofSummEditText.size(); i++) {
+                    EditText ed = getView().findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+                    if (!ed.getText().toString().equals("")) {
+                        EditTexts.add(ed.getText().toString());
+                    } else {
+                        // Toast.makeText(ChartGenerator.this, "сумма не может быть пустой", Toast.LENGTH_SHORT).show();
 
-                                            //значения
-                                            for (int i = 0; i < NumbersofSummEditText.size(); i++) {
-                                                EditText ed =getView().findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
-                                                if (!ed.getText().toString().equals("")) {
-                                                    EditTexts.add(ed.getText().toString());
-                                                } else {
-                                                    // Toast.makeText(ChartGenerator.this, "сумма не может быть пустой", Toast.LENGTH_SHORT).show();
+                    }
 
-                                                }
+                }
+                intent1.putExtra("list", EditTexts);
+                startActivity(intent1);
 
-                                            }
-                                            intent1.putExtra("list", EditTexts);
-                                            startActivity(intent1);
-
-                                        }
-                                    });
+            }
+        });
 
 
         addBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final LinearLayout llMain2 =(LinearLayout) getView().findViewById(R.id.llMain2);
+                final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);
                 Checkid2 = Checkid2 + x;
                 i++;
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
                 param.gravity = RELATIVE_LAYOUT_DIRECTION;
                 final EditText editText = new EditText(getActivity());
                 editText.setId(i);
@@ -110,7 +119,8 @@ public class AddUsers extends Fragment  {
                 //запись id едиттекстов
                 editText.setInputType(TYPE_CLASS_NUMBER);
                 d = d + x;
-                final LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                final LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
                 param2.gravity = RIGHT;
                 final EditText Users = new EditText(getActivity());
                 Users.setId(d);
@@ -162,9 +172,32 @@ public class AddUsers extends Fragment  {
                 startActivity(progresIntent);
             }
         });
-       // return inflater.inflate(R.layout.fragment_add_users, container, false);
+        SaveButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                payment = FirebaseAuth.getInstance().getCurrentUser();
+                String PaymentKey = payment.getUid();
+                mDataBase = FirebaseDatabase.getInstance().getReference(PaymentKey).child("Payments");
+                Date currentTime = Calendar.getInstance().getTime();
+                EditText EditText;
+                Payment payment = new Payment();
+                for (int i = 0; i < NumbersofNameEditText.size(); i++){
+                    EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
+                    payment.name = EditText.getText().toString();
+                    EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+                    payment.amount = EditText.getText().toString();
+                    payment.date = currentTime.toString();
+                    payment.percent = "0%";
+                    payment.id = Integer.toString(i);;
+                    mDataBase.push().setValue(payment);
+                }
 
-return RootView;
+
+            }
+        });
+        // return inflater.inflate(R.layout.fragment_add_users, container, false);
+
+        return RootView;
 
     }
 
@@ -176,6 +209,7 @@ return RootView;
         integrator.setPrompt("Scanning code");
         integrator.initiateScan();
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
