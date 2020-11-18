@@ -26,8 +26,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import static com.example.myapplication.R.id.sign_in;
 import static com.example.myapplication.R.id.sign_up;
 import static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;
@@ -46,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser!=null){
-            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);
+            Intent intentGoogleSignUp = new Intent(MainActivity.this,MainWindow.class);
             startActivity(intentGoogleSignUp);
         }
     }
@@ -113,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "Authentification succes",
                                     Toast.LENGTH_SHORT).show();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intentGoogleSignUp = new Intent(MainActivity.this,ChartGenerator.class);
+                            Intent intentGoogleSignUp = new Intent(MainActivity.this,MainWindow.class);
                             startActivity(intentGoogleSignUp);
                         } else {
                             // If sign in fails, display a message to the user.
@@ -140,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intentMainWindows = new Intent(MainActivity.this, ChartGenerator.class);
+                                        Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
                                         startActivity(intentMainWindows);
                                     } else {
                                         Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),

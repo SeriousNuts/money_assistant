@@ -7,14 +7,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import static com.example.myapplication.R.id.AddDataBase;
 
@@ -51,7 +50,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
-                                            Intent intentSignup = new Intent(SignUpActivity.this, ChartGenerator.class);
+                                            Intent intentSignup = new Intent(SignUpActivity.this, MainWindow.class);
                                             startActivity(intentSignup);
                                             finish();
                                         } else {

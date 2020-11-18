@@ -18,9 +18,6 @@
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="false"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".ChartGenerator"
-            android:windowSoftInputMode="adjustPan"
-            />
         <activity android:name=".SignUpActivity" />
         <activity android:name=".MainWindow" />
         <activity android:name=".MainActivity">

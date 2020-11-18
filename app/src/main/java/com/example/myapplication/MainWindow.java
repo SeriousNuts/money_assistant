@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -18,31 +19,35 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import java.util.ArrayList;
 
 
-
-
-
-public class MainWindow extends AppCompatActivity {
+public class MainWindow extends FragmentActivity {
     PieChart pieChart;
-    private TextView ChartName;
     String pieChartName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_window);
+        Fragment Us = new AddUsers();
+        FragmentTransaction ft= getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.Add_f,Us);
+        ft.commit();
+
 //Добавление Пользовательских Данных
         //Имя Диаграммы
-        ChartName = (TextView) findViewById(R.id.ChartName);
         Intent intentReceived= getIntent();
         Bundle name=intentReceived.getExtras();
-        pieChartName=name.getString("Chart Name");
-        ChartName.setText(pieChartName);
-        Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();
-//////////////////////////////////////////////////////////
-
+        if(name != null){
+            pieChartName=name.getString("Chart Name");
+        }
+        else {
+            pieChartName="";
+        }
+      Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();
+/////////////////////////////////////////////////////////
         setContentView(R.layout.main_window);
         pieChart= findViewById(R.id.piechart);
-        //процентные значения
+        //процентные значени
         pieChart.setUsePercentValues(false);
         pieChart.getLegend().setEnabled(true);
         pieChart.setSoundEffectsEnabled(true);
@@ -52,6 +57,7 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setDragDecelerationFrictionCoef(150f);
         //прозрачный круг
         pieChart.setTransparentCircleRadius(100f);
+        pieChart.setTransparentCircleColor(Color.LTGRAY);
         //бул рисовать окно посередине или нет
         pieChart.setDrawHoleEnabled(true);
         //задаем текст в центре
@@ -72,6 +78,7 @@ public class MainWindow extends AppCompatActivity {
         pieChart.setDrawEntryLabels(true);
         pieChart.setEntryLabelTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
 
+
         // ArrayList<String> values = name.getStringArrayList("list");
         ArrayList<String> arrayFrom;
         arrayFrom = getIntent().getStringArrayListExtra("users");
@@ -80,9 +87,11 @@ public class MainWindow extends AppCompatActivity {
         ArrayList<String> arrayFromIntent = (ArrayList) getIntent().getStringArrayListExtra("list");
         //users
         ArrayList<PieEntry> yValues= new ArrayList<>();
-        for (int i =0; i < arrayFromIntent.size(); i++) {
+        if(arrayFromIntent != null) {
+            for (int i = 0; i < arrayFromIntent.size(); i++) {
 
-            yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), arrayFrom.get(i)));
+                yValues.add(new PieEntry(Float.parseFloat(arrayFromIntent.get(i)), arrayFrom.get(i)));
+            }
         }
 
 
@@ -103,6 +112,11 @@ public class MainWindow extends AppCompatActivity {
         pieChart.notifyDataSetChanged();
         pieChart.setData(data);
         pieChart.animateY(1500);
+
+
+
+
+
     }
 
 }

@@ -1,103 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F4511E"
     android:backgroundTint="@color/colorPrimary"
+    android:orientation="vertical"
+    android:scrollbarAlwaysDrawHorizontalTrack="false"
     tools:context=".MainActivity">
 
     //диаграмма
 
     //ввод с клавиатуры
 
-    <LinearLayout
-        android:id="@+id/activity_main"
-        android:layout_width="match_parent"
-        android:layout_height="345dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="65dp"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="251dp"
-            android:layout_height="wrap_content"
-            android:textSize="50dp" />
-        <TextView
-            android:id="@+id/ChartName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/UserOne"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/UserTwo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/UserThree"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/UserFour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/UserFive"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/ValueUs5"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            /><TextView
-        android:id="@+id/ValueUs4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-        <TextView
-            android:id="@+id/ValueUs3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/ValueUs2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:id="@+id/ValueUs1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
-
-
-    </LinearLayout>
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/piechart"
-        android:layout_width="match_parent"
-        android:layout_height="292dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="0dp"
-        android:layout_marginBottom="443dp">
-
+        android:layout_width="360dp"
+        android:layout_height="251dp"
+        android:layout_marginBottom="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/dataContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.246"
+        tools:ignore="MissingConstraints">
 
     </com.github.mikephil.charting.charts.PieChart>
 
+    <LinearLayout
+        android:id="@+id/dataContainer"
+        android:layout_width="406dp"
+        android:layout_height="406dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-</RelativeLayout>
+        <FrameLayout
+            android:id="@+id/Add_f"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:transitionName=".ChartGenerator"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="2dp"
+            tools:visibility="visible">
+
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
