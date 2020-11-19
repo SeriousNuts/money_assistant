@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-        ViewPager mSlidePageViewer = (ViewPager) findViewById(R.id.Pager);
-        mDotsLayout = (LinearLayout) findViewById(R.id.LinearLayout);
+        ViewPager mSlidePageViewer = findViewById(R.id.Pager);
+        mDotsLayout = findViewById(R.id.LinearLayout);
         authorization_slider_layout sliderAdapter = new authorization_slider_layout(this);
         mSlidePageViewer.setAdapter(sliderAdapter);
         addDotsInditcator(0);
@@ -128,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case sign_in:
-                EditText email = (EditText) findViewById(R.id.email_toggle);
-                Password = (EditText) findViewById(R.id.password_toggle);
+                EditText email = findViewById(R.id.email_toggle);
+                Password = findViewById(R.id.password_toggle);
                 if((email.getText().toString().length()!=0) || (Password.getText().toString().length()!=0)) {
                     //вход
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();

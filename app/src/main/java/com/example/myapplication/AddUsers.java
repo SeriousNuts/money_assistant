@@ -190,6 +190,7 @@ public class AddUsers extends Fragment {
                     payment.percent = "0%";
                     payment.id = Integer.toString(i);;
                     mDataBase.push().setValue(payment);
+                    Toast.makeText(getActivity(), "Добавлено",Toast.LENGTH_SHORT).show();
                 }
 
 

@@ -19,11 +19,6 @@ public class authorization_slider_layout extends PagerAdapter{
         this.context = context;
     }
 
-    public void SliderAdapter(Context context)
-    {
-        this.context = context;
-
-    }
     //Arrays
     public int[] slide_images = {
             R.drawable.authorization_first_ico,
@@ -47,7 +42,7 @@ public class authorization_slider_layout extends PagerAdapter{
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == (ConstraintLayout) object;
+        return view == object;
     }
 
 
@@ -56,9 +51,9 @@ public class authorization_slider_layout extends PagerAdapter{
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.authorization_slider_layout,container,false);
 
-        ImageView slideImageView = (ImageView) view.findViewById(R.id.first_ico);
-        TextView slideHeading = (TextView) view.findViewById(R.id.Heading_text);
-        TextView slideLowText = (TextView) view.findViewById(R.id.low_text);
+        ImageView slideImageView = view.findViewById(R.id.first_ico);
+        TextView slideHeading = view.findViewById(R.id.Heading_text);
+        TextView slideLowText = view.findViewById(R.id.low_text);
 
         slideImageView.setImageResource(slide_images[position]);
         slideHeading.setText(slide_heading[position]);
