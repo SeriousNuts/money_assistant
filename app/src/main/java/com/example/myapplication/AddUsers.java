@@ -11,25 +11,33 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
 import static android.text.InputType.TYPE_TEXT_VARIATION_PERSON_NAME;
 import static android.view.Gravity.RELATIVE_LAYOUT_DIRECTION;
 import static android.view.Gravity.RIGHT;
+import static com.example.myapplication.R.id.ChartName;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
 import static com.example.myapplication.R.id.progress_bars;
@@ -51,6 +59,8 @@ public class AddUsers extends Fragment {
     int Checkid2 = 0;
     private DatabaseReference mDataBase;
     FirebaseUser payment;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -168,38 +178,45 @@ public class AddUsers extends Fragment {
         progressBars.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent progresIntent = new Intent(getActivity(), ProgressBars.class);
+                Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);
                 startActivity(progresIntent);
             }
         });
-        SaveButton.setOnClickListener(new View.OnClickListener(){
+        SaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 payment = FirebaseAuth.getInstance().getCurrentUser();
                 String PaymentKey = payment.getUid();
-                mDataBase = FirebaseDatabase.getInstance().getReference(PaymentKey).child("Payments");
+
+                EditText chartname = RootView.findViewById(ChartName);
+                String Chartname = chartname.getText().toString();
                 Date currentTime = Calendar.getInstance().getTime();
                 EditText EditText;
-                Payment payment = new Payment();
-                for (int i = 0; i < NumbersofNameEditText.size(); i++){
+                Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0");
+                int fullAmount = 0;
+                Map<String, Object> paymentsMap = new HashMap<>();
+                paymentsMap.put("Chart", chart);
+                String date = currentTime.toString();
+                for (int i = 0; i < NumbersofNameEditText.size(); i++) {
                     EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
-                    payment.name = EditText.getText().toString();
+                    String name = EditText.getText().toString();
                     EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
-                    payment.amount = EditText.getText().toString();
-                    payment.date = currentTime.toString();
-                    payment.percent = "0%";
-                    payment.id = Integer.toString(i);;
-                    mDataBase.push().setValue(payment);
-                    Toast.makeText(getActivity(), "Добавлено",Toast.LENGTH_SHORT).show();
-                }
+                    String amount = EditText.getText().toString();
+                    fullAmount = fullAmount + Integer.parseInt(amount);
+                    String percent = "0%";
+                    String id = Integer.toString(i);
+                    Payment paymentCh = new Payment(Chartname,id,name,date,amount,percent);
 
+                    chart.payments.put("Payment " + i, paymentCh);
+                    paymentsMap.put("Payment" + i, paymentCh);
+                    Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
+                }
+                chart.fullAmount = fullAmount + " rub";
+                firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
 
             }
         });
-        // return inflater.inflate(R.layout.fragment_add_users, container, false);
-
         return RootView;
-
     }
 
     private void scanCode() {

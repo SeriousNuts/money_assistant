@@ -3,72 +3,98 @@ package com.example.myapplication;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
-import java.util.ArrayList;
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ProgressBars extends AppCompatActivity {
-    ArrayList<Payment> listDataPayment = new ArrayList<>();
     RecyclerView recyclerView;
-    RecycleViewAdapter recyclerViewAdapter;
     FirebaseUser payment;
     Dialog EditDelete;
+    Query query;
+    FirebaseFirestore firebaseFirestore;
+    FirestoreRecyclerAdapter firestoreRecyclerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listDataPayment = new ArrayList<>();
-
         payment = FirebaseAuth.getInstance().getCurrentUser();
         String PaymentKey = payment.getUid();
-
+        firebaseFirestore = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_progress_bars);
+
         recyclerView = findViewById(R.id.PaymentResView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        FirebaseRecyclerOptions<Payment> options =
-                new FirebaseRecyclerOptions.Builder<Payment>()
-                        .setQuery(FirebaseDatabase.getInstance().getReference(PaymentKey).child("Payments"), Payment.class)
+
+        FirestoreRecyclerOptions<Payment> options =
+                new FirestoreRecyclerOptions.Builder<Payment>()
+                        .setQuery(query, Payment.class)
                         .build();
-
-        recyclerViewAdapter = new RecycleViewAdapter(options);
-        recyclerViewAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<Payment, PaymentsViewHolder>(options) {
+            @NonNull
             @Override
-            public void OnItemClickListener(View view, int position) {
-                Toast.makeText(ProgressBars.this,"click work",Toast.LENGTH_SHORT).show();
-                Log.v("  ", "click");
-
+            public PaymentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_payment_row, parent, false);
+                //view.setOnClickListener(new RecycleViewAdapter.RV_ItemListener());
+                //view.setOnLongClickListener(new RecycleViewAdapter.RV_ItemListener());
+                return new PaymentsViewHolder(view);
             }
 
             @Override
-            public void OnItemLongClickListener(View view, int position) {
-                setDialog();
+            protected void onBindViewHolder(@NonNull PaymentsViewHolder holder, int position, @NonNull Payment payment) {
+                holder.parentChartName.setText(payment.ParentChart);
+                holder.name.setText(payment.name);
+                holder.date.setText(payment.date);
+                holder.amount.setText(payment.amount);
+                holder.percent.setText(payment.percent);
+                holder.itemView.setId(position);
             }
-        });
+        };
+        //recyclerView.setHasFixedSize(true);
 
-        recyclerView.setAdapter(recyclerViewAdapter);
+        recyclerView.setAdapter(firestoreRecyclerAdapter);
     }
+
     @Override
-    protected void onStart(){
-        super.onStart();
-        recyclerViewAdapter.startListening();
-    }
-    @Override
-    protected void onStop(){
+    protected void onStop() {
         super.onStop();
-        recyclerViewAdapter.stopListening();
+        firestoreRecyclerAdapter.stopListening();
     }
-    public void setDialog(){
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firestoreRecyclerAdapter.startListening();
+    }
+
+    private static class PaymentsViewHolder extends RecyclerView.ViewHolder {
+        TextView name, date, amount, percent, parentChartName;
+
+        public PaymentsViewHolder(@NonNull View itemview) {
+            super(itemview);
+            parentChartName = itemView.findViewById(R.id.parentChartName);
+            name = itemView.findViewById(R.id.name);
+            date = itemView.findViewById(R.id.date);
+            amount = itemView.findViewById(R.id.amount);
+            percent = itemView.findViewById(R.id.percent);
+        }
+    }
+
+    public void setDialog() {
         EditDelete = new Dialog(ProgressBars.this);
         EditDelete.setTitle("Удалить или изменить");
         EditDelete.setContentView(R.layout.edit_delete_dialog);

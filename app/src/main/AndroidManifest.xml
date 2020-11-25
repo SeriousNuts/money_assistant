@@ -12,7 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ProgressBars"></activity>
+        <activity android:name=".ChartProgressActivity"></activity>
+        <activity android:name=".ProgressBars" />
         <activity
             android:name=".QRScanner"
             android:screenOrientation="fullSensor"
@@ -28,13 +29,12 @@
             </intent-filter>
         </activity>
     </application>
-
-    <uses-feature android:name="android.hardware.autofocus" />
     <uses-feature android:name="android.hardware.camera" />
 
-    <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-feature android:name="android.hardware.autofocus" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <dist:module dist:instant="true" />
 

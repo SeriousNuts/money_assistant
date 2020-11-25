@@ -1,10 +1,8 @@
-package com.example.myapplication;
+/*package com.example.myapplication;
 
-import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -22,6 +20,7 @@ public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleV
 
     @Override
     protected void onBindViewHolder(@NonNull final myviewholder holder, final int position, @NonNull Payment payment) {
+        holder.parentChartName.setText(payment.ParentChart);
         holder.name.setText(payment.name);
         holder.date.setText(payment.date);
         holder.amount.setText(payment.amount);
@@ -39,9 +38,10 @@ public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleV
     }
 
     static class myviewholder extends RecyclerView.ViewHolder{
-        TextView name, date, amount, percent;
+        TextView name, date, amount, percent, parentChartName;
         public myviewholder(@NonNull final View itemView) {
             super(itemView);
+            parentChartName = itemView.findViewById(R.id.parentChartName);
             name = itemView.findViewById(R.id.name);
             date = itemView.findViewById(R.id.date);
             amount = itemView.findViewById(R.id.amount);
@@ -74,3 +74,5 @@ public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleV
         this.onItemListener = listener;
     }
 }
+*/
+

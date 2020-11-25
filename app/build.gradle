@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.4.0'
     implementation 'androidx.paging:paging-runtime:2.1.2'
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+    implementation 'com.firebaseui:firebase-ui-firestore:6.2.1'
 
 }
 

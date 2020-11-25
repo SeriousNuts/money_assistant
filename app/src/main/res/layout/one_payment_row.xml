@@ -14,9 +14,23 @@
         android:longClickable="false">
 
         <TextView
+            android:id="@+id/parentChartName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="157dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="155dp"
+            android:layout_marginBottom="69dp"
+            android:text="TextView" />
+
+        <TextView
             android:id="@+id/name"
-            android:layout_width="105dp"
-            android:layout_height="37dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
@@ -31,7 +45,7 @@
 
         <TextView
             android:id="@+id/date"
-            android:layout_width="309dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
@@ -44,11 +58,11 @@
 
         <TextView
             android:id="@+id/amount"
-            android:layout_width="100dp"
-            android:layout_height="35dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="58dp"
+            android:layout_marginTop="62dp"
             android:layout_marginEnd="31dp"
             android:layout_marginBottom="3dp"
             android:layout_toStartOf="@+id/percent"
