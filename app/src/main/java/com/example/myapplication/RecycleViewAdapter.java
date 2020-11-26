@@ -1,20 +1,20 @@
-/*package com.example.myapplication;
+package com.example.myapplication;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleViewAdapter.myviewholder> {
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+
+public class RecycleViewAdapter extends FirestoreRecyclerAdapter<Payment, RecycleViewAdapter.myviewholder> {
     private OnItemListener onItemListener;
 
-    public RecycleViewAdapter(@NonNull FirebaseRecyclerOptions<Payment> options) {
+    public RecycleViewAdapter(@NonNull FirestoreRecyclerOptions<Payment> options) {
         super(options);
     }
 
@@ -74,5 +74,5 @@ public class RecycleViewAdapter extends FirebaseRecyclerAdapter<Payment,RecycleV
         this.onItemListener = listener;
     }
 }
-*/
+
 

@@ -22,18 +22,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ProgressBars extends AppCompatActivity {
     RecyclerView recyclerView;
-    FirebaseUser payment;
-    Dialog EditDelete;
-    Query query;
-    FirebaseFirestore firebaseFirestore;
-    FirestoreRecyclerAdapter firestoreRecyclerAdapter;
+    FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();
+    String PaymentKey = payment.getUid();
+    Query queryPayments;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    RecycleViewAdapter firestoreRecyclerAdapter;
+    String chartname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        payment = FirebaseAuth.getInstance().getCurrentUser();
-        String PaymentKey = payment.getUid();
-        firebaseFirestore = FirebaseFirestore.getInstance();
+        Intent intentReceived= getIntent();
+        Bundle bundleChartName=intentReceived.getExtras();
+        if(bundleChartName != null){
+            chartname=bundleChartName.getString("chartname");
+        }
+        queryPayments = firebaseFirestore.collection(PaymentKey).whereEqualTo("ParentChart",chartname);
         setContentView(R.layout.activity_progress_bars);
 
         recyclerView = findViewById(R.id.PaymentResView);
@@ -41,31 +45,10 @@ public class ProgressBars extends AppCompatActivity {
 
         FirestoreRecyclerOptions<Payment> options =
                 new FirestoreRecyclerOptions.Builder<Payment>()
-                        .setQuery(query, Payment.class)
+                        .setQuery(queryPayments, Payment.class)
                         .build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        firestoreRecyclerAdapter = new FirestoreRecyclerAdapter<Payment, PaymentsViewHolder>(options) {
-            @NonNull
-            @Override
-            public PaymentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_payment_row, parent, false);
-                //view.setOnClickListener(new RecycleViewAdapter.RV_ItemListener());
-                //view.setOnLongClickListener(new RecycleViewAdapter.RV_ItemListener());
-                return new PaymentsViewHolder(view);
-            }
-
-            @Override
-            protected void onBindViewHolder(@NonNull PaymentsViewHolder holder, int position, @NonNull Payment payment) {
-                holder.parentChartName.setText(payment.ParentChart);
-                holder.name.setText(payment.name);
-                holder.date.setText(payment.date);
-                holder.amount.setText(payment.amount);
-                holder.percent.setText(payment.percent);
-                holder.itemView.setId(position);
-            }
-        };
-        //recyclerView.setHasFixedSize(true);
-
+        firestoreRecyclerAdapter = new RecycleViewAdapter(options);
         recyclerView.setAdapter(firestoreRecyclerAdapter);
     }
 
@@ -81,23 +64,4 @@ public class ProgressBars extends AppCompatActivity {
         firestoreRecyclerAdapter.startListening();
     }
 
-    private static class PaymentsViewHolder extends RecyclerView.ViewHolder {
-        TextView name, date, amount, percent, parentChartName;
-
-        public PaymentsViewHolder(@NonNull View itemview) {
-            super(itemview);
-            parentChartName = itemView.findViewById(R.id.parentChartName);
-            name = itemView.findViewById(R.id.name);
-            date = itemView.findViewById(R.id.date);
-            amount = itemView.findViewById(R.id.amount);
-            percent = itemView.findViewById(R.id.percent);
-        }
-    }
-
-    public void setDialog() {
-        EditDelete = new Dialog(ProgressBars.this);
-        EditDelete.setTitle("Удалить или изменить");
-        EditDelete.setContentView(R.layout.edit_delete_dialog);
-        EditDelete.show();
-    }
 }

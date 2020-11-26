@@ -57,7 +57,6 @@ public class AddUsers extends Fragment {
     int buttonId;
     int Checkid = 0;
     int Checkid2 = 0;
-    private DatabaseReference mDataBase;
     FirebaseUser payment;
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 

@@ -20,7 +20,7 @@ public class EditDeleteDialog extends DialogFragment {
                 .setPositiveButton("Да, удалить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ((ChartProgressActivity) getActivity()).okClicked(which);
+                        ((ChartProgressActivity) getActivity()).okClicked();
                     }
                 }).setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
             @Override

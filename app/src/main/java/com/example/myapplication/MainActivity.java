@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_LONG).show();
                 // ...
             }
         }
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             // If sign in fails, display a message to the user.
                             Toast.makeText(MainActivity.this, "Authentification failed" + task.getException().getMessage(),
-                                    Toast.LENGTH_SHORT).show();
+                                    Toast.LENGTH_LONG).show();
                         }
 
                         // ...

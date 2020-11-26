@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
@@ -32,21 +33,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ChartProgressActivity extends AppCompatActivity {
     RecyclerView recyclerViewChart;
-    FirebaseUser payment;
-    Dialog EditDelete;
-    Query queryChart;
-    FirebaseFirestore firebaseFirestore;
+    FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();
+    String PaymentKey = payment.getUid();
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+    Query queryChart = firebaseFirestore.collection(PaymentKey);
     String chartname;
     private RecycleViewChartAdapter firestoreRecyclerAdapter;
+    int ViewPosition;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_progress);
 
-        payment = FirebaseAuth.getInstance().getCurrentUser();
-        final String PaymentKey = payment.getUid();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        queryChart = firebaseFirestore.collection(PaymentKey);
         recyclerViewChart = findViewById(R.id.RecyclerViewChart);
 
         FirestoreRecyclerOptions<Chart> options =
@@ -60,10 +58,18 @@ public class ChartProgressActivity extends AppCompatActivity {
             @Override
             public void OnItemClickListener(View view, int position) {
                 chartname = firestoreRecyclerAdapter.getItem(position).Chartname;
+                Intent chartToProgressBars = new Intent(ChartProgressActivity.this, ProgressBars.class);
+                Bundle bundleChartName = new Bundle();
+                //имя диаграммы
+                bundleChartName.putString("chartname", chartname);
+                chartToProgressBars.putExtras(bundleChartName);
+                startActivity(chartToProgressBars);
+                //Toast.makeText(ChartProgressActivity.this, "click", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void OnItemLongClickListener(View view, int position) {
+                ViewPosition = position;
                     ShowAlertDialog();
             }
         });
@@ -82,18 +88,13 @@ public class ChartProgressActivity extends AppCompatActivity {
         super.onStart();
         firestoreRecyclerAdapter.startListening();
     }
-    public void setDialog(){
-        EditDelete = new Dialog(ChartProgressActivity.this);
-        EditDelete.setContentView(R.layout.edit_delete_dialog);
-        EditDelete.show();
-    }
+
     public void ShowAlertDialog(){
         EditDeleteDialog dialog = new EditDeleteDialog();
         dialog.show(getSupportFragmentManager(),"Delete");
     }
-    public void okClicked(int which) {
-        chartname = firestoreRecyclerAdapter.getItem(which).Chartname;
-        payment = FirebaseAuth.getInstance().getCurrentUser();
+    public void okClicked() {
+        chartname = firestoreRecyclerAdapter.getItem(ViewPosition).Chartname;
         final String PaymentKey = payment.getUid();
         firebaseFirestore.collection(PaymentKey).document(chartname)
                 .delete()
@@ -101,6 +102,25 @@ public class ChartProgressActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(ChartProgressActivity.this, "Deleted",Toast.LENGTH_SHORT).show();
+                        DeleteDocument(chartname);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ChartProgressActivity.this, e.toString(),Toast.LENGTH_SHORT).show();
+            }
+        });
+        firestoreRecyclerAdapter.notifyDataSetChanged();
+    }
+    public void DeleteDocument(String chartname){
+        final String PaymentKey = payment.getUid();
+        firebaseFirestore.collection(PaymentKey).document(chartname)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ChartProgressActivity.this, "Deleted",Toast.LENGTH_SHORT).show();
+                        firestoreRecyclerAdapter.notifyDataSetChanged();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
