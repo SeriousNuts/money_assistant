@@ -33,12 +33,13 @@ public class ProgressBars extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intentReceived= getIntent();
+        setContentView(R.layout.activity_progress_bars);
         Bundle bundleChartName=intentReceived.getExtras();
         if(bundleChartName != null){
             chartname=bundleChartName.getString("chartname");
         }
         queryPayments = firebaseFirestore.collection(PaymentKey).whereEqualTo("ParentChart",chartname);
-        setContentView(R.layout.activity_progress_bars);
+
 
         recyclerView = findViewById(R.id.PaymentResView);
 

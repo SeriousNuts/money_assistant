@@ -191,7 +191,7 @@ public class AddUsers extends Fragment {
                 String Chartname = chartname.getText().toString();
                 Date currentTime = Calendar.getInstance().getTime();
                 EditText EditText;
-                Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0");
+                Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0","Chart");
                 int fullAmount = 0;
                 Map<String, Object> paymentsMap = new HashMap<>();
                 paymentsMap.put("Chart", chart);
@@ -206,8 +206,9 @@ public class AddUsers extends Fragment {
                     String id = Integer.toString(i);
                     Payment paymentCh = new Payment(Chartname,id,name,date,amount,percent);
 
-                    chart.payments.put("Payment " + i, paymentCh);
-                    paymentsMap.put("Payment" + i, paymentCh);
+                    //chart.payments.put("Payment " + i, paymentCh);
+                    //paymentsMap.put("Payment" + i, paymentCh);
+                    firebaseFirestore.collection(PaymentKey).add(paymentCh);
                     Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
                 }
                 chart.fullAmount = fullAmount + " rub";

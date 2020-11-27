@@ -11,14 +11,16 @@ public class Chart {
     String NumberOfPeople = "";
     String percent = "";
     Map<String, Object>payments = new HashMap<>();
+    String typo = "";
     public Chart() {
     }
 
-    public Chart(String chartname, String fullAmount, String numberOfPeople, String percent) {
+    public Chart(String chartname, String fullAmount, String numberOfPeople, String percent, String typo) {
         Chartname = chartname;
         this.fullAmount = fullAmount;
         NumberOfPeople = numberOfPeople;
         this.percent = percent;
+        this.typo = typo;
     }
 
     public String getChartname() {
@@ -59,6 +61,14 @@ public class Chart {
 
     public void setPayments(Map<String, Object> payments) {
         this.payments = payments;
+    }
+
+    public String getTypo() {
+        return typo;
+    }
+
+    public void setTypo(String typo) {
+        this.typo = typo;
     }
 }
 

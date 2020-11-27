@@ -36,7 +36,7 @@ public class ChartProgressActivity extends AppCompatActivity {
     FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();
     String PaymentKey = payment.getUid();
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    Query queryChart = firebaseFirestore.collection(PaymentKey);
+    Query queryChart = firebaseFirestore.collection(PaymentKey).whereEqualTo("typo", "Chart");
     String chartname;
     private RecycleViewChartAdapter firestoreRecyclerAdapter;
     int ViewPosition;

@@ -3,7 +3,7 @@ package com.example.myapplication;
 import java.util.Map;
 
 public class Payment{
-    public String ParentChart, id, name, date, amount, percent;
+    public String ParentChart, id, name, date, amount, Paypercent;
 
     Payment(){}
 
@@ -13,6 +13,6 @@ public class Payment{
         this.name = name;
         this.date = date;
         this.amount = amount;
-        this.percent = percent;
+        this.Paypercent = percent;
     }
 }
