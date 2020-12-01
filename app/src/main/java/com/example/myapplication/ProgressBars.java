@@ -50,6 +50,17 @@ public class ProgressBars extends AppCompatActivity {
                         .build();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         firestoreRecyclerAdapter = new RecycleViewAdapter(options);
+        firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {
+            @Override
+            public void OnItemClickListener(View view, int position) {
+
+            }
+
+            @Override
+            public void OnItemLongClickListener(View view, int position) {
+
+            }
+        });
         recyclerView.setAdapter(firestoreRecyclerAdapter);
     }
 

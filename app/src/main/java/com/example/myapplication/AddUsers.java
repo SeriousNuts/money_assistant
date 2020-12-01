@@ -186,34 +186,37 @@ public class AddUsers extends Fragment {
             public void onClick(View v) {
                 payment = FirebaseAuth.getInstance().getCurrentUser();
                 String PaymentKey = payment.getUid();
-
                 EditText chartname = RootView.findViewById(ChartName);
-                String Chartname = chartname.getText().toString();
-                Date currentTime = Calendar.getInstance().getTime();
-                EditText EditText;
-                Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0","Chart");
-                int fullAmount = 0;
-                Map<String, Object> paymentsMap = new HashMap<>();
-                paymentsMap.put("Chart", chart);
-                String date = currentTime.toString();
-                for (int i = 0; i < NumbersofNameEditText.size(); i++) {
-                    EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
-                    String name = EditText.getText().toString();
-                    EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
-                    String amount = EditText.getText().toString();
-                    fullAmount = fullAmount + Integer.parseInt(amount);
-                    String percent = "0%";
-                    String id = Integer.toString(i);
-                    Payment paymentCh = new Payment(Chartname,id,name,date,amount,percent);
+                if (chartname.equals("")) {
+                    String Chartname = chartname.getText().toString();
+                    Date currentTime = Calendar.getInstance().getTime();
+                    EditText EditText;
+                    Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0", "Chart");
+                    int fullAmount = 0;
+                    Map<String, Object> paymentsMap = new HashMap<>();
+                    paymentsMap.put("Chart", chart);
+                    String date = currentTime.toString();
+                    for (int i = 0; i < NumbersofNameEditText.size(); i++) {
+                        EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
+                        String name = EditText.getText().toString();
+                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+                        String amount = EditText.getText().toString();
+                        fullAmount = fullAmount + Integer.parseInt(amount);
+                        String percent = "0%";
+                        String id = Integer.toString(i);
+                        Payment paymentCh = new Payment(Chartname, id, name, date, amount, percent);
 
-                    //chart.payments.put("Payment " + i, paymentCh);
-                    //paymentsMap.put("Payment" + i, paymentCh);
-                    firebaseFirestore.collection(PaymentKey).add(paymentCh);
-                    Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
+                        //chart.payments.put("Payment " + i, paymentCh);
+                        //paymentsMap.put("Payment" + i, paymentCh);
+                        firebaseFirestore.collection(PaymentKey).add(paymentCh);
+                        Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
+                    }
+                    chart.fullAmount = fullAmount + " rub";
+                    firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
                 }
-                chart.fullAmount = fullAmount + " rub";
-                firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
-
+                else{
+                    Toast.makeText(getActivity(), "Введите имя дигарммы",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         return RootView;
