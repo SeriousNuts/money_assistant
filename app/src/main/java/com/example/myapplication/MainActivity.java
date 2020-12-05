@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
@@ -19,6 +21,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -26,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import static com.example.myapplication.R.id.ForgotPassword;
 import static com.example.myapplication.R.id.sign_in;
 import static com.example.myapplication.R.id.sign_up;
 import static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;
@@ -162,7 +167,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 signIn();
 
                 break;
+            case ForgotPassword:
+                final EditText resetMail=  new EditText (v.getContext());
+                final AlertDialog.Builder passwordResetDialog= new AlertDialog.Builder(v.getContext());
+                passwordResetDialog.setTitle("Восстановить пароль");
+                passwordResetDialog.setMessage("Введите ваш Email, что бы восстановить пароль.");
+                passwordResetDialog.setView(resetMail);
 
+
+
+                passwordResetDialog.setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String mail = resetMail. getText().toString();
+
+                        mAuth.sendPasswordResetEmail(mail).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(MainActivity.this,"Ссылка для восстановления отправленна на ваш Email!", Toast.LENGTH_SHORT ).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(MainActivity.this,"Ошибка! Ссылка для восстановления не отправлена!"+ e.getMessage(), Toast.LENGTH_SHORT ).show();
+                            }
+                        });
+                    }
+
+                });
+
+
+                passwordResetDialog.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+
+                    }
+                });
+                passwordResetDialog.create().show();
+                break;
             default:
                 break;
         }

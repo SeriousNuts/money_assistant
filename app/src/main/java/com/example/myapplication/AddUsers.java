@@ -42,7 +42,6 @@ import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.buttonAdd;
 import static com.example.myapplication.R.id.progress_bars;
 import static com.example.myapplication.R.id.qr_scanner;
-import static com.example.myapplication.R.id.save_button;
 
 public class AddUsers extends Fragment {
 
@@ -55,8 +54,6 @@ public class AddUsers extends Fragment {
     int d = 0;
     int x = 50;
     int buttonId;
-    int Checkid = 0;
-    int Checkid2 = 0;
     FirebaseUser payment;
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
@@ -75,7 +72,6 @@ public class AddUsers extends Fragment {
         Button qr = RootView.findViewById(qr_scanner);
         Button logout = RootView.findViewById(R.id.logout);
         Button progressBars = RootView.findViewById(progress_bars);
-        Button SaveButton = RootView.findViewById(save_button);
 
         EnterBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,6 +102,39 @@ public class AddUsers extends Fragment {
 
                 }
                 intent1.putExtra("list", EditTexts);
+                payment = FirebaseAuth.getInstance().getCurrentUser();
+                String PaymentKey = payment.getUid();
+                EditText chartname = RootView.findViewById(ChartName);
+                if (!chartname.equals("")) {
+                    String Chartname = chartname.getText().toString();
+                    Date currentTime = Calendar.getInstance().getTime();
+                    EditText EditText;
+                    Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0", "Chart");
+                    int fullAmount = 0;
+                    Map<String, Object> paymentsMap = new HashMap<>();
+                    paymentsMap.put("Chart", chart);
+                    String date = currentTime.toString();
+                    for (int i = 0; i < NumbersofNameEditText.size(); i++) {
+                        EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
+                        String name = EditText.getText().toString();
+                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+                        String amount = EditText.getText().toString();
+                        fullAmount = fullAmount + Integer.parseInt(amount);
+                        String percent = "0%";
+                        String id = Integer.toString(i);
+                        Payment paymentCh = new Payment(Chartname, id, name, date, amount, percent);
+
+                        //chart.payments.put("Payment " + i, paymentCh);
+                        //paymentsMap.put("Payment" + i, paymentCh);
+                        firebaseFirestore.collection(PaymentKey).add(paymentCh);
+                        Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
+                    }
+                    chart.fullAmount = fullAmount + " rub";
+                    firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
+                }
+                else{
+                    Toast.makeText(getActivity(), "Введите имя дигарммы",Toast.LENGTH_SHORT).show();
+                }
                 startActivity(intent1);
 
             }
@@ -116,7 +145,6 @@ public class AddUsers extends Fragment {
             @Override
             public void onClick(View v) {
                 final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);
-                Checkid2 = Checkid2 + x;
                 i++;
                 LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -146,8 +174,6 @@ public class AddUsers extends Fragment {
                 deleteField.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Checkid++;
-                        Checkid2++;
                         NumbersofNameEditText.remove(Integer.toString(Users.getId()));
                         NumbersofSummEditText.remove(Integer.toString(editText.getId()));
                         llMain2.removeView(Users);
@@ -179,44 +205,6 @@ public class AddUsers extends Fragment {
             public void onClick(View v) {
                 Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);
                 startActivity(progresIntent);
-            }
-        });
-        SaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                payment = FirebaseAuth.getInstance().getCurrentUser();
-                String PaymentKey = payment.getUid();
-                EditText chartname = RootView.findViewById(ChartName);
-                if (chartname.equals("")) {
-                    String Chartname = chartname.getText().toString();
-                    Date currentTime = Calendar.getInstance().getTime();
-                    EditText EditText;
-                    Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0", "Chart");
-                    int fullAmount = 0;
-                    Map<String, Object> paymentsMap = new HashMap<>();
-                    paymentsMap.put("Chart", chart);
-                    String date = currentTime.toString();
-                    for (int i = 0; i < NumbersofNameEditText.size(); i++) {
-                        EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
-                        String name = EditText.getText().toString();
-                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
-                        String amount = EditText.getText().toString();
-                        fullAmount = fullAmount + Integer.parseInt(amount);
-                        String percent = "0%";
-                        String id = Integer.toString(i);
-                        Payment paymentCh = new Payment(Chartname, id, name, date, amount, percent);
-
-                        //chart.payments.put("Payment " + i, paymentCh);
-                        //paymentsMap.put("Payment" + i, paymentCh);
-                        firebaseFirestore.collection(PaymentKey).add(paymentCh);
-                        Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
-                    }
-                    chart.fullAmount = fullAmount + " rub";
-                    firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
-                }
-                else{
-                    Toast.makeText(getActivity(), "Введите имя дигарммы",Toast.LENGTH_SHORT).show();
-                }
             }
         });
         return RootView;
