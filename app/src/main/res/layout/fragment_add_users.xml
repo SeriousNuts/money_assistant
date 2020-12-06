@@ -65,52 +65,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="304dp"
-        android:layout_marginBottom="16dp"
-        android:onClick="onClick"
-        android:text="выйти"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints" />
-
-    <Button
-        android:id="@+id/buttonAdd"
-        android:layout_width="84dp"
-        android:layout_height="35dp"
-        android:background="@android:color/holo_green_dark"
-        android:onClick="onClick1"
-        android:text="@string/add_btn"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="2dp" />
-
-    <Button
-        android:id="@+id/qr_scanner"
-        android:layout_width="93dp"
-        android:layout_height="45dp"
-        android:layout_marginBottom="16dp"
-        android:onClick="onClick"
-        android:text="qr_scanner"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.924"
-        app:layout_constraintStart_toEndOf="@+id/logout" />
-
-    <Button
-        android:id="@+id/progress_bars"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:onClick="onClick"
-        android:text="progress"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/qr_scanner"
-        app:layout_constraintHorizontal_bias="0.504"
-        app:layout_constraintStart_toEndOf="@+id/logout" />
-
     <ScrollView
         android:layout_width="234dp"
         android:layout_height="187dp"
@@ -136,5 +90,21 @@
             tools:ignore="MissingConstraints"></LinearLayout>
 
     </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/fui_bgPhone"
+        app:itemIconTint="#FFFFFF"
+        app:itemTextColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_menu"
+        app:itemIconSize="26dp"
+        tools:ignore="MissingConstraints" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

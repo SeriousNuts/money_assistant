@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -39,9 +41,12 @@ import static android.view.Gravity.RELATIVE_LAYOUT_DIRECTION;
 import static android.view.Gravity.RIGHT;
 import static com.example.myapplication.R.id.ChartName;
 import static com.example.myapplication.R.id.EnterName;
-import static com.example.myapplication.R.id.buttonAdd;
-import static com.example.myapplication.R.id.progress_bars;
-import static com.example.myapplication.R.id.qr_scanner;
+import static com.example.myapplication.R.id.bottom_menu;
+import static com.example.myapplication.R.id.nav_add;
+import static com.example.myapplication.R.id.nav_exit;
+import static com.example.myapplication.R.id.nav_progress;
+import static com.example.myapplication.R.id.nav_qr;
+
 
 public class AddUsers extends Fragment {
 
@@ -56,7 +61,6 @@ public class AddUsers extends Fragment {
     int buttonId;
     FirebaseUser payment;
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,10 +72,8 @@ public class AddUsers extends Fragment {
                              Bundle savedInstanceState) {
         final View RootView = inflater.inflate(R.layout.fragment_add_users, container, false);
         Button EnterBut = RootView.findViewById(EnterName);
-        Button addBut = RootView.findViewById(buttonAdd);
-        Button qr = RootView.findViewById(qr_scanner);
-        Button logout = RootView.findViewById(R.id.logout);
-        Button progressBars = RootView.findViewById(progress_bars);
+        BottomNavigationView bottomMenu= RootView.findViewById(bottom_menu);
+        bottomMenu.setOnNavigationItemSelectedListener(navListener);
 
         EnterBut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,77 +141,69 @@ public class AddUsers extends Fragment {
 
             }
         });
-
-
-        addBut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);
-                i++;
-                LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                param.gravity = RELATIVE_LAYOUT_DIRECTION;
-                final EditText editText = new EditText(getActivity());
-                editText.setId(i);
-                NumbersofSummEditText.add(Integer.toString(i));
-                editText.setHint("Сумма");
-                //запись id едиттекстов
-                editText.setInputType(TYPE_CLASS_NUMBER);
-                d = d + x;
-                final LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                param2.gravity = RIGHT;
-                final EditText Users = new EditText(getActivity());
-                Users.setId(d);
-                NumbersofNameEditText.add(Integer.toString(d));
-                Users.setHint("Имя");
-                Users.setInputType(TYPE_TEXT_VARIATION_PERSON_NAME);
-                buttonId++;
-                final Button deleteField = new Button(getActivity());
-                deleteField.setId(buttonId);
-                deleteField.setText("Удалить");
-                llMain2.addView(Users, param2);
-                llMain2.addView(editText, param);
-                llMain2.addView(deleteField);
-                deleteField.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        NumbersofNameEditText.remove(Integer.toString(Users.getId()));
-                        NumbersofSummEditText.remove(Integer.toString(editText.getId()));
-                        llMain2.removeView(Users);
-                        llMain2.removeView(editText);
-                        llMain2.removeView(deleteField);
-                    }
-
-                });
-            }
-        });
-
-        qr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scanCode();
-            }
-        });
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intentLogout = new Intent(getActivity(), MainActivity.class);
-                startActivity(intentLogout);
-                getActivity().finish();
-            }
-        });
-        progressBars.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);
-                startActivity(progresIntent);
-            }
-        });
         return RootView;
     }
+private BottomNavigationView.OnNavigationItemSelectedListener navListener= new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case nav_exit:
+                        FirebaseAuth.getInstance().signOut();
+                        Intent intentLogout = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intentLogout);
+                        getActivity().finish();
+                        break;
+                    case nav_qr:
+                        scanCode();
+                        break;
+                    case nav_progress:
+                        Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);
+                        startActivity(progresIntent);
+                        break;
+                    case nav_add:
+                        final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);
+                        i++;
+                        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        param.gravity = RELATIVE_LAYOUT_DIRECTION;
+                        final EditText editText = new EditText(getActivity());
+                        editText.setId(i);
+                        NumbersofSummEditText.add(Integer.toString(i));
+                        editText.setHint("Сумма");
+                        //запись id едиттекстов
+                        editText.setInputType(TYPE_CLASS_NUMBER);
+                        d = d + x;
+                        final LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT);
+                        param2.gravity = RIGHT;
+                        final EditText Users = new EditText(getActivity());
+                        Users.setId(d);
+                        NumbersofNameEditText.add(Integer.toString(d));
+                        Users.setHint("Имя");
+                        Users.setInputType(TYPE_TEXT_VARIATION_PERSON_NAME);
+                        buttonId++;
+                        final Button deleteField = new Button(getActivity());
+                        deleteField.setId(buttonId);
+                        deleteField.setText("Удалить");
+                        llMain2.addView(Users, param2);
+                        llMain2.addView(editText, param);
+                        llMain2.addView(deleteField);
+                        deleteField.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                NumbersofNameEditText.remove(Integer.toString(Users.getId()));
+                                NumbersofSummEditText.remove(Integer.toString(editText.getId()));
+                                llMain2.removeView(Users);
+                                llMain2.removeView(editText);
+                                llMain2.removeView(deleteField);
+                            }
 
+                        });
+                        break;
+                }
+                return true;
+            }
+        };
     private void scanCode() {
         IntentIntegrator integrator = new IntentIntegrator(getActivity());
         integrator.setCaptureActivity(QRScanner.class);

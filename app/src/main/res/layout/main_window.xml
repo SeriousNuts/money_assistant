@@ -47,12 +47,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:layout_editor_absoluteX="2dp"
-            tools:visibility="visible">
-
-
-        </FrameLayout>
+            tools:visibility="visible"/>
 
     </LinearLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
