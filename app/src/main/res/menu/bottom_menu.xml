@@ -3,6 +3,10 @@
 
 
     <item
+        android:id="@+id/nav_contacts"
+        android:icon="@drawable/fui_ic_anonymous_white_24dp"
+        android:title="contacts" />
+    <item
         android:title="Exit"
         android:id="@+id/nav_exit"
         android:icon="@drawable/ic_baseline_exit_to_app_24"

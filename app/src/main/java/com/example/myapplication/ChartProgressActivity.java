@@ -77,7 +77,12 @@ public class ChartProgressActivity extends AppCompatActivity {
     }
 
     public void ShowAlertDialog(){
+        Bundle bundle = new Bundle();
+        bundle.putString("chartname", firestoreRecyclerAdapter.getItem(ViewPosition).Chartname );
         EditDeleteDialog dialog = new EditDeleteDialog();
+        dialog.setArguments(bundle);
+        //transaction.replace(R.id.editDeleteDialog, fragInfo);
+        //transaction.commit();
         dialog.show(getSupportFragmentManager(),"Delete");
     }
     public void okClicked() {

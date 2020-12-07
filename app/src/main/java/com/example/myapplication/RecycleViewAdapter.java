@@ -23,8 +23,8 @@ public class RecycleViewAdapter extends FirestoreRecyclerAdapter<Payment, Recycl
         holder.parentChartName.setText(payment.ParentChart);
         holder.name.setText(payment.name);
         holder.date.setText(payment.date);
-        holder.amount.setText(payment.amount);
-        holder.percent.setText(payment.Paypercent);
+        holder.amount.setText(String.format(String.valueOf(payment.amount)));
+        holder.percent.setText(String.format(String.valueOf(payment.Paypercent)));
         holder.itemView.setId(position);
     }
 

@@ -17,7 +17,7 @@ public class Chart {
 
     public Chart(String chartname, String fullAmount, String numberOfPeople, String percent, String typo) {
         Chartname = chartname;
-        this.fullAmount = fullAmount;
+        this.fullAmount = fullAmount + " rub";
         NumberOfPeople = numberOfPeople;
         this.percent = percent;
         this.typo = typo;

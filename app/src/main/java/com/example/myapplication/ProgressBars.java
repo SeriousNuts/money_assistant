@@ -53,12 +53,12 @@ public class ProgressBars extends AppCompatActivity {
         firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {
             @Override
             public void OnItemClickListener(View view, int position) {
-
+                //заглушка для клика
             }
 
             @Override
             public void OnItemLongClickListener(View view, int position) {
-
+                //заглушка для долгого клика
             }
         });
         recyclerView.setAdapter(firestoreRecyclerAdapter);
