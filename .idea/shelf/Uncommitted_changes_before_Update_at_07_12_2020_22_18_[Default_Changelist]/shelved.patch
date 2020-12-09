@@ -1,0 +1,319 @@
+Index: app/src/main/java/com/example/myapplication/ProgressBars.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.app.Dialog;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.TextView;\r\n\r\nimport com.firebase.ui.firestore.FirestoreRecyclerAdapter;\r\nimport com.firebase.ui.firestore.FirestoreRecyclerOptions;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.firestore.FirebaseFirestore;\r\nimport com.google.firebase.firestore.Query;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\npublic class ProgressBars extends AppCompatActivity {\r\n    RecyclerView recyclerView;\r\n    FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();\r\n    String PaymentKey = payment.getUid();\r\n    Query queryPayments;\r\n    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();\r\n    RecycleViewAdapter firestoreRecyclerAdapter;\r\n    String chartname;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        Intent intentReceived= getIntent();\r\n        setContentView(R.layout.activity_progress_bars);\r\n        Bundle bundleChartName=intentReceived.getExtras();\r\n        if(bundleChartName != null){\r\n            chartname=bundleChartName.getString(\"chartname\");\r\n        }\r\n        queryPayments = firebaseFirestore.collection(PaymentKey).whereEqualTo(\"ParentChart\",chartname);\r\n\r\n\r\n        recyclerView = findViewById(R.id.PaymentResView);\r\n\r\n\r\n        FirestoreRecyclerOptions<Payment> options =\r\n                new FirestoreRecyclerOptions.Builder<Payment>()\r\n                        .setQuery(queryPayments, Payment.class)\r\n                        .build();\r\n        recyclerView.setLayoutManager(new LinearLayoutManager(this));\r\n        firestoreRecyclerAdapter = new RecycleViewAdapter(options);\r\n        firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {\r\n            @Override\r\n            public void OnItemClickListener(View view, int position) {\r\n\r\n            }\r\n\r\n            @Override\r\n            public void OnItemLongClickListener(View view, int position) {\r\n\r\n            }\r\n        });\r\n        recyclerView.setAdapter(firestoreRecyclerAdapter);\r\n    }\r\n\r\n    @Override\r\n    protected void onStop() {\r\n        super.onStop();\r\n        firestoreRecyclerAdapter.stopListening();\r\n    }\r\n\r\n    @Override\r\n    protected void onStart() {\r\n        super.onStart();\r\n        firestoreRecyclerAdapter.startListening();\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/ProgressBars.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/ProgressBars.java	(date 1607322151908)
+@@ -53,12 +53,12 @@
+         firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {
+             @Override
+             public void OnItemClickListener(View view, int position) {
+-
++                //заглушка для клика
+             }
+ 
+             @Override
+             public void OnItemLongClickListener(View view, int position) {
+-
++                //заглушка для долгого клика
+             }
+         });
+         recyclerView.setAdapter(firestoreRecyclerAdapter);
+Index: app/src/main/java/com/example/myapplication/RecycleViewAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.view.LayoutInflater;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.TextView;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport com.firebase.ui.firestore.FirestoreRecyclerAdapter;\r\nimport com.firebase.ui.firestore.FirestoreRecyclerOptions;\r\n\r\npublic class RecycleViewAdapter extends FirestoreRecyclerAdapter<Payment, RecycleViewAdapter.myviewholder> {\r\n    private OnItemListener onItemListener;\r\n\r\n    public RecycleViewAdapter(@NonNull FirestoreRecyclerOptions<Payment> options) {\r\n        super(options);\r\n    }\r\n\r\n    @Override\r\n    protected void onBindViewHolder(@NonNull final myviewholder holder, final int position, @NonNull Payment payment) {\r\n        holder.parentChartName.setText(payment.ParentChart);\r\n        holder.name.setText(payment.name);\r\n        holder.date.setText(payment.date);\r\n        holder.amount.setText(payment.amount);\r\n        holder.percent.setText(payment.Paypercent);\r\n        holder.itemView.setId(position);\r\n    }\r\n\r\n    @NonNull\r\n    @Override\r\n    public myviewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {\r\n        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.one_payment_row,parent,false);\r\n        view.setOnClickListener(new RV_ItemListener());\r\n        view.setOnLongClickListener(new RV_ItemListener());\r\n        return new myviewholder(view);\r\n    }\r\n\r\n    static class myviewholder extends RecyclerView.ViewHolder{\r\n        TextView name, date, amount, percent, parentChartName;\r\n        public myviewholder(@NonNull final View itemView) {\r\n            super(itemView);\r\n            parentChartName = itemView.findViewById(R.id.parentChartName);\r\n            name = itemView.findViewById(R.id.name);\r\n            date = itemView.findViewById(R.id.date);\r\n            amount = itemView.findViewById(R.id.amount);\r\n            percent = itemView.findViewById(R.id.percent);\r\n\r\n\r\n        }\r\n    }\r\n    public  interface OnItemListener{\r\n        void OnItemClickListener(View view, int position);\r\n        void OnItemLongClickListener(View view, int position);\r\n    }\r\n    class RV_ItemListener implements View.OnClickListener, View.OnLongClickListener{\r\n\r\n        @Override\r\n        public void onClick(View view) {\r\n           if (onItemListener != null){\r\n                onItemListener.OnItemClickListener(view, view.getId());\r\n            }\r\n        }\r\n        @Override\r\n        public boolean onLongClick(View view) {\r\n            if (onItemListener != null){\r\n                onItemListener.OnItemLongClickListener(view,view.getId());\r\n            }\r\n            return true;\r\n        }\r\n    }\r\n    public void setOnItemListenerListener(OnItemListener listener){\r\n        this.onItemListener = listener;\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/RecycleViewAdapter.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/RecycleViewAdapter.java	(date 1607329373794)
+@@ -23,8 +23,8 @@
+         holder.parentChartName.setText(payment.ParentChart);
+         holder.name.setText(payment.name);
+         holder.date.setText(payment.date);
+-        holder.amount.setText(payment.amount);
+-        holder.percent.setText(payment.Paypercent);
++        holder.amount.setText(String.format(String.valueOf(payment.amount)));
++        holder.percent.setText(String.format(String.valueOf(payment.Paypercent)));
+         holder.itemView.setId(position);
+     }
+ 
+Index: app/src/main/java/com/example/myapplication/EditDeleteDialog.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.app.AlertDialog;\r\nimport android.app.Dialog;\r\nimport android.content.DialogInterface;\r\nimport android.os.Bundle;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.fragment.app.DialogFragment;\r\n\r\npublic class EditDeleteDialog extends DialogFragment {\r\n    public EditDeleteDialog() {\r\n    }\r\n    @NonNull\r\n    @Override\r\n    public Dialog onCreateDialog(Bundle savedInstanceState) {\r\n        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());\r\n        builder.setTitle(\"Удаление\")\r\n                .setMessage(\"Диаграмма будет удалена без возможности восстановления\")\r\n                .setPositiveButton(\"Да, удалить\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        ((ChartProgressActivity) getActivity()).okClicked();\r\n                    }\r\n                }).setNegativeButton(\"Отмена\", new DialogInterface.OnClickListener() {\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n                dialog.cancel();\r\n            }\r\n        });\r\n        return builder.create();\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/EditDeleteDialog.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/EditDeleteDialog.java	(date 1607325672443)
+@@ -3,20 +3,25 @@
+ import android.app.AlertDialog;
+ import android.app.Dialog;
+ import android.content.DialogInterface;
++import android.content.Intent;
+ import android.os.Bundle;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.fragment.app.DialogFragment;
+ 
++import static android.content.Intent.getIntent;
++
+ public class EditDeleteDialog extends DialogFragment {
++    String chartname;
+     public EditDeleteDialog() {
+     }
+     @NonNull
+     @Override
+     public Dialog onCreateDialog(Bundle savedInstanceState) {
++        chartname = this.getArguments().getString("chartname");
+         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+         builder.setTitle("Удаление")
+-                .setMessage("Диаграмма будет удалена без возможности восстановления")
++                .setMessage("Диаграмма " + chartname + " будет удалена без возможности восстановления")
+                 .setPositiveButton("Да, удалить", new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+Index: app/src/main/java/com/example/myapplication/Chart.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\npublic class Chart {\r\n    String Chartname = \"\";\r\n    String fullAmount = \"\";\r\n    String NumberOfPeople = \"\";\r\n    String percent = \"\";\r\n    Map<String, Object>payments = new HashMap<>();\r\n    String typo = \"\";\r\n    public Chart() {\r\n    }\r\n\r\n    public Chart(String chartname, String fullAmount, String numberOfPeople, String percent, String typo) {\r\n        Chartname = chartname;\r\n        this.fullAmount = fullAmount;\r\n        NumberOfPeople = numberOfPeople;\r\n        this.percent = percent;\r\n        this.typo = typo;\r\n    }\r\n\r\n    public String getChartname() {\r\n        return Chartname;\r\n    }\r\n\r\n    public void setChartname(String chartname) {\r\n        Chartname = chartname;\r\n    }\r\n\r\n    public String getFullAmount() {\r\n        return fullAmount;\r\n    }\r\n\r\n    public void setFullAmount(String fullAmount) {\r\n        this.fullAmount = fullAmount;\r\n    }\r\n\r\n    public String getNumberOfPeople() {\r\n        return NumberOfPeople;\r\n    }\r\n\r\n    public void setNumberOfPeople(String numberOfPeople) {\r\n        NumberOfPeople = numberOfPeople;\r\n    }\r\n\r\n    public String getPercent() {\r\n        return percent;\r\n    }\r\n\r\n    public void setPercent(String percent) {\r\n        this.percent = percent;\r\n    }\r\n\r\n    public Map<String, Object> getPayments() {\r\n        return payments;\r\n    }\r\n\r\n    public void setPayments(Map<String, Object> payments) {\r\n        this.payments = payments;\r\n    }\r\n\r\n    public String getTypo() {\r\n        return typo;\r\n    }\r\n\r\n    public void setTypo(String typo) {\r\n        this.typo = typo;\r\n    }\r\n}\r\n\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/Chart.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/Chart.java	(date 1607327678639)
+@@ -17,7 +17,7 @@
+ 
+     public Chart(String chartname, String fullAmount, String numberOfPeople, String percent, String typo) {
+         Chartname = chartname;
+-        this.fullAmount = fullAmount;
++        this.fullAmount = fullAmount + " rub";
+         NumberOfPeople = numberOfPeople;
+         this.percent = percent;
+         this.typo = typo;
+Index: app/src/main/java/com/example/myapplication/Payment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport java.util.Map;\r\n\r\npublic class Payment{\r\n    public String ParentChart, id, name, date, amount, Paypercent;\r\n\r\n    Payment(){}\r\n\r\n    public Payment(String parentChart, String id, String name, String date, String amount, String percent) {\r\n        ParentChart = parentChart;\r\n        this.id = id;\r\n        this.name = name;\r\n        this.date = date;\r\n        this.amount = amount;\r\n        this.Paypercent = percent;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/Payment.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/Payment.java	(date 1607327748449)
+@@ -2,12 +2,13 @@
+ 
+ import java.util.Map;
+ 
+-public class Payment{
+-    public String ParentChart, id, name, date, amount, Paypercent;
++public class Payment extends  Chart{
++    public String ParentChart, id, name, date;
++    public int amount, Paypercent;
+ 
+     Payment(){}
+ 
+-    public Payment(String parentChart, String id, String name, String date, String amount, String percent) {
++    public Payment(String parentChart, String id, String name, String date, int amount, int percent) {
+         ParentChart = parentChart;
+         this.id = id;
+         this.name = name;
+@@ -15,4 +16,8 @@
+         this.amount = amount;
+         this.Paypercent = percent;
+     }
++    public int percentCalculation(int fullAmount){
++        Paypercent = amount / fullAmount;
++        return  Paypercent;
++    }
+ }
+Index: app/src/main/java/com/example/myapplication/ChartProgressActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport com.firebase.ui.firestore.FirestoreRecyclerOptions;\r\nimport com.google.android.gms.tasks.OnFailureListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.firestore.FirebaseFirestore;\r\nimport com.google.firebase.firestore.Query;\r\n\r\npublic class ChartProgressActivity extends AppCompatActivity {\r\n    RecyclerView recyclerViewChart;\r\n    FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();\r\n    String PaymentKey = payment.getUid();\r\n    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();\r\n    Query queryChart = firebaseFirestore.collection(PaymentKey).whereEqualTo(\"typo\", \"Chart\");\r\n    String chartname;\r\n    private RecycleViewChartAdapter firestoreRecyclerAdapter;\r\n    int ViewPosition;\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_chart_progress);\r\n\r\n        recyclerViewChart = findViewById(R.id.RecyclerViewChart);\r\n\r\n        FirestoreRecyclerOptions<Chart> options =\r\n                new FirestoreRecyclerOptions.Builder<Chart>()\r\n                        .setQuery(queryChart, Chart.class)\r\n                        .build();\r\n\r\n        recyclerViewChart.setLayoutManager(new LinearLayoutManager(this));\r\n        firestoreRecyclerAdapter = new RecycleViewChartAdapter(options);\r\n        firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewChartAdapter.OnItemListener() {\r\n            @Override\r\n            public void OnItemClickListener(View view, int position) {\r\n                chartname = firestoreRecyclerAdapter.getItem(position).Chartname;\r\n                Intent chartToProgressBars = new Intent(ChartProgressActivity.this, ProgressBars.class);\r\n                Bundle bundleChartName = new Bundle();\r\n                //имя диаграммы\r\n                bundleChartName.putString(\"chartname\", chartname);\r\n                chartToProgressBars.putExtras(bundleChartName);\r\n                startActivity(chartToProgressBars);\r\n                //Toast.makeText(ChartProgressActivity.this, \"click\", Toast.LENGTH_LONG).show();\r\n            }\r\n\r\n            @Override\r\n            public void OnItemLongClickListener(View view, int position) {\r\n                ViewPosition = position;\r\n                    ShowAlertDialog();\r\n            }\r\n        });\r\n\r\n        recyclerViewChart.setAdapter(firestoreRecyclerAdapter);\r\n\r\n    }\r\n    @Override\r\n    public void onStop(){\r\n        super.onStop();\r\n        firestoreRecyclerAdapter.stopListening();\r\n    }\r\n\r\n    @Override\r\n    public void onStart(){\r\n        super.onStart();\r\n        firestoreRecyclerAdapter.startListening();\r\n    }\r\n\r\n    public void ShowAlertDialog(){\r\n        EditDeleteDialog dialog = new EditDeleteDialog();\r\n        dialog.show(getSupportFragmentManager(),\"Delete\");\r\n    }\r\n    public void okClicked() {\r\n        chartname = firestoreRecyclerAdapter.getItem(ViewPosition).Chartname;\r\n        final String PaymentKey = payment.getUid();\r\n        firebaseFirestore.collection(PaymentKey).document(chartname)\r\n                .delete()\r\n                .addOnSuccessListener(new OnSuccessListener<Void>() {\r\n                    @Override\r\n                    public void onSuccess(Void aVoid) {\r\n                        Toast.makeText(ChartProgressActivity.this, \"Deleted\",Toast.LENGTH_SHORT).show();\r\n                        DeleteDocument(chartname);\r\n                    }\r\n                }).addOnFailureListener(new OnFailureListener() {\r\n            @Override\r\n            public void onFailure(@NonNull Exception e) {\r\n                Toast.makeText(ChartProgressActivity.this, e.toString(),Toast.LENGTH_SHORT).show();\r\n            }\r\n        });\r\n        firestoreRecyclerAdapter.notifyDataSetChanged();\r\n    }\r\n    public void DeleteDocument(String chartname){\r\n        final String PaymentKey = payment.getUid();\r\n        firebaseFirestore.collection(PaymentKey).document(chartname)\r\n                .delete()\r\n                .addOnSuccessListener(new OnSuccessListener<Void>() {\r\n                    @Override\r\n                    public void onSuccess(Void aVoid) {\r\n                        Toast.makeText(ChartProgressActivity.this, \"Deleted\",Toast.LENGTH_SHORT).show();\r\n                        firestoreRecyclerAdapter.notifyDataSetChanged();\r\n                    }\r\n                }).addOnFailureListener(new OnFailureListener() {\r\n            @Override\r\n            public void onFailure(@NonNull Exception e) {\r\n                Toast.makeText(ChartProgressActivity.this, e.toString(),Toast.LENGTH_SHORT).show();\r\n            }\r\n        });\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/ChartProgressActivity.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/ChartProgressActivity.java	(date 1607325985655)
+@@ -77,7 +77,12 @@
+     }
+ 
+     public void ShowAlertDialog(){
++        Bundle bundle = new Bundle();
++        bundle.putString("chartname", firestoreRecyclerAdapter.getItem(ViewPosition).Chartname );
+         EditDeleteDialog dialog = new EditDeleteDialog();
++        dialog.setArguments(bundle);
++        //transaction.replace(R.id.editDeleteDialog, fragInfo);
++        //transaction.commit();
+         dialog.show(getSupportFragmentManager(),"Delete");
+     }
+     public void okClicked() {
+Index: .idea/render.experimental.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"RenderSettings\">\r\n    <option name=\"showDecorations\" value=\"true\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- .idea/render.experimental.xml	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ .idea/render.experimental.xml	(date 1607319596069)
+@@ -1,6 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="RenderSettings">
++    <option name="quality" value="0.0" />
+     <option name="showDecorations" value="true" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: app/src/main/java/com/example/myapplication/AddUsers.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication;\r\n\r\nimport android.content.DialogInterface;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.view.LayoutInflater;\r\nimport android.view.MenuItem;\r\nimport android.view.View;\r\nimport android.view.ViewGroup;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.annotation.NonNull;\r\nimport androidx.annotation.Nullable;\r\nimport androidx.appcompat.app.AlertDialog;\r\nimport androidx.fragment.app.Fragment;\r\n\r\nimport com.google.android.gms.tasks.OnFailureListener;\r\nimport com.google.android.gms.tasks.OnSuccessListener;\r\nimport com.google.android.material.bottomnavigation.BottomNavigationView;\r\nimport com.google.firebase.auth.FirebaseAuth;\r\nimport com.google.firebase.auth.FirebaseUser;\r\nimport com.google.firebase.database.DataSnapshot;\r\nimport com.google.firebase.database.DatabaseReference;\r\nimport com.google.firebase.database.FirebaseDatabase;\r\nimport com.google.firebase.firestore.FirebaseFirestore;\r\nimport com.google.zxing.integration.android.IntentIntegrator;\r\nimport com.google.zxing.integration.android.IntentResult;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Calendar;\r\nimport java.util.Date;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\nimport static android.text.InputType.TYPE_CLASS_NUMBER;\r\nimport static android.text.InputType.TYPE_TEXT_VARIATION_PERSON_NAME;\r\nimport static android.view.Gravity.RELATIVE_LAYOUT_DIRECTION;\r\nimport static android.view.Gravity.RIGHT;\r\nimport static com.example.myapplication.R.id.ChartName;\r\nimport static com.example.myapplication.R.id.EnterName;\r\nimport static com.example.myapplication.R.id.bottom_menu;\r\nimport static com.example.myapplication.R.id.nav_add;\r\nimport static com.example.myapplication.R.id.nav_exit;\r\nimport static com.example.myapplication.R.id.nav_progress;\r\nimport static com.example.myapplication.R.id.nav_qr;\r\n\r\n\r\npublic class AddUsers extends Fragment {\r\n\r\n\r\n    ArrayList<String> NumbersofNameEditText = new ArrayList<>();\r\n    ArrayList<String> EditTexts = new ArrayList<>();\r\n    ArrayList<String> NumbersofSummEditText = new ArrayList<>();\r\n    ArrayList<String> EditTexts2 = new ArrayList<>();\r\n    int i = 0;\r\n    int d = 0;\r\n    int x = 50;\r\n    int buttonId;\r\n    FirebaseUser payment;\r\n    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();\r\n    @Override\r\n    public void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n\r\n    }\r\n\r\n    @Override\r\n    public View onCreateView(LayoutInflater inflater, ViewGroup container,\r\n                             Bundle savedInstanceState) {\r\n        final View RootView = inflater.inflate(R.layout.fragment_add_users, container, false);\r\n        Button EnterBut = RootView.findViewById(EnterName);\r\n        BottomNavigationView bottomMenu= RootView.findViewById(bottom_menu);\r\n        bottomMenu.setOnNavigationItemSelectedListener(navListener);\r\n\r\n        EnterBut.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                EditText chartName = RootView.findViewById(R.id.ChartName);\r\n                Intent intent1 = new Intent(getActivity(), MainWindow.class);\r\n                Bundle Name = new Bundle();\r\n                //имя диаграммы\r\n                Name.putString(\"Chart Name\", chartName.getText().toString());\r\n                intent1.putExtras(Name);\r\n                //пользователи\r\n                for (int z = 0; z < NumbersofNameEditText.size(); z++) {\r\n                    EditText ed2 = getView().findViewById(Integer.parseInt(NumbersofNameEditText.get(z)));\r\n                    EditTexts2.add(ed2.getText().toString());\r\n                }\r\n\r\n                intent1.putExtra(\"users\", EditTexts2);\r\n\r\n                //значения\r\n                for (int i = 0; i < NumbersofSummEditText.size(); i++) {\r\n                    EditText ed = getView().findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));\r\n                    if (!ed.getText().toString().equals(\"\")) {\r\n                        EditTexts.add(ed.getText().toString());\r\n                    } else {\r\n                        // Toast.makeText(ChartGenerator.this, \"сумма не может быть пустой\", Toast.LENGTH_SHORT).show();\r\n\r\n                    }\r\n\r\n                }\r\n                intent1.putExtra(\"list\", EditTexts);\r\n                payment = FirebaseAuth.getInstance().getCurrentUser();\r\n                String PaymentKey = payment.getUid();\r\n                EditText chartname = RootView.findViewById(ChartName);\r\n                if (!chartname.equals(\"\")) {\r\n                    String Chartname = chartname.getText().toString();\r\n                    Date currentTime = Calendar.getInstance().getTime();\r\n                    EditText EditText;\r\n                    Chart chart = new Chart(Chartname, \"\", Integer.toString(NumbersofNameEditText.size()), \"0\", \"Chart\");\r\n                    int fullAmount = 0;\r\n                    Map<String, Object> paymentsMap = new HashMap<>();\r\n                    paymentsMap.put(\"Chart\", chart);\r\n                    String date = currentTime.toString();\r\n                    for (int i = 0; i < NumbersofNameEditText.size(); i++) {\r\n                        EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));\r\n                        String name = EditText.getText().toString();\r\n                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));\r\n                        String amount = EditText.getText().toString();\r\n                        fullAmount = fullAmount + Integer.parseInt(amount);\r\n                        String percent = \"0%\";\r\n                        String id = Integer.toString(i);\r\n                        Payment paymentCh = new Payment(Chartname, id, name, date, amount, percent);\r\n\r\n                        //chart.payments.put(\"Payment \" + i, paymentCh);\r\n                        //paymentsMap.put(\"Payment\" + i, paymentCh);\r\n                        firebaseFirestore.collection(PaymentKey).add(paymentCh);\r\n                        Toast.makeText(getActivity(), \"Добавлено\", Toast.LENGTH_SHORT).show();\r\n                    }\r\n                    chart.fullAmount = fullAmount + \" rub\";\r\n                    firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);\r\n                }\r\n                else{\r\n                    Toast.makeText(getActivity(), \"Введите имя дигарммы\",Toast.LENGTH_SHORT).show();\r\n                }\r\n                startActivity(intent1);\r\n\r\n            }\r\n        });\r\n        return RootView;\r\n    }\r\nprivate BottomNavigationView.OnNavigationItemSelectedListener navListener= new BottomNavigationView.OnNavigationItemSelectedListener() {\r\n            @Override\r\n            public boolean onNavigationItemSelected(@NonNull MenuItem item) {\r\n                switch (item.getItemId()) {\r\n                    case nav_exit:\r\n                        FirebaseAuth.getInstance().signOut();\r\n                        Intent intentLogout = new Intent(getActivity(), MainActivity.class);\r\n                        startActivity(intentLogout);\r\n                        getActivity().finish();\r\n                        break;\r\n                    case nav_qr:\r\n                        scanCode();\r\n                        break;\r\n                    case nav_progress:\r\n                        Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);\r\n                        startActivity(progresIntent);\r\n                        break;\r\n                    case nav_add:\r\n                        final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);\r\n                        i++;\r\n                        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,\r\n                                LinearLayout.LayoutParams.WRAP_CONTENT);\r\n                        param.gravity = RELATIVE_LAYOUT_DIRECTION;\r\n                        final EditText editText = new EditText(getActivity());\r\n                        editText.setId(i);\r\n                        NumbersofSummEditText.add(Integer.toString(i));\r\n                        editText.setHint(\"Сумма\");\r\n                        //запись id едиттекстов\r\n                        editText.setInputType(TYPE_CLASS_NUMBER);\r\n                        d = d + x;\r\n                        final LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,\r\n                                LinearLayout.LayoutParams.WRAP_CONTENT);\r\n                        param2.gravity = RIGHT;\r\n                        final EditText Users = new EditText(getActivity());\r\n                        Users.setId(d);\r\n                        NumbersofNameEditText.add(Integer.toString(d));\r\n                        Users.setHint(\"Имя\");\r\n                        Users.setInputType(TYPE_TEXT_VARIATION_PERSON_NAME);\r\n                        buttonId++;\r\n                        final Button deleteField = new Button(getActivity());\r\n                        deleteField.setId(buttonId);\r\n                        deleteField.setText(\"Удалить\");\r\n                        llMain2.addView(Users, param2);\r\n                        llMain2.addView(editText, param);\r\n                        llMain2.addView(deleteField);\r\n                        deleteField.setOnClickListener(new View.OnClickListener() {\r\n                            @Override\r\n                            public void onClick(View v) {\r\n                                NumbersofNameEditText.remove(Integer.toString(Users.getId()));\r\n                                NumbersofSummEditText.remove(Integer.toString(editText.getId()));\r\n                                llMain2.removeView(Users);\r\n                                llMain2.removeView(editText);\r\n                                llMain2.removeView(deleteField);\r\n                            }\r\n\r\n                        });\r\n                        break;\r\n                }\r\n                return true;\r\n            }\r\n        };\r\n    private void scanCode() {\r\n        IntentIntegrator integrator = new IntentIntegrator(getActivity());\r\n        integrator.setCaptureActivity(QRScanner.class);\r\n        integrator.setOrientationLocked(false);\r\n        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);\r\n        integrator.setPrompt(\"Scanning code\");\r\n        integrator.initiateScan();\r\n    }\r\n\r\n    @Override\r\n    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {\r\n        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);\r\n        if (result != null) {\r\n            if (result.getContents() != null) {\r\n                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());\r\n                builder.setMessage(result.getContents());\r\n                builder.setTitle(\"Результат сканирования\");\r\n                builder.setPositiveButton(\"Отсканировать ещё\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        scanCode();\r\n                    }\r\n                }).setNegativeButton(\"Закончить\", new DialogInterface.OnClickListener() {\r\n                    @Override\r\n                    public void onClick(DialogInterface dialog, int which) {\r\n                        getActivity().finish();\r\n                    }\r\n                });\r\n                AlertDialog dialog = builder.create();\r\n                dialog.show();\r\n            } else {\r\n                Toast.makeText(getActivity(), \"Ничего не отсканировано\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        } else {\r\n            super.onActivityResult(requestCode, resultCode, data);\r\n        }\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/myapplication/AddUsers.java	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/src/main/java/com/example/myapplication/AddUsers.java	(date 1607329971985)
+@@ -46,6 +46,7 @@
+ import static com.example.myapplication.R.id.nav_exit;
+ import static com.example.myapplication.R.id.nav_progress;
+ import static com.example.myapplication.R.id.nav_qr;
++import static com.example.myapplication.R.id.percent;
+ 
+ 
+ public class AddUsers extends Fragment {
+@@ -116,28 +117,32 @@
+                     Map<String, Object> paymentsMap = new HashMap<>();
+                     paymentsMap.put("Chart", chart);
+                     String date = currentTime.toString();
++                    for (int j = 0; j < NumbersofSummEditText.size();j++){
++                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(j)));
++                        String amount = EditText.getText().toString();
++                        fullAmount = fullAmount + Integer.parseInt(amount);
++                    }
+                     for (int i = 0; i < NumbersofNameEditText.size(); i++) {
+                         EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
+                         String name = EditText.getText().toString();
+                         EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+                         String amount = EditText.getText().toString();
+-                        fullAmount = fullAmount + Integer.parseInt(amount);
+-                        String percent = "0%";
+                         String id = Integer.toString(i);
+-                        Payment paymentCh = new Payment(Chartname, id, name, date, amount, percent);
++                        int percentPayment = (Integer.parseInt(amount)*100 / fullAmount);
++                        Payment paymentCh = new Payment(Chartname, id, name, date, Integer.parseInt(amount),percentPayment );
+ 
+-                        //chart.payments.put("Payment " + i, paymentCh);
+-                        //paymentsMap.put("Payment" + i, paymentCh);
++
+                         firebaseFirestore.collection(PaymentKey).add(paymentCh);
+                         Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
+                     }
+-                    chart.fullAmount = fullAmount + " rub";
+                     firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
+                 }
+                 else{
+                     Toast.makeText(getActivity(), "Введите имя дигарммы",Toast.LENGTH_SHORT).show();
+                 }
+                 startActivity(intent1);
++                EditTexts.clear();
++                EditTexts2.clear();
+ 
+             }
+         });
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>apply plugin: 'com.android.application'\r\napply plugin: 'com.google.gms.google-services'\r\n\r\n\r\nandroid {\r\n    compileSdkVersion 30\r\n    buildToolsVersion \"30.0.2\"\r\n    defaultConfig {\r\n        applicationId \"com.example.myapplication\"\r\n        minSdkVersion 28\r\n        targetSdkVersion 30\r\n        versionCode 1\r\n        versionName \"1.0\"\r\n        testInstrumentationRunner \"androidx.test.runner.AndroidJUnitRunner\"\r\n        multiDexEnabled true\r\n    }\r\n    buildTypes {\r\n        release {\r\n            minifyEnabled false\r\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'\r\n        }\r\n    }\r\n}\r\n\r\ndependencies {\r\n    implementation fileTree(dir: 'libs', include: ['*.jar'])\r\n    implementation 'androidx.appcompat:appcompat:1.3.0-alpha02'\r\n    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'\r\n    implementation 'com.google.firebase:firebase-firestore:22.0.0'\r\n    implementation 'com.google.firebase:firebase-auth:20.0.1'\r\n    implementation 'com.google.firebase:firebase-database:19.5.1'\r\n    implementation 'androidx.legacy:legacy-support-v4:1.0.0'\r\n    testImplementation 'junit:junit:4.12'\r\n    androidTestImplementation 'androidx.test:runner:1.3.1-alpha02'\r\n    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-alpha02'\r\n\r\n    implementation 'com.google.android.material:material:1.2.1'\r\n    implementation 'com.android.support:multidex:1.0.3'\r\n    //AnyChart\r\n    implementation 'com.github.AnyChart:AnyChart-Android:1.1.2'\r\n\r\n    //MPAndroidChart\r\n    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'\r\n    implementation 'com.android.support:multidex:1.0.3'\r\n    //viewpager 2.0\r\n    implementation \"androidx.viewpager2:viewpager2:1.0.0\"\r\n    //implemantation 'com.android.support:support-annotations:28.0.0'\r\n    //jbcrypt\r\n    implementation \"org.mindrot:jbcrypt:0.4\"\r\n    //firebase\r\n   implementation 'com.google.android.material:material:1.2.1'\r\n   implementation platform('com.google.firebase:firebase-bom:26.0.0')\r\n    implementation 'com.google.firebase:firebase-analytics'// аналитика\r\n    implementation 'com.google.firebase:firebase-auth'\r\n    implementation 'com.google.android.gms:play-services-auth:19.0.0'\r\n    implementation 'com.firebaseui:firebase-ui-database:7.0.0'\r\n   // implementation 'com.google.firebase:firebase-admin:7.0.1'\r\n    //qr codes\r\n    implementation 'com.journeyapps:zxing-android-embedded:3.4.0'\r\n    implementation 'androidx.paging:paging-runtime:2.1.2'\r\n    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'\r\n    implementation 'com.firebaseui:firebase-ui-firestore:6.2.1'\r\n    //navigation\r\n   implementation 'com.google.android.material:material:1.2.1'\r\n\r\n}\r\n\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(revision d4562ec0cfa8aa2f048f45f0a2d20d3a0bf91755)
++++ app/build.gradle	(date 1607319596085)
+@@ -63,5 +63,11 @@
+     //navigation
+    implementation 'com.google.android.material:material:1.2.1'
+ 
++    implementation "androidx.navigation:navigation-fragment:2.3.1"
++    implementation "androidx.navigation:navigation-ui:2.3.1"
++    implementation "androidx.navigation:navigation-dynamic-features-fragment:2.3.1"
++    implementation "androidx.navigation:navigation-compose:1.0.0-alpha02"
++    androidTestImplementation "androidx.navigation:navigation-testing:2.3.1"
++
+ }
+ 
+Index: app/src/main/res/navigation/navigation.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/navigation/navigation.xml	(date 1607319596101)
++++ app/src/main/res/navigation/navigation.xml	(date 1607319596101)
+@@ -0,0 +1,44 @@
++<?xml version="1.0" encoding="utf-8"?>
++<navigation xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:id="@+id/navigation"
++    app:startDestination="@id/addUsers">
++
++    <fragment
++        android:id="@+id/addUsers"
++        android:name="com.example.myapplication.AddUsers"
++        android:label="AddUsers" />
++    <activity
++        android:id="@+id/chartProgressActivity"
++        android:name="com.example.myapplication.ChartProgressActivity"
++        android:label="activity_chart_progress"
++        tools:layout="@layout/activity_chart_progress" />
++    <dialog
++        android:id="@+id/editDeleteDialog"
++        android:name="com.example.myapplication.EditDeleteDialog"
++        android:label="EditDeleteDialog" />
++    <activity
++        android:id="@+id/mainActivity"
++        android:name="com.example.myapplication.MainActivity"
++        android:label="main_window"
++        tools:layout="@layout/main_window" />
++    <activity
++        android:id="@+id/signUpActivity"
++        android:name="com.example.myapplication.SignUpActivity"
++        android:label="activity_sign_up"
++        tools:layout="@layout/activity_sign_up" />
++    <activity
++        android:id="@+id/progressBars"
++        android:name="com.example.myapplication.ProgressBars"
++        android:label="activity_progress_bars"
++        tools:layout="@layout/activity_progress_bars" />
++    <activity
++        android:id="@+id/mainWindow"
++        android:name="com.example.myapplication.MainWindow"
++        android:label="MainWindow" />
++    <activity
++        android:id="@+id/QRScanner"
++        android:name="com.example.myapplication.QRScanner"
++        android:label="QRScanner" />
++</navigation>
+\ No newline at end of file
+Index: app/src/main/res/layout/one_contact_row.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/one_contact_row.xml	(date 1607354326226)
++++ app/src/main/res/layout/one_contact_row.xml	(date 1607354326226)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout
++    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
++    android:layout_height="match_parent">
++
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+diff --git .idea/shelf/Default_Changelist.xml .idea/shelf/Default_Changelist.xml
