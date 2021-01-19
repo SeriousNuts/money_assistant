@@ -89,8 +89,7 @@ public class AddUsers extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // sent_pi= PendingIntent.getBroadcast(getActivity(),0,sent_intent,0);
-        //deliver_pi= PendingIntent.getBroadcast(getActivity(),0,deliver_intent,0);
+
 
     }
 
@@ -130,6 +129,8 @@ public class AddUsers extends Fragment {
                     }
 
                 }
+                Name.putString("Chart Name", chartName.getText().toString());
+                intent1.putExtras(Name);
                 intent1.putExtra("list", EditTexts);
                 payment = FirebaseAuth.getInstance().getCurrentUser();
                 String PaymentKey = payment.getUid();
@@ -177,8 +178,7 @@ public class AddUsers extends Fragment {
                         EditText ed = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(h)));
                         smsManager.sendTextMessage(String.valueOf(EditTexts3), chartName.getText().toString(), ed2.getText().toString() + ",вы должны мне -" + ed.getText().toString() + " рублей.", sent_pi, deliver_pi);
                         EditTexts3.clear();
-                        Name.putString("Chart Name", chartName.getText().toString());
-                        intent1.putExtras(Name);
+
                     }
                 }
 
