@@ -54,9 +54,9 @@ public class MainWindow extends FragmentActivity {
         pieChart.getDescription().setEnabled(false);
         pieChart.setDragDecelerationEnabled(true);
         //коэф трения/торможения
-        pieChart.setDragDecelerationFrictionCoef(150f);
+        pieChart.setDragDecelerationFrictionCoef(120f);
         //прозрачный круг
-        pieChart.setTransparentCircleRadius(100f);
+        pieChart.setTransparentCircleRadius(80f);
         pieChart.setTransparentCircleColor(Color.LTGRAY);
         //бул рисовать окно посередине или нет
         pieChart.setDrawHoleEnabled(true);
@@ -67,7 +67,7 @@ public class MainWindow extends FragmentActivity {
         //шрифт текста в центре
         pieChart.setCenterTextTypeface(Typeface.defaultFromStyle(Typeface.BOLD_ITALIC));
         //радиус окна в центре
-        pieChart.setHoleRadius(30f);
+        pieChart.setHoleRadius(25f);
         //цвет текста в центре
         pieChart.setCenterTextColor(Color.WHITE);
         //цвет самого окна(может не работать)
@@ -85,8 +85,18 @@ public class MainWindow extends FragmentActivity {
         //ArrayList<String>  arrayFromIntent=getIntent().getStringArrayListExtra("list");
 
         ArrayList<String> arrayFromIntent = (ArrayList) getIntent().getStringArrayListExtra("list");
+        ArrayList<Contact> arrayFromContacts = (ArrayList) getIntent().getSerializableExtra("ChoosenContacts");
         //users
         ArrayList<PieEntry> yValues= new ArrayList<>();
+        //кусок кода для заполнения диаграммы напрямую из контактов
+        /*
+        if (arrayFromContacts!=null){
+            for (int j = 0; j < arrayFromContacts.size(); j++) {
+                yValues.add(new PieEntry(Float.parseFloat(arrayFromContacts.get(j).name), arrayFromContacts.get(j).id));
+            }
+        }
+        */
+        //////
         if(arrayFromIntent != null) {
             for (int i = 0; i < arrayFromIntent.size(); i++) {
 

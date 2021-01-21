@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -25,11 +27,13 @@ public class ContactsList extends AppCompatActivity {
     ArrayList<Contact>ChooseContact = new ArrayList<>();
     ArrayList<ImageView>Avatars = new ArrayList<>();
     ArrayList<Contact>contacts = new ArrayList<>();
+    Button choosenContactButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contacts_list);
         ContactView = findViewById(R.id.ContactView);
+        choosenContactButton = findViewById(R.id.contactsChoosenButt);
         ContactView.setLayoutManager(new LinearLayoutManager(this));
         ContactsAdapter = new ContactsAdapter();
         ContactView.setAdapter(ContactsAdapter);
@@ -104,6 +108,14 @@ public class ContactsList extends AppCompatActivity {
             }
         });
         ContactsAdapter.setContacts(contacts);
+        choosenContactButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent IntentAddUsers = new Intent(ContactsList.this, MainWindow.class);
+                IntentAddUsers.putExtra("ChoosenContacts",ChooseContact );
+                startActivity(IntentAddUsers);
 
+            }
+        });
     }
 }
