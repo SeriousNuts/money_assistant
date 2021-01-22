@@ -85,11 +85,11 @@ public class MainWindow extends FragmentActivity {
         //ArrayList<String>  arrayFromIntent=getIntent().getStringArrayListExtra("list");
 
         ArrayList<String> arrayFromIntent = (ArrayList) getIntent().getStringArrayListExtra("list");
-        ArrayList<Contact> arrayFromContacts = (ArrayList) getIntent().getSerializableExtra("ChoosenContacts");
+
         //users
         ArrayList<PieEntry> yValues= new ArrayList<>();
         //кусок кода для заполнения диаграммы напрямую из контактов
-        /*
+/*
         if (arrayFromContacts!=null){
             for (int j = 0; j < arrayFromContacts.size(); j++) {
                 yValues.add(new PieEntry(Float.parseFloat(arrayFromContacts.get(j).name), arrayFromContacts.get(j).id));

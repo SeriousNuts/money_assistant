@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser!=null){
-            Intent intentGoogleSignUp = new Intent(MainActivity.this,MainWindow.class);
+            Intent intentGoogleSignUp = new Intent(MainActivity.this,StartMenu.class);
             startActivity(intentGoogleSignUp);
         }
     }
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
-                                        Intent intentMainWindows = new Intent(MainActivity.this, MainWindow.class);
+                                        Intent intentMainWindows = new Intent(MainActivity.this, StartMenu.class);
                                         startActivity(intentMainWindows);
                                     } else {
                                         Toast.makeText(MainActivity.this, "Authentication failed." + task.getException().getMessage(),

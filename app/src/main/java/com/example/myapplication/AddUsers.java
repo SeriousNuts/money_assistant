@@ -55,10 +55,7 @@ import static com.example.myapplication.R.id.ChartName;
 import static com.example.myapplication.R.id.EnterName;
 import static com.example.myapplication.R.id.bottom_menu;
 import static com.example.myapplication.R.id.nav_add;
-import static com.example.myapplication.R.id.nav_contacts;
 import static com.example.myapplication.R.id.nav_exit;
-import static com.example.myapplication.R.id.nav_progress;
-import static com.example.myapplication.R.id.nav_qr;
 import static com.example.myapplication.R.id.percent;
 
 
@@ -80,6 +77,7 @@ public class AddUsers extends Fragment {
     FirebaseUser payment;
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     CheckBox notifyALL;
+    //смски
     String SENT_SMS = "SENT_SMS";
     String DELIVER_SMS = "DELIVER_SMS";
     Intent sent_intent = new Intent(SENT_SMS);
@@ -89,17 +87,17 @@ public class AddUsers extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // sent_pi= PendingIntent.getBroadcast(getActivity(),0,sent_intent,0);
-        //deliver_pi= PendingIntent.getBroadcast(getActivity(),0,deliver_intent,0);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View RootView = inflater.inflate(R.layout.fragment_add_users, container, false);
+
         ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, 1);
+
         notifyALL = (CheckBox) RootView.findViewById(R.id.notifyAll);
+
         Button EnterBut = RootView.findViewById(EnterName);
         BottomNavigationView bottomMenu = RootView.findViewById(bottom_menu);
         bottomMenu.setOnNavigationItemSelectedListener(navListener);
@@ -253,6 +251,7 @@ public class AddUsers extends Fragment {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
+                /*
                 case nav_contacts:
                     int permissionStatus = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
                     if(permissionStatus == PackageManager.PERMISSION_GRANTED) {
@@ -265,6 +264,7 @@ public class AddUsers extends Fragment {
                                 1);
                     }
                     break;
+                 */
                 case nav_exit:
                     FirebaseAuth.getInstance().signOut();
                     Intent intentLogout = new Intent(getActivity(), MainActivity.class);
@@ -272,13 +272,18 @@ public class AddUsers extends Fragment {
                     startActivity(intentLogout);
                     getActivity().finish();
                     break;
+                    /*
                 case nav_qr:
                     scanCode();
                     break;
+                     */
+                /*
                 case nav_progress:
                     Intent progresIntent = new Intent(getActivity(), ChartProgressActivity.class);
                     startActivity(progresIntent);
                     break;
+
+                 */
                 case nav_add:
                     final LinearLayout llMain2 = getView().findViewById(R.id.llMain2);
                     i++;

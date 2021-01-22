@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 
 public class ContactsList extends AppCompatActivity {
@@ -27,7 +29,7 @@ public class ContactsList extends AppCompatActivity {
     ArrayList<Contact>ChooseContact = new ArrayList<>();
     ArrayList<ImageView>Avatars = new ArrayList<>();
     ArrayList<Contact>contacts = new ArrayList<>();
-    Button choosenContactButton;
+    FloatingActionButton choosenContactButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +39,9 @@ public class ContactsList extends AppCompatActivity {
         ContactView.setLayoutManager(new LinearLayoutManager(this));
         ContactsAdapter = new ContactsAdapter();
         ContactView.setAdapter(ContactsAdapter);
+        ContactView.addItemDecoration(new contact_item_recor.SpacesItemDecoration(25));
         contentResolver = getContentResolver();
-        @SuppressLint("UseCompatLoadingForDrawables") final Drawable checkCircle = this.getResources().getDrawable(R.drawable.ic_baseline_check_circle_outline_24);
+        @SuppressLint("UseCompatLoadingForDrawables") final Drawable checkCircle = this.getResources().getDrawable(R.drawable.ic_baseline_brightness_1_24);
         @SuppressLint("UseCompatLoadingForDrawables") final Drawable oneXML = this.getResources().getDrawable(R.drawable.one);
         Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, new String[]{
                 ContactsContract.Contacts._ID,
@@ -111,7 +114,7 @@ public class ContactsList extends AppCompatActivity {
         choosenContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent IntentAddUsers = new Intent(ContactsList.this, MainWindow.class);
+                Intent IntentAddUsers = new Intent(ContactsList.this, AfterContact.class);
                 IntentAddUsers.putExtra("ChoosenContacts",ChooseContact );
                 startActivity(IntentAddUsers);
 

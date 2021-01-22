@@ -24,7 +24,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".StartMenu"></activity>
+        <activity android:name=".AfterContact"></activity>
+        <activity android:name=".StartMenu" />
         <activity android:name=".ContactsList" />
         <activity android:name=".ChartProgressActivity" />
         <activity android:name=".ProgressBars" />
@@ -45,8 +46,8 @@
 
         <receiver
             android:name=".AddUsers"
-            tools:ignore="Instantiatable"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
