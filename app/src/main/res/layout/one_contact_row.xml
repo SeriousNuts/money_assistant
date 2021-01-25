@@ -9,7 +9,7 @@
         android:layout_width="413dp"
         android:layout_height="69dp"
         android:layout_gravity="center"
-        app:cardBackgroundColor="#BDBDBD"
+        app:cardBackgroundColor="#CAC9C9"
         app:cardCornerRadius="4dp"
         app:cardElevation="50dp"
         app:cardPreventCornerOverlap="false"
@@ -65,13 +65,11 @@
 
             <ImageView
                 android:id="@+id/checkImage"
-                android:layout_width="39dp"
-                android:layout_height="34dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/ContactAvatar"
+                android:layout_width="30dp"
+                android:layout_height="21dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/ContactAvatar"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/ContactAvatar"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/one" />
         </androidx.constraintlayout.widget.ConstraintLayout>

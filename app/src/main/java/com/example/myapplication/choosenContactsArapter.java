@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class choosenContactsArapter extends RecyclerView.Adapter<choosenContactsArapter.choosenContactsViewHolder> {
     ArrayList<Contact> ChoosenContacts = new ArrayList<>();
@@ -21,19 +22,21 @@ public class choosenContactsArapter extends RecyclerView.Adapter<choosenContacts
     private int numberItems;
     String data1[],data2[];
     int images;
+    public void setChoosenContacts(ArrayList<Contact> ChoosenContacts) {
+        this.ChoosenContacts = ChoosenContacts;
+        notifyDataSetChanged();
+    }
+    /*
     public choosenContactsArapter(Context ct,ArrayList<Contact> ChoosenContacts ,int numberOfItems){
         numberItems= numberOfItems;
         this.ChoosenContacts = ChoosenContacts;
         context=ct;
-    }
+        notifyDataSetChanged();
+    }*/
     @NonNull
     @Override
     public choosenContactsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        int layoutIdForListItem = R.layout.choosen_contacts_list_item;
-        LayoutInflater inflater = LayoutInflater.from(context);
-
-        View view =inflater.inflate(layoutIdForListItem,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.choosen_contacts_list_item, parent, false);
         return new choosenContactsViewHolder(view);
     }
 
@@ -61,6 +64,7 @@ public class choosenContactsArapter extends RecyclerView.Adapter<choosenContacts
 
 
         }
+
        public void bindContact(Contact contact) {
            ChoosenContactName.setText(contact.name);
            ChoosenContactPhone.setText(contact.number);
@@ -69,6 +73,8 @@ public class choosenContactsArapter extends RecyclerView.Adapter<choosenContacts
            ChoosenContactsImage.setImageURI(imageUri);
 
        }
+
+
 
     }
 }

@@ -4,8 +4,8 @@ import android.graphics.Rect;
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
-
-public class contact_item_recor {
+//класс для отступов между элементами кард вью
+public class Cardview_item_decor {
     public static class SpacesItemDecoration extends RecyclerView.ItemDecoration
     {
         private int space;

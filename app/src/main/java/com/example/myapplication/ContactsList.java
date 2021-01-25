@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,12 +8,10 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,7 +36,7 @@ public class ContactsList extends AppCompatActivity {
         ContactView.setLayoutManager(new LinearLayoutManager(this));
         ContactsAdapter = new ContactsAdapter();
         ContactView.setAdapter(ContactsAdapter);
-        ContactView.addItemDecoration(new contact_item_recor.SpacesItemDecoration(25));
+        ContactView.addItemDecoration(new Cardview_item_decor.SpacesItemDecoration(10));
         contentResolver = getContentResolver();
         @SuppressLint("UseCompatLoadingForDrawables") final Drawable checkCircle = this.getResources().getDrawable(R.drawable.ic_baseline_brightness_1_24);
         @SuppressLint("UseCompatLoadingForDrawables") final Drawable oneXML = this.getResources().getDrawable(R.drawable.one);
@@ -114,6 +111,8 @@ public class ContactsList extends AppCompatActivity {
         choosenContactButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Intent IntentAddUsers = new Intent(ContactsList.this, AfterContact.class);
                 IntentAddUsers.putExtra("ChoosenContacts",ChooseContact );
                 startActivity(IntentAddUsers);
