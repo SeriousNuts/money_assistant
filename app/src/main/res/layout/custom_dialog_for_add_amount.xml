@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/customDialog"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<de.hdodenhof.circleimageview.CircleImageView
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    android:src="@drawable/authorization_third_ico"
+    android:layout_marginTop="40dp"
+    android:id="@+id/dialog_boxImage"
+    ></de.hdodenhof.circleimageview.CircleImageView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/dialog_boxImage"
+        android:id="@+id/dialog_boxUserName"
+        android:text="UserName"
+        android:textSize="25sp"
+        android:layout_marginTop="15dp"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:fontFamily="sans-serif"
+
+        ></TextView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/dialog_boxUserName"
+        android:id="@+id/dialog_boxUserPhone"
+        android:text="UserPhone"
+        android:textSize="14sp"
+        android:layout_marginTop="3dp"
+        android:textAlignment="center"
+        android:fontFamily="sans-serif"
+
+        ></TextView>
+    <EditText
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_boxUserPhone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:hint="Введите сумму"
+        android:layout_marginTop="30dp"
+        android:id="@+id/dialog_UserAmountText"
+        android:inputType="numberDecimal"
+
+        ></EditText>
+
+    <Button
+        android:id="@+id/ContinueBtn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="Продолжить"
+        android:textAllCaps="false"
+        android:textColor="#C8000000"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_UserAmountText"></Button>
+</androidx.constraintlayout.widget.ConstraintLayout>

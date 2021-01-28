@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -78,11 +79,7 @@ public class AddUsers extends Fragment {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     CheckBox notifyALL;
     //смски
-    String SENT_SMS = "SENT_SMS";
-    String DELIVER_SMS = "DELIVER_SMS";
-    Intent sent_intent = new Intent(SENT_SMS);
-    Intent deliver_intent = new Intent(DELIVER_SMS);
-    PendingIntent sent_pi, deliver_pi;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,15 +91,14 @@ public class AddUsers extends Fragment {
                              Bundle savedInstanceState) {
         final View RootView = inflater.inflate(R.layout.fragment_add_users, container, false);
 
-        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.SEND_SMS}, 1);
+
 
         notifyALL = (CheckBox) RootView.findViewById(R.id.notifyAll);
 
         Button EnterBut = RootView.findViewById(EnterName);
         BottomNavigationView bottomMenu = RootView.findViewById(bottom_menu);
         bottomMenu.setOnNavigationItemSelectedListener(navListener);
-        sent_pi = PendingIntent.getBroadcast(getActivity(), 0, sent_intent, 0);
-        deliver_pi = PendingIntent.getBroadcast(getActivity(), 0, deliver_intent, 0);
+
         EnterBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -164,7 +160,7 @@ public class AddUsers extends Fragment {
                     Toast.makeText(getActivity(), "Введите имя дигарммы", Toast.LENGTH_SHORT).show();
                 }
                 if (notifyALL.isChecked()) {
-                    SmsManager smsManager = SmsManager.getDefault();
+
                     for (int h = 0; h < NumbersofPhonesEditText.size(); h++) {
                         EditText ed3 = RootView.findViewById(Integer.parseInt(NumbersofPhonesEditText.get(h)));
                         if (!ed3.getText().toString().equals("")) {
@@ -173,7 +169,7 @@ public class AddUsers extends Fragment {
 
                         EditText ed2 = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(h)));
                         EditText ed = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(h)));
-                        smsManager.sendTextMessage(String.valueOf(EditTexts3), chartName.getText().toString(), ed2.getText().toString() + ",вы должны мне -" + ed.getText().toString() + " рублей.", sent_pi, deliver_pi);
+                      //  smsManager.sendTextMessage(String.valueOf(EditTexts3), chartName.getText().toString(), ed2.getText().toString() + ",вы должны мне -" + ed.getText().toString() + " рублей.", sent_pi, deliver_pi);
                         EditTexts3.clear();
                         Name.putString("Chart Name", chartName.getText().toString());
                         intent1.putExtras(Name);
@@ -190,64 +186,9 @@ public class AddUsers extends Fragment {
         return RootView;
     }
 
-    @Override
-    public void onResume() {
 
-        super.onResume();
-
-        requireActivity().registerReceiver(sentReceiver, new IntentFilter(SENT_SMS));
-
-        requireActivity().registerReceiver(deliverReceiver, new IntentFilter(DELIVER_SMS));
-
-    }
-
-
-    @Override
-    public void onStop() {
-
-        super.onStop();
-
-        requireActivity().unregisterReceiver(sentReceiver);
-
-        requireActivity().unregisterReceiver(deliverReceiver);
-
-    }
-
-    BroadcastReceiver sentReceiver = new BroadcastReceiver() {
-
-        @Override
-
-        public void onReceive(Context context, Intent intent) {
-            switch (getResultCode()) {
-                case Activity.RESULT_OK:
-                    Toast.makeText(context, "Sented", Toast.LENGTH_LONG).show();
-                    break;
-                default:
-                    Toast.makeText(context, "Error S", Toast.LENGTH_LONG).show();
-                    break;
-            }
-        }
-
-    };
-
-
-    BroadcastReceiver deliverReceiver = new BroadcastReceiver() {
-
-        @Override
-
-        public void onReceive(Context context, Intent intent) {
-            switch (getResultCode()) {
-                case Activity.RESULT_OK:
-                    Toast.makeText(context, "Delivered", Toast.LENGTH_LONG).show();
-                    break;
-                default:
-                    Toast.makeText(context, "Error D", Toast.LENGTH_LONG).show();
-                    break;
-            }
-        }
-
-    };
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @SuppressLint("NonConstantResourceId")
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
@@ -274,7 +215,7 @@ public class AddUsers extends Fragment {
                     break;
                     /*
                 case nav_qr:
-                    scanCode();
+
                     break;
                      */
                 /*
@@ -346,42 +287,8 @@ public class AddUsers extends Fragment {
         }
     };
 
-    private void scanCode() {
-        IntentIntegrator integrator = new IntentIntegrator(getActivity());
-        integrator.setCaptureActivity(QRScanner.class);
-        integrator.setOrientationLocked(false);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
-        integrator.setPrompt("Scanning code");
-        integrator.initiateScan();
-    }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() != null) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(result.getContents());
-                builder.setTitle("Результат сканирования");
-                builder.setPositiveButton("Отсканировать ещё", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        scanCode();
-                    }
-                }).setNegativeButton("Закончить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        getActivity().finish();
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            } else {
-                Toast.makeText(getActivity(), "Ничего не отсканировано", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
+
+
 
 }

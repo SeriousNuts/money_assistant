@@ -1,8 +1,12 @@
 package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,8 +27,16 @@ public class StartMenu extends AppCompatActivity {
         createEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent createEventIntent = new Intent(StartMenu.this, ContactsList.class);
-                startActivity(createEventIntent);
+                int permissionStatus = ContextCompat.checkSelfPermission(StartMenu.this, Manifest.permission.READ_CONTACTS);
+                if(permissionStatus == PackageManager.PERMISSION_GRANTED) {
+                    Intent contactIntent = new Intent(StartMenu.this, ContactsList.class);
+                    startActivity(contactIntent);
+                }
+                else {
+                    ActivityCompat.requestPermissions(StartMenu.this, new String[] {Manifest.permission.READ_CONTACTS,
+                                    Manifest.permission.WRITE_CONTACTS},
+                            1);
+                }
             }
         });
     }

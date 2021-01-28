@@ -24,7 +24,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".AfterContact"></activity>
+        <activity android:name=".DialogToAddAmount"></activity>
+        <activity
+            android:name=".AfterContact"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </activity>
         <activity android:name=".StartMenu" />
         <activity android:name=".ContactsList" />
         <activity android:name=".ChartProgressActivity" />
@@ -45,7 +52,7 @@
         </activity>
 
         <receiver
-            android:name=".AddUsers"
+            android:name=".AfterContact"
             android:screenOrientation="portrait"
             tools:ignore="Instantiatable">
             <intent-filter>

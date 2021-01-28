@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="Уведомить всех"
+        android:id="@+id/Notify_item"
+        android:icon="@drawable/ic_baseline_notification_add_24"
+        />
+
+    <item
+        android:title="Общая сумма"
+        android:id="@+id/totalAmount_item"
+        android:icon="@drawable/group"
+        />
+
+    <item
+        android:title="Qr-Cканнер"
+        android:id="@+id/QR_Scanner_item"
+        android:icon="@drawable/ic_baseline_qr_code_scanner_24"
+        />
+</menu>
