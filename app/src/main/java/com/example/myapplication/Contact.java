@@ -6,6 +6,7 @@ public class Contact implements Serializable {
     String name;
     String number;
     Long image_id;
+    Double amount;
     long id;
 
     public Contact() {

@@ -22,14 +22,25 @@ import java.util.ArrayList;
 
 public class ChoosenContactsArapter extends RecyclerView.Adapter<ChoosenContactsArapter.choosenContactsViewHolder> {
     ArrayList<Contact> ChoosenContacts = new ArrayList<>();
-    static double AmountForEveryUserValue = 0;
+    static double AmountForEveryUserValue = -1;
     public void setChoosenContacts(ArrayList<Contact> ChoosenContacts) {
         this.ChoosenContacts = ChoosenContacts;
         notifyDataSetChanged();
     }
+
+    public ArrayList<Contact> getChoosenContacts() {
+        return ChoosenContacts;
+    }
+
     public void setAmountForEveryUserValue(double AmountForEveryUserValue){
-        this.AmountForEveryUserValue = AmountForEveryUserValue;
+        ChoosenContactsArapter.AmountForEveryUserValue = AmountForEveryUserValue;
         notifyDataSetChanged();
+        if (ChoosenContacts.size()!=0) {
+            for (int i = 0; i < ChoosenContacts.size(); i++) {
+                ChoosenContacts.get(i).amount = AmountForEveryUserValue;
+            }
+        }
+
     }
     @NonNull
     @Override
@@ -64,7 +75,8 @@ public class ChoosenContactsArapter extends RecyclerView.Adapter<ChoosenContacts
                     @Override
                     public void onClick(View v) {
                         holder.AmountForPersonalityUser.setText(AmountInput.getText().toString());
-                        notifyDataSetChanged();
+                        holder.AmountForEveryUser.setText("    ");
+                        ChoosenContacts.get(position).amount = Double.parseDouble(AmountInput.getText().toString());
                         AmountDialog.cancel();
                     }
                 });
@@ -102,6 +114,7 @@ public class ChoosenContactsArapter extends RecyclerView.Adapter<ChoosenContacts
        public void bindContact(Contact contact) {
             if(AmountForEveryUserValue != -1){
                 AmountForEveryUser.setText(String.valueOf(AmountForEveryUserValue));
+                AmountForPersonalityUser.setText(" ");
             }
            ChoosenContactName.setText(contact.name);
            ChoosenContactPhone.setText(contact.number);

@@ -1,13 +1,20 @@
 package com.example.myapplication;
 
+import android.net.Uri;
+
 public class User {
-    String email;
-    String hashpassword;
-    public User( String phone, String hashpassword){
-        this.email = email;
-        this.hashpassword = hashpassword;
+    String name;
+    String phone;
+    Uri avatar;
+    Double amount;
+    Long id;
+
+    public User(String name, String phone, Uri avatar, Double amount, Long id) {
+        this.name = name;
+        this.phone = phone;
+        this.avatar = avatar;
+        this.amount = amount;
+        this.id = id;
     }
-    public String getEmail(){return  email;}
-    public String getHashpassword(){return hashpassword;}
-    }
+}
 

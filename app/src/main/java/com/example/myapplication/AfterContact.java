@@ -181,6 +181,7 @@ public class AfterContact extends AppCompatActivity {
                   double AmountForEveryUser = (T_A_var / ContactsArray.size());
                   Intent intentForAdapter = new Intent(AfterContact.this,ChoosenContactsArapter.class);
                   intentForAdapter.putExtra("AmountForEveryUser",AmountForEveryUser);
+
                   choosenContactsArapter.setAmountForEveryUserValue(AmountForEveryUser);
               }
               else{
@@ -202,7 +203,7 @@ public class AfterContact extends AppCompatActivity {
         
         AlertDialog.Builder NotifyAllDialog = new AlertDialog.Builder(AfterContact.this);
         NotifyAllDialog.setTitle("Уведомлять всех.");
-        NotifyAllDialog.setMessage("Вы хотите отправлять каждому участнику собития смс с прозьбой оплатить долг?\n" +
+        NotifyAllDialog.setMessage("Вы действительно хотите отправлять каждому участнику события смс с просьбой оплатить долг?\n" +
                 "Содержание смс можно изменить в настройках.");
         NotifyAllDialog.setPositiveButton("Да", new DialogInterface.OnClickListener() {
             @Override
