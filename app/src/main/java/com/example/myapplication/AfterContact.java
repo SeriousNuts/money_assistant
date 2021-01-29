@@ -86,7 +86,7 @@ public class AfterContact extends AppCompatActivity   {
             Toast.makeText(AfterContact.this, "список контактов пуст", Toast.LENGTH_SHORT).show();
         }
         choosenContactsArapter.setChoosenContacts(ContactsArray);
-        MySwipeHelper swipeHelper = new MySwipeHelper(this, choosenContactsList,200) {
+        MySwipeHelper swipeHelper = new MySwipeHelper(this, choosenContactsList,300) {
             @Override
             public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buffer) {
                 buffer.add(new MyButton(AfterContact.this,
