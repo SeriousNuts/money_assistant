@@ -17,24 +17,27 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.myapplication.Helper.MyButtonClickListener;
+import com.example.myapplication.Helper.MySwipeHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
 
-public class AfterContact extends AppCompatActivity {
+public class AfterContact extends AppCompatActivity   {
     private RecyclerView choosenContactsList;
     public ArrayList<Contact>ContactsArray = new ArrayList<>();
     public ArrayList<String> NumberOfPhones = new ArrayList<>();
@@ -60,9 +63,11 @@ public class AfterContact extends AppCompatActivity {
         ActivityCompat.requestPermissions(AfterContact.this, new String[]{Manifest.permission.SEND_SMS}, 1);
         sent_pi = PendingIntent.getBroadcast(AfterContact.this, 0, sent_intent, 0);
         deliver_pi = PendingIntent.getBroadcast(AfterContact.this, 0, deliver_intent, 0);
-        
-        
         choosenContactsList= findViewById(R.id.contactsRecycler);
+
+
+        
+
         choosenContactsList.setLayoutManager(new LinearLayoutManager(this));
 
         choosenContactsList.addItemDecoration(new Cardview_item_decor.SpacesItemDecoration(10));
@@ -81,6 +86,23 @@ public class AfterContact extends AppCompatActivity {
             Toast.makeText(AfterContact.this, "список контактов пуст", Toast.LENGTH_SHORT).show();
         }
         choosenContactsArapter.setChoosenContacts(ContactsArray);
+        MySwipeHelper swipeHelper = new MySwipeHelper(this, choosenContactsList,200) {
+            @Override
+            public void instantiateMyButton(RecyclerView.ViewHolder viewHolder, List<MyButton> buffer) {
+                buffer.add(new MyButton(AfterContact.this,
+                        "Удалить",
+                        30,
+                        0,
+                        Color.parseColor("#8B0000"), new  MyButtonClickListener(){
+                    @Override
+                    public void onClick(int pos) {
+                        ContactsArray.remove(pos);
+                        choosenContactsArapter.notifyItemRemoved(pos);
+                        Toast.makeText(AfterContact.this, "Удалено!", Toast.LENGTH_SHORT).show();
+                    }
+                }));
+            }
+        };
         Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,4 +319,7 @@ public class AfterContact extends AppCompatActivity {
         }
 
     };
+
+
+
 }

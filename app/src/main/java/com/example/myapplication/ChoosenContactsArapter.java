@@ -91,7 +91,7 @@ public class ChoosenContactsArapter extends RecyclerView.Adapter<ChoosenContacts
         return ChoosenContacts.size();
     }
 
-   static class choosenContactsViewHolder extends RecyclerView.ViewHolder{
+   public class choosenContactsViewHolder extends RecyclerView.ViewHolder{
         TextView ChoosenContactPhone;
         TextView ChoosenContactName;
         TextView AmountForEveryUser;
