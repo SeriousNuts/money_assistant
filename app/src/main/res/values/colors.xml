@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="Purple">#673AB7</color>
+    <color name="White">#FFFF</color>
+    <color name="TransparentWhite">#cccccc</color>
+    <color name="Black">#000000</color>
+    <color name="FragmentA">#DD673AB7</color>
 </resources>

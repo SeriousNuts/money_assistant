@@ -35,7 +35,7 @@ public abstract class MySwipeHelper extends ItemTouchHelper.SimpleCallback  {
     private GestureDetector gestureDetector;
     private RecyclerView recyclerView;
     private int swipePosition = -1;
-    private float swipeThreshold = 0.5f;
+    private float swipeThreshold = 5.0f;
     private Map<Integer,List<MyButton>> buttonBuffer;
     private Queue<Integer> removerQueue;
 
@@ -202,7 +202,7 @@ public abstract class MySwipeHelper extends ItemTouchHelper.SimpleCallback  {
             {
             buttonList.clear();
             buttonBuffer.clear();
-            swipeThreshold = 0.5f*buttonList.size()*ButtonWidth;
+            swipeThreshold = 5.0f*buttonList.size()*ButtonWidth;
             recoverSwipedItem();
 
         }
@@ -217,13 +217,13 @@ public abstract class MySwipeHelper extends ItemTouchHelper.SimpleCallback  {
 
     @Override
     public float getSwipeEscapeVelocity(float defaultValue) {
-        return 0.1f * defaultValue;
+        return 0.8f * defaultValue;
     }
 
 
     @Override
     public float getSwipeVelocityThreshold(float defaultValue) {
-        return 0.5f * defaultValue;
+        return 5.0f * defaultValue;
     }
 
     @Override

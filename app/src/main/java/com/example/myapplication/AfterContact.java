@@ -65,9 +65,6 @@ public class AfterContact extends AppCompatActivity   {
         deliver_pi = PendingIntent.getBroadcast(AfterContact.this, 0, deliver_intent, 0);
         choosenContactsList= findViewById(R.id.contactsRecycler);
 
-
-        
-
         choosenContactsList.setLayoutManager(new LinearLayoutManager(this));
 
         choosenContactsList.addItemDecoration(new Cardview_item_decor.SpacesItemDecoration(10));
@@ -319,7 +316,4 @@ public class AfterContact extends AppCompatActivity   {
         }
 
     };
-
-
-
 }

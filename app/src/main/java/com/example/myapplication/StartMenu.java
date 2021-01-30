@@ -11,33 +11,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import com.cuberto.liquid_swipe.LiquidPager;
+import com.example.myapplication.ViewPager.ViewPager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import static com.example.myapplication.R.id.Pager;
 import static com.example.myapplication.R.id.bottom_menu;
 
 public class StartMenu extends AppCompatActivity {
-
+LiquidPager pager;
+ViewPager viewPager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_menu);
-        Button createEventButton = findViewById(R.id.createEvent);
+        pager = findViewById(R.id.pager);
+        viewPager = new ViewPager(getSupportFragmentManager(),10);
+        pager.setAdapter(viewPager);
 
 
-        createEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int permissionStatus = ContextCompat.checkSelfPermission(StartMenu.this, Manifest.permission.READ_CONTACTS);
-                if(permissionStatus == PackageManager.PERMISSION_GRANTED) {
-                    Intent contactIntent = new Intent(StartMenu.this, ContactsList.class);
-                    startActivity(contactIntent);
-                }
-                else {
-                    ActivityCompat.requestPermissions(StartMenu.this, new String[] {Manifest.permission.READ_CONTACTS,
-                                    Manifest.permission.WRITE_CONTACTS},
-                            1);
-                }
-            }
-        });
     }
 }
