@@ -6,6 +6,8 @@ import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,12 +17,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
-    List<Contact> Contacts = new ArrayList<>();
+public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> implements Filterable {
+    List<Contact> Contacts;
+    List<Contact>ContactsFull;
     private ContactsAdapter.OnItemListener onItemListener;
 
     public void setContacts(List<Contact> Contacts) {
         this.Contacts = Contacts;
+        ContactsFull = new ArrayList<>(
+                Contacts
+        );
         notifyDataSetChanged();
     }
 
@@ -47,6 +53,37 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return Contacts.size();
     }
 
+    @Override
+    public Filter getFilter() {
+        return ContactFlter;
+    }
+    private Filter ContactFlter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Contact>FilterderContactsList = new ArrayList<>();
+            if (constraint == null || constraint.length() == 0){
+                FilterderContactsList.addAll(ContactsFull);
+            }
+            else {
+                String FilterPattern = constraint.toString().toLowerCase().trim();
+                for (Contact item: ContactsFull ){
+                    if (item.name.toLowerCase().contains(FilterPattern)){
+                        FilterderContactsList.add(item);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = FilterderContactsList;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            Contacts.clear();
+            Contacts.addAll((List)results.values);
+            notifyDataSetChanged();
+        }
+    };
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView ContactName, ContactNumber;

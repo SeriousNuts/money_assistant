@@ -33,7 +33,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".StartMenu" />
-        <activity android:name=".ContactsList" />
+        <activity android:name=".ContactsList"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
         <activity android:name=".ChartProgressActivity" />
         <activity android:name=".ProgressBars" />
         <activity

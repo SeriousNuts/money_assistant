@@ -42,6 +42,7 @@ public class AfterContact extends AppCompatActivity   {
     public ArrayList<Contact>ContactsArray = new ArrayList<>();
     public ArrayList<String> NumberOfPhones = new ArrayList<>();
     int Checker = 0;
+    Double T_A_var;
    // double ValueForEveryUser;
     Long phone;
 
@@ -94,6 +95,10 @@ public class AfterContact extends AppCompatActivity   {
                     @Override
                     public void onClick(int pos) {
                         ContactsArray.remove(pos);
+                        if(T_A_var!=null) {
+                            double AmountForEveryUser = (T_A_var / ContactsArray.size());
+                            choosenContactsArapter.setAmountForEveryUserValue(AmountForEveryUser);
+                        }
                         choosenContactsArapter.notifyItemRemoved(pos);
                         Toast.makeText(AfterContact.this, "Удалено!", Toast.LENGTH_SHORT).show();
                     }
@@ -195,7 +200,7 @@ public class AfterContact extends AppCompatActivity   {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
               String T_A =  totalAmount.getText().toString();
-              Double T_A_var= Double.parseDouble(T_A);
+              T_A_var= Double.parseDouble(T_A);
               if(T_A_var!=null) {
                   double AmountForEveryUser = (T_A_var / ContactsArray.size());
                   Intent intentForAdapter = new Intent(AfterContact.this,ChoosenContactsArapter.class);

@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     tools:context=".ContactsList">
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/contactsChoosenButt"
         android:layout_width="wrap_content"

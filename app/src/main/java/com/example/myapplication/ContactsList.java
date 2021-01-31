@@ -11,12 +11,19 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.SearchView;
+import android.widget.Toolbar;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ContactsList extends AppCompatActivity {
     RecyclerView ContactView;
@@ -119,5 +126,26 @@ public class ContactsList extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater contactSearchInflater = getMenuInflater();
+        contactSearchInflater.inflate(R.menu.contact_search_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.ContactSearch);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                ContactsAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        return true;
     }
 }
