@@ -95,7 +95,7 @@ public class AfterContact extends AppCompatActivity   {
                     @Override
                     public void onClick(int pos) {
                         ContactsArray.remove(pos);
-                        if(T_A_var!=null) {
+                        if(T_A_var!=null && ContactsArray.size() !=0) {
                             double AmountForEveryUser = (T_A_var / ContactsArray.size());
                             choosenContactsArapter.setAmountForEveryUserValue(AmountForEveryUser);
                         }
