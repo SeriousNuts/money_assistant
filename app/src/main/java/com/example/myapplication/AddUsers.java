@@ -75,8 +75,7 @@ public class AddUsers extends Fragment {
     int f = 1000;
     int g = 0;
     int buttonId;
-    FirebaseUser payment;
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
     CheckBox notifyALL;
     //смски
 
@@ -102,6 +101,9 @@ public class AddUsers extends Fragment {
         EnterBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
+
                 final EditText chartName = RootView.findViewById(R.id.ChartName);
                 Intent intent1 = new Intent(getActivity(), MainWindow.class);
                 Bundle Name = new Bundle();
@@ -125,40 +127,21 @@ public class AddUsers extends Fragment {
 
                 }
                 intent1.putExtra("list", EditTexts);
-                payment = FirebaseAuth.getInstance().getCurrentUser();
-                String PaymentKey = payment.getUid();
-                EditText chartname = RootView.findViewById(ChartName);
-                if (!chartname.equals("")) {
-                    String Chartname = chartname.getText().toString();
-                    Date currentTime = Calendar.getInstance().getTime();
-                    EditText EditText;
-                    Chart chart = new Chart(Chartname, "", Integer.toString(NumbersofNameEditText.size()), "0", "Chart");
-                    int fullAmount = 0;
-                    Map<String, Object> paymentsMap = new HashMap<>();
-                    paymentsMap.put("Chart", chart);
-                    String date = currentTime.toString();
-                    for (int j = 0; j < NumbersofSummEditText.size(); j++) {
-                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(j)));
-                        String amount = EditText.getText().toString();
-                        fullAmount = fullAmount + Integer.parseInt(amount);
-                    }
-                    for (int i = 0; i < NumbersofNameEditText.size(); i++) {
-                        EditText = RootView.findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
-                        String name = EditText.getText().toString();
-                        EditText = RootView.findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
-                        String amount = EditText.getText().toString();
-                        String id = Integer.toString(i);
-                        int percentPayment = (Integer.parseInt(amount) * 100 / fullAmount);
-                        Payment paymentCh = new Payment(Chartname, id, name, date, Integer.parseInt(amount), percentPayment);
 
 
-                        firebaseFirestore.collection(PaymentKey).add(paymentCh);
-                        Toast.makeText(getActivity(), "Добавлено", Toast.LENGTH_SHORT).show();
-                    }
-                    firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
-                } else {
+                ///////
+
+
+
+               // if (!chartname.equals("")) {
+
+
+
+
+
+               // } else {
                     Toast.makeText(getActivity(), "Введите имя дигарммы", Toast.LENGTH_SHORT).show();
-                }
+               // }
                 if (notifyALL.isChecked()) {
 
                     for (int h = 0; h < NumbersofPhonesEditText.size(); h++) {

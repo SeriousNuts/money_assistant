@@ -21,59 +21,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ProgressBars extends AppCompatActivity {
-    RecyclerView recyclerView;
-    FirebaseUser payment = FirebaseAuth.getInstance().getCurrentUser();
-    String PaymentKey = payment.getUid();
-    Query queryPayments;
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    RecycleViewAdapter firestoreRecyclerAdapter;
-    String chartname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intentReceived= getIntent();
+
         setContentView(R.layout.activity_progress_bars);
-        Bundle bundleChartName=intentReceived.getExtras();
-        if(bundleChartName != null){
-            chartname=bundleChartName.getString("chartname");
-        }
-        queryPayments = firebaseFirestore.collection(PaymentKey).whereEqualTo("ParentChart",chartname);
 
-
-        recyclerView = findViewById(R.id.PaymentResView);
-
-
-        FirestoreRecyclerOptions<Payment> options =
-                new FirestoreRecyclerOptions.Builder<Payment>()
-                        .setQuery(queryPayments, Payment.class)
-                        .build();
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        firestoreRecyclerAdapter = new RecycleViewAdapter(options);
-        firestoreRecyclerAdapter.setOnItemListenerListener(new RecycleViewAdapter.OnItemListener() {
-            @Override
-            public void OnItemClickListener(View view, int position) {
-                //заглушка для клика
-            }
-
-            @Override
-            public void OnItemLongClickListener(View view, int position) {
-                //заглушка для долгого клика
-            }
-        });
-        recyclerView.setAdapter(firestoreRecyclerAdapter);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        firestoreRecyclerAdapter.stopListening();
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        firestoreRecyclerAdapter.startListening();
-    }
 
 }
