@@ -28,13 +28,12 @@ public class MainWindow extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_window);
-        Fragment Us = new AddUsers();
+        Fragment Us = new AddedUsers_progress();
         FragmentTransaction ft= getSupportFragmentManager().beginTransaction();
-        ft.add(R.id.Add_f,Us);
+        ft.add(R.id.addedUsers,Us);
         ft.commit();
 
 //Добавление Пользовательских Данных
-        //Имя Диаграммы
         Intent intentReceived= getIntent();
         Bundle name=intentReceived.getExtras();
         if(name != null){
@@ -45,7 +44,6 @@ public class MainWindow extends FragmentActivity {
         }
       Toast.makeText(MainWindow.this,pieChartName,Toast.LENGTH_SHORT).show();
 /////////////////////////////////////////////////////////
-        setContentView(R.layout.main_window);
         pieChart= findViewById(R.id.piechart);
         //процентные значени
         pieChart.setUsePercentValues(false);
@@ -56,7 +54,7 @@ public class MainWindow extends FragmentActivity {
         //коэф трения/торможения
         pieChart.setDragDecelerationFrictionCoef(120f);
         //прозрачный круг
-        pieChart.setTransparentCircleRadius(80f);
+        pieChart.setTransparentCircleRadius(40f);
         pieChart.setTransparentCircleColor(Color.LTGRAY);
         //бул рисовать окно посередине или нет
         pieChart.setDrawHoleEnabled(true);

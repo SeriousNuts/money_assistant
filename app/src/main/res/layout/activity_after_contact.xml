@@ -8,7 +8,7 @@
     tools:context=".AfterContact">
 
     <EditText
-        android:id="@+id/editTextTextPersonName"
+        android:id="@+id/Chart_nameEditText"
         style="@android:style/Widget.DeviceDefault.EditText"
         android:layout_width="344dp"
         android:layout_height="43dp"

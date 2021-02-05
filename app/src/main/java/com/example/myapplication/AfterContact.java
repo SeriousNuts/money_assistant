@@ -29,15 +29,24 @@ import com.example.myapplication.Helper.MyButtonClickListener;
 import com.example.myapplication.Helper.MySwipeHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
+import static com.example.myapplication.R.id.ChartName;
 
 public class AfterContact extends AppCompatActivity   {
+
     private RecyclerView choosenContactsList;
     public ArrayList<Contact>ContactsArray = new ArrayList<>();
     public ArrayList<String> NumberOfPhones = new ArrayList<>();
@@ -57,7 +66,10 @@ public class AfterContact extends AppCompatActivity   {
     FloatingActionButton Button;
 
     ChoosenContactsArapter choosenContactsArapter = new ChoosenContactsArapter();
-    
+
+    FirebaseUser payment;
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,18 +122,10 @@ public class AfterContact extends AppCompatActivity   {
         Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Checker!=0){
-                    for(int i=0;i<ContactsArray.size();i++) {
-                        NumberOfPhones.add(String.valueOf(ContactsArray.get(i).number));
-                    }
-                        for(int j=0;j<NumberOfPhones.size();j++){
-                            phone = Long.parseLong(NumberOfPhones.get(j));
-                            if (!phone.equals("")) {
-                                SmsManager smsManager = SmsManager.getDefault();
-                                smsManager.sendTextMessage(String.valueOf(phone),null,"Test Message", sent_pi, deliver_pi);
-                            }
-                        }
-                }
+                SmsSender();
+                DataSender();
+                Intent MainWindowIntent = new Intent(AfterContact.this,MainWindow.class);
+                startActivity(MainWindowIntent);
             }
         });
     }
@@ -323,4 +327,56 @@ public class AfterContact extends AppCompatActivity   {
         }
 
     };
+    public void SmsSender(){
+        if (Checker!=0){
+            for(int i=0;i<ContactsArray.size();i++) {
+                NumberOfPhones.add(String.valueOf(ContactsArray.get(i).number));
+            }
+            for(int j=0;j<NumberOfPhones.size();j++){
+                phone = Long.parseLong(NumberOfPhones.get(j));
+                if (!phone.equals("")) {
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(String.valueOf(phone),null,"Test Message", sent_pi, deliver_pi);
+                }
+            }
+        }
+    }
+    public void DataSender(){
+        ///
+        //работает
+        payment = FirebaseAuth.getInstance().getCurrentUser();
+        String PaymentKey = payment.getUid();
+        EditText chartname =findViewById(R.id.Chart_nameEditText);
+        String Chartname = chartname.getText().toString();
+        Date currentTime = Calendar.getInstance().getTime();
+        EditText EditText;
+        Chart chart = new Chart(Chartname, "", Integer.toString(ContactsArray.size()), "0", "Chart");
+        int fullAmount = 0;
+        Map<String, Object> paymentsMap = new HashMap<>();
+        paymentsMap.put("Chart", chart);
+        String date = currentTime.toString();
+
+
+        ///
+        //то что не работает
+        for (int j = 0; j < NumbersofSummEditText.size(); j++) {
+            EditText =findViewById(Integer.parseInt(NumbersofSummEditText.get(j)));
+            String amount = EditText.getText().toString();
+            fullAmount = fullAmount + Integer.parseInt(amount);
+        }
+        for (int i = 0; i < NumbersofNameEditText.size(); i++) {
+            EditText =findViewById(Integer.parseInt(NumbersofNameEditText.get(i)));
+            String name = EditText.getText().toString();
+            EditText = findViewById(Integer.parseInt(NumbersofSummEditText.get(i)));
+            String amount = EditText.getText().toString();
+            String id = Integer.toString(i);
+            int percentPayment = (Integer.parseInt(amount) * 100 / fullAmount);
+            Payment paymentCh = new Payment(Chartname, id, name, date, Integer.parseInt(amount), percentPayment);
+
+
+            firebaseFirestore.collection(PaymentKey).add(paymentCh);
+            Toast.makeText(AfterContact.this, "Добавлено", Toast.LENGTH_SHORT).show();
+        }
+        firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
+    }
 }

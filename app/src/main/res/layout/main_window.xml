@@ -40,15 +40,11 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <FrameLayout
-            android:id="@+id/Add_f"
+            android:id="@+id/addedUsers"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:transitionName=".ChartGenerator"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="2dp"
-            tools:visibility="visible" />
+            android:layout_height="match_parent">
 
+        </FrameLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
