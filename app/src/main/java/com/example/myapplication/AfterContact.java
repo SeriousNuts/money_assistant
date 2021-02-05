@@ -44,6 +44,8 @@ public class AfterContact extends AppCompatActivity   {
     int Checker = 0;
     Double T_A_var;
    // double ValueForEveryUser;
+
+    
     Long phone;
 
     String SENT_SMS = "SENT_SMS";
