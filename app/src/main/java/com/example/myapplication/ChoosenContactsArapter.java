@@ -74,10 +74,19 @@ public class ChoosenContactsArapter extends RecyclerView.Adapter<ChoosenContacts
                 ContinueBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        holder.AmountForPersonalityUser.setText(AmountInput.getText().toString());
-                        holder.AmountForEveryUser.setText("    ");
-                        ChoosenContacts.get(position).amount = Double.parseDouble(AmountInput.getText().toString());
-                        AmountDialog.cancel();
+                        if(!AmountInput.getText().toString().equals(null)) {
+                            AmountDialog.cancel();
+
+                            holder.AmountForPersonalityUser.setText(AmountInput.getText().toString());
+                            holder.AmountForEveryUser.setText("    ");
+                            ChoosenContacts.get(position).amount = Double.parseDouble(AmountInput.getText().toString());
+                            AmountDialog.cancel();
+                        }
+                        else{
+                            AmountDialog.cancel();
+                        }
+
+
                     }
                 });
             }

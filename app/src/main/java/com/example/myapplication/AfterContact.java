@@ -1,13 +1,5 @@
 package com.example.myapplication;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,6 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.Helper.MyButtonClickListener;
 import com.example.myapplication.Helper.MySwipeHelper;
@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 
 import static android.text.InputType.TYPE_CLASS_NUMBER;
-import static com.example.myapplication.R.id.ChartName;
 
 public class AfterContact extends AppCompatActivity   {
 
@@ -356,7 +355,7 @@ public class AfterContact extends AppCompatActivity   {
         paymentsMap.put("Chart", chart);
         String date = currentTime.toString();
 
-
+/*
         ///
         //то что не работает
         for (int j = 0; j < NumbersofSummEditText.size(); j++) {
@@ -378,5 +377,9 @@ public class AfterContact extends AppCompatActivity   {
             Toast.makeText(AfterContact.this, "Добавлено", Toast.LENGTH_SHORT).show();
         }
         firebaseFirestore.collection(PaymentKey).document(Chartname).set(chart);
+
+
+ */
+
     }
 }
