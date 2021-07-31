@@ -48,6 +48,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.065" />
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/afterContact_menu"
+            android:layout_width="342dp"
+            android:layout_height="53dp"
+            android:background="@color/fui_bgPhone"
+            app:itemIconSize="26dp"
+            app:itemIconTint="#FFFFFF"
+            app:itemTextColor="#FFFFFF"
+            app:menu="@menu/arter_contacts_menu"
+            tools:layout_editor_absoluteY="260dp" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -62,19 +73,6 @@
         app:layout_constraintHorizontal_bias="0.952"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_baseline_arrow_forward_24" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/afterContact_menu"
-        android:layout_width="342dp"
-        android:layout_height="53dp"
-        android:background="@color/fui_bgPhone"
-        app:itemIconSize="26dp"
-        app:itemIconTint="#FFFFFF"
-        app:itemTextColor="#FFFFFF"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:menu="@menu/arter_contacts_menu" />
 
     <TextView
         android:id="@+id/textView"

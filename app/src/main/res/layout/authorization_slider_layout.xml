@@ -69,7 +69,7 @@
 
     <TextView
         android:id="@+id/low_text"
-        android:layout_width="405dp"
+        android:layout_width="wrap_content"
         android:layout_height="79dp"
         android:layout_marginBottom="412dp"
         android:text="A lot of text for first slide page"
@@ -81,7 +81,7 @@
 
     <TextView
         android:id="@+id/Heading_text"
-        android:layout_width="129dp"
+        android:layout_width="wrap_content"
         android:layout_height="51dp"
         android:layout_marginTop="32dp"
         android:text="HEADING"
@@ -116,9 +116,9 @@
         android:text="Забыли пароль? Восстановите!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.504"
+        app:layout_constraintHorizontal_bias="0.511"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.943" />
+        app:layout_constraintVertical_bias="0.97" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

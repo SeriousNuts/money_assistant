@@ -12,11 +12,12 @@
         style="@android:style/Widget.DeviceDefault.EditText"
         android:layout_width="344dp"
         android:layout_height="43dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="4dp"
         android:background="#009688"
         android:ems="10"
         android:hint="Название события"
         android:inputType="textPersonName"
+        android:isScrollContainer="false"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColorHighlight="@color/common_google_signin_btn_text_dark_focused"
@@ -25,17 +26,15 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.522"
-        app:layout_constraintStart_toStartOf="parent"
-        android:isScrollContainer="false"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="335dp"
         android:layout_height="434dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="112dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView

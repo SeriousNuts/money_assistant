@@ -65,10 +65,10 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/afterContact_menu"
-        android:layout_width="342dp"
-        android:layout_height="53dp"
+        android:layout_width="950dp"
+        android:layout_height="168dp"
         android:background="@color/fui_bgPhone"
-        app:itemIconSize="26dp"
+        app:itemIconSize="30dp"
         app:itemIconTint="#FFFFFF"
         app:itemTextColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"

@@ -5,6 +5,7 @@
         android:title="Уведомить всех"
         android:id="@+id/Notify_item"
         android:icon="@drawable/ic_baseline_notification_add_24"
+
         />
 
     <item
