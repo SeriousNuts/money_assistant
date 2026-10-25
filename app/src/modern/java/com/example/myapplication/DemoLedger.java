@@ -31,9 +31,10 @@ public final class DemoLedger implements Serializable {
     public synchronized List<BillDocument> read() throws IOException {
         if (!file.getBaseFile().exists() && !new File(file.getBaseFile().getPath() + ".bak").exists()) {
             BillDocument sample = new BillDocument();
-            sample.name = "Ужин с друзьями";
+            sample.id = "demo-dinner";
+            sample.name = "Ужин с друзьями · пример";
             List<Long> shares = Money.split(10000, 3);
-            String[] names = {"Аня", "Борис", "Вы"};
+            String[] names = {"Вы (тестовый пользователь)", "Анна", "Михаил"};
             for (int i = 0; i < 3; i++) sample.people.add(new BillDocument.Person(names[i], "", shares.get(i), false));
             List<BillDocument> first = new ArrayList<>();
             first.add(sample);

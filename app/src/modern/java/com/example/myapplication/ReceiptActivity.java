@@ -47,9 +47,11 @@ public final class ReceiptActivity extends AppCompatActivity {
             photo = new File(directory, bill.id + ".jpg");
             if (state != null && state.getString("pending") != null) pending = new File(state.getString("pending"));
         } catch (Exception e) { Ui.error(this, e); finish(); return; }
-        LinearLayout root = Ui.page(this), body = Ui.scroll(this, root);
-        Ui.add(this, body, Ui.label(this, "РАЗМЕТКА ЧЕКА · БЕЗ OCR"), 0);
-        Ui.add(this, body, Ui.text(this, "Отметьте позиции", 28, true), 9);
+        LinearLayout root = Ui.page(this);
+        Ui.toolbar(this, root, "Чек", true, null);
+        LinearLayout body = Ui.scroll(this, root);
+        Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА · БЕЗ OCR"), 8);
+        Ui.add(this, body, Ui.headline(this, "Отметьте позиции", 34), 10);
         Ui.add(this, body, Ui.label(this, "Выделите область пальцем, введите сумму и выберите людей."), 8);
         Ui.add(this, body, Ui.secondary(this, "Сфотографировать чек", this::takePhoto), 18);
         Ui.add(this, body, Ui.secondary(this, "Выбрать изображение", this::choosePhoto), 8);
@@ -59,7 +61,7 @@ public final class ReceiptActivity extends AppCompatActivity {
         Ui.add(this, body, image, 15);
         positions = Ui.column(this);
         Ui.add(this, body, positions, 12);
-        Ui.add(this, root, Ui.button(this, "Перенести доли в счёт", this::apply), 8);
+        Ui.add(this, Ui.footer(this, root), Ui.button(this, "Перенести доли в счёт", this::apply), 0);
         showPhoto();
         render();
     }
