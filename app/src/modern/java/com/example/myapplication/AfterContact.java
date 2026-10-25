@@ -1,9 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -19,16 +17,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class AfterContact extends AppCompatActivity {
-    private static final int PICK_CONTACT = 100;
+    static final int PICK_CONTACT = 100;
     private static final int EDIT_RECEIPT = 101;
     private BillDocument bill = new BillDocument();
     private BillRepository repository;
     private LinearLayout people;
     private EditText title, total;
-    private TextView summary, displayedTotal;
+    private TextView summary;
     private CheckBox shareAfterSave;
     private boolean saving;
 
@@ -81,8 +80,11 @@ public final class AfterContact extends AppCompatActivity {
         TextView add = Ui.link(this, "＋  Добавить", () -> addPerson("", ""));
         Ui.addRow(this, actions, add, 1);
         TextView contacts = Ui.link(this, "Из контактов", () -> {
-            Intent intent = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
-            startActivityForResult(intent, PICK_CONTACT);
+            if (bill.people.size() >= 450) {
+                Ui.error(this, new IllegalArgumentException("Не более 450 участников")); return;
+            }
+            startActivityForResult(new Intent(this, ContactSelectionActivity.class)
+                    .putExtra("available", 450 - bill.people.size()), PICK_CONTACT);
         });
         contacts.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
         Ui.addRow(this, actions, contacts, 0);
@@ -270,12 +272,31 @@ public final class AfterContact extends AppCompatActivity {
                 total.setText(Money.format(bill.total()).replace(" ₽", ""));
                 render();
             } catch (Exception e) { Ui.error(this, e); }
-        } else if (request == PICK_CONTACT && data.getData() != null) {
-            try (Cursor cursor = getContentResolver().query(data.getData(),
-                    new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-                            ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, null)) {
-                if (cursor != null && cursor.moveToFirst()) addPerson(cursor.getString(0), cursor.getString(1));
-            } catch (Exception e) { Ui.error(this, e); }
+        } else if (request == PICK_CONTACT) {
+            ArrayList<String> names = data.getStringArrayListExtra(ContactSelectionActivity.NAMES);
+            ArrayList<String> phones = data.getStringArrayListExtra(ContactSelectionActivity.PHONES);
+            if (names == null || phones == null || names.size() != phones.size()) return;
+            ArrayList<BillDocument.Person> additions = new ArrayList<>();
+            for (int i = 0; i < names.size(); i++) {
+                if (names.get(i) == null || names.get(i).trim().isEmpty()) continue;
+                String name = names.get(i).trim();
+                String phone = phones.get(i) == null ? "" : phones.get(i);
+                boolean exists = false;
+                for (BillDocument.Person person : bill.people)
+                    if (person.name.equals(name) && person.phone.equals(phone)) { exists = true; break; }
+                for (BillDocument.Person person : additions)
+                    if (person.name.equals(name) && person.phone.equals(phone)) { exists = true; break; }
+                if (!exists) additions.add(new BillDocument.Person(name, phone, 0, false));
+            }
+            if (additions.isEmpty()) return;
+            if (bill.people.size() + additions.size() > 450) {
+                Ui.error(this, new IllegalArgumentException("Не более 450 участников")); return;
+            }
+            captureDraft();
+            bill.people.addAll(additions);
+            bill.lines.clear(); // Assignee indices changed.
+            if (!total.getText().toString().trim().isEmpty()) splitEvenly();
+            else render();
         }
     }
 }

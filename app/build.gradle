@@ -14,8 +14,8 @@ android {
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode 5
-        versionName '1.4-design'
+        versionCode 6
+        versionName '1.4.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 

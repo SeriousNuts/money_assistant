@@ -23,6 +23,7 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
         <activity android:name=".ReceiptActivity" android:exported="false" />
+        <activity android:name=".ContactSelectionActivity" android:exported="false" />
         <activity android:name=".AfterContact" android:exported="false" />
         <activity android:name=".MainWindow" android:exported="false" />
         <activity android:name=".StartMenu" android:exported="false" />

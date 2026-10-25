@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.app.Activity;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.EditText;
@@ -76,6 +77,25 @@ public class UiFlowTest {
         Shadows.shadowOf(Looper.getMainLooper()).idle();
         assertNotNull(findText(root, "Анна"));
         assertEquals("Пятничный ужин", title.getText().toString());
+    }
+
+    @Test public void multipleContactsAreAddedTogetherWithoutDuplicatingExistingPeople() {
+        AfterContact editor = Robolectric.buildActivity(AfterContact.class).create().start().resume().get();
+        View root = editor.findViewById(android.R.id.content);
+        findInput(root, "Название счёта").setText("Ужин");
+        findInput(root, "0,00").setText("90,00");
+        Intent selection = new Intent()
+                .putStringArrayListExtra(ContactSelectionActivity.NAMES,
+                        new java.util.ArrayList<>(java.util.Arrays.asList("Анна", "Михаил")))
+                .putStringArrayListExtra(ContactSelectionActivity.PHONES,
+                        new java.util.ArrayList<>(java.util.Arrays.asList("+79991111111", "+79992222222")));
+        editor.onActivityResult(AfterContact.PICK_CONTACT, Activity.RESULT_OK, selection);
+        assertNotNull(findText(root, "Анна"));
+        assertNotNull(findText(root, "Михаил"));
+        assertNotNull(findText(root, "Участников: 2 · Доли: 90,00 ₽"));
+        assertEquals("Ужин", findInput(root, "Название счёта").getText().toString());
+        editor.onActivityResult(AfterContact.PICK_CONTACT, Activity.RESULT_OK, selection);
+        assertNotNull(findText(root, "Участников: 2 · Доли: 90,00 ₽"));
     }
 
     @Test public void receiptEditorAcceptsDraftWithoutPhoto() throws Exception {
