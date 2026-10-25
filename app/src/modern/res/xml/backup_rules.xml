@@ -1,0 +1,4 @@
+<full-backup-content>
+    <!-- Receipt images are private on-device data, never part of Android cloud backup. -->
+    <exclude domain="file" path="receipts/" />
+</full-backup-content>

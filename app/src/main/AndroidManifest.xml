@@ -1,66 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:dist="http://schemas.android.com/apk/distribution"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
-
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-feature android:name="android.hardware.autofocus" />
-
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-
-    <dist:module dist:instant="true" />
-
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
-        android:icon="@drawable/authorization_second_ico"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/app_icon"
+        android:label="${appLabel}"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".DialogToAddAmount"></activity>
-        <activity
-            android:name=".AfterContact"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".StartMenu" />
-        <activity android:name=".ContactsList"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
-        <activity android:name=".ChartProgressActivity" />
-        <activity android:name=".ProgressBars" />
-        <activity
-            android:name=".QRScanner"
-            android:screenOrientation="fullSensor"
-            android:stateNotNeeded="false"
-            android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".MainWindow" />
-        <activity android:name=".MainActivity">
+        android:theme="@style/AppTheme">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+        <activity android:name=".ReceiptActivity" android:exported="false" />
+        <activity android:name=".AfterContact" android:exported="false" />
+        <activity android:name=".MainWindow" android:exported="false" />
+        <activity android:name=".StartMenu" android:exported="false" />
+        <activity android:name=".SignUpActivity" android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver
-            android:name=".AfterContact"
-            android:screenOrientation="portrait"
-            tools:ignore="Instantiatable">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
     </application>
-
 </manifest>

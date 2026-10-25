@@ -12,4 +12,8 @@ n*.iml
 /captures
 .externalNativeBuild
 github.properties
-
+app/google-services.json
+app/FirebaseService.json
+**/build/
+*.apk
+local.properties
