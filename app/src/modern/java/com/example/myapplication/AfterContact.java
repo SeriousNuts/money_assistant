@@ -30,16 +30,25 @@ public final class AfterContact extends AppCompatActivity {
     private TextView summary;
     private CheckBox shareAfterSave;
     private boolean saving;
+    private boolean editing;
+    private boolean saved;
+    private String stagedPhoto;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         repository = new BillRepository(this);
-        if (state != null) try {
-            bill = BillDocument.fromJson(new JSONObject(state.getString("draft")));
-        } catch (JSONException | NullPointerException ignored) { }
+        editing = getIntent().hasExtra("editDraft");
+        if (state != null) {
+            saved = state.getBoolean("saved");
+            stagedPhoto = state.getString("stagedPhoto");
+        }
+        if (state != null || editing) try {
+            bill = BillDocument.fromJson(new JSONObject(state != null
+                    ? state.getString("draft") : getIntent().getStringExtra("editDraft")));
+        } catch (JSONException | NullPointerException e) { Ui.error(this, e); finish(); return; }
 
         LinearLayout root = Ui.page(this);
-        Ui.toolbar(this, root, "Новый счёт", true, null);
+        Ui.toolbar(this, root, editing ? "Редактировать счёт" : "Новый счёт", true, null);
         LinearLayout body = Ui.scroll(this, root);
         title = Ui.input(this, "Название счёта");
         title.setText(bill.name);
@@ -59,6 +68,7 @@ public final class AfterContact extends AppCompatActivity {
         total.setMinHeight(Ui.dp(this, 58));
         total.setMaxWidth(Ui.dp(this, 240));
         if (state != null) total.setText(state.getString("enteredTotal", ""));
+        else if (editing) total.setText(Money.format(bill.total()).replace(" ₽", ""));
         LinearLayout moneyRow = Ui.row(this);
         moneyRow.addView(total, new LinearLayout.LayoutParams(-2, Ui.dp(this, 58)));
         LinearLayout.LayoutParams currencyParams = new LinearLayout.LayoutParams(-2, -2);
@@ -92,7 +102,9 @@ public final class AfterContact extends AppCompatActivity {
 
         people = Ui.column(this);
         Ui.add(this, body, people, 7);
-        Ui.add(this, body, Ui.secondary(this, "▧  Фото и разметка чека", () -> {
+        if (editing) Ui.add(this, body, Ui.label(this,
+                "Чеки сохраняются при изменении счёта. Для правки фото откройте экран чеков после сохранения."), 16);
+        else Ui.add(this, body, Ui.secondary(this, "▧  Фото и разметка чека", () -> {
             try {
                 captureDraft();
                 if (bill.people.isEmpty()) throw new IllegalArgumentException("Сначала добавьте участников");
@@ -109,7 +121,7 @@ public final class AfterContact extends AppCompatActivity {
         shareAfterSave.setTextSize(14);
         if (state != null) shareAfterSave.setChecked(state.getBoolean("share", false));
         Ui.add(this, footer, shareAfterSave, 0);
-        Ui.add(this, footer, Ui.button(this, "Сохранить счёт", this::save), 6);
+        Ui.add(this, footer, Ui.button(this, editing ? "Сохранить изменения" : "Сохранить счёт", this::save), 6);
         render();
     }
 
@@ -154,8 +166,8 @@ public final class AfterContact extends AppCompatActivity {
         }
         if (bill.people.isEmpty()) Ui.add(this, people,
                 Ui.label(this, "Добавьте себя и друзей, чтобы разделить счёт."), 8);
-        if (!bill.lines.isEmpty()) Ui.add(this, people,
-                Ui.label(this, "Позиции чека: " + bill.lines.size() + " · доли рассчитаны автоматически"), 10);
+        if (bill.hasReceiptLines()) Ui.add(this, people,
+                Ui.label(this, "Чеков: " + bill.receipts.size() + " · доли: ручные + позиции чеков"), 10);
         updateSummary();
     }
 
@@ -166,15 +178,20 @@ public final class AfterContact extends AppCompatActivity {
         EditText name = Ui.input(this, "Имя участника");
         name.setText(person.name);
         Ui.add(this, form, name, 0);
-        EditText amount = Ui.input(this, "Доля, ₽");
+        EditText amount = Ui.input(this, bill.hasReceiptLines() ? "Ручная доля, ₽" : "Доля, ₽");
         amount.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        amount.setText(Money.format(person.amount).replace(" ₽", ""));
+        amount.setText(Money.format(person.manualAmount).replace(" ₽", ""));
         Ui.add(this, form, amount, 10);
         AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Участник")
                 .setView(form).setNegativeButton("Отмена", null)
                 .setNeutralButton("Удалить", (d, w) -> {
+                    if (editing || bill.hasReceiptLines()) {
+                        Ui.error(this, new IllegalStateException(editing
+                                ? "Удаление участника сохранённого счёта недоступно: оно может изменить назначения позиций и оплаты"
+                                : "Сначала удалите позиции чеков: они назначены участникам"));
+                        return;
+                    }
                     bill.people.remove(index);
-                    bill.lines.clear(); // Position assignee indices no longer match.
                     if (!total.getText().toString().trim().isEmpty() && !bill.people.isEmpty()) splitEvenly();
                     else render();
                 }).setPositiveButton("Сохранить", null).create();
@@ -183,11 +200,20 @@ public final class AfterContact extends AppCompatActivity {
                 String renamed = name.getText().toString().trim();
                 if (renamed.isEmpty()) throw new IllegalArgumentException("Введите имя");
                 long value = Money.parse(amount.getText().toString());
-                person.name = renamed;
-                if (value != person.amount) bill.lines.clear();
-                person.amount = value;
+                String previousName = person.name;
+                long previousManual = person.manualAmount;
+                try {
+                    person.name = renamed;
+                    person.manualAmount = value;
+                    bill.recalculateAmounts();
+                } catch (RuntimeException e) {
+                    person.name = previousName;
+                    person.manualAmount = previousManual;
+                    throw e;
+                }
+                if (editing || bill.hasReceiptLines()) total.setText(Money.format(bill.total()).replace(" ₽", ""));
                 dialog.dismiss(); render();
-            } catch (IllegalArgumentException e) { Ui.error(this, e); }
+            } catch (RuntimeException e) { Ui.error(this, e); }
         }));
         dialog.show();
     }
@@ -195,10 +221,10 @@ public final class AfterContact extends AppCompatActivity {
     private void addPerson(String name, String phone) {
         if (!name.isEmpty()) {
             if (bill.people.size() >= 450) { Ui.error(this, new IllegalArgumentException("Не более 450 участников")); return; }
+            if (editing) { promptDebt(new BillDocument.Person(name, phone, 0, false), null); return; }
             captureDraft();
             bill.people.add(new BillDocument.Person(name, phone, 0, false));
-            bill.lines.clear();
-            if (!total.getText().toString().trim().isEmpty()) splitEvenly();
+            if (!total.getText().toString().trim().isEmpty() && !bill.hasReceiptLines()) splitEvenly();
             else render();
             return;
         }
@@ -214,14 +240,58 @@ public final class AfterContact extends AppCompatActivity {
                 }).show();
     }
 
+    private void promptDebt(BillDocument.Person person, Runnable after) {
+        EditText input = Ui.input(this, "Сколько должен, ₽");
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        LinearLayout form = Ui.column(this);
+        form.setPadding(Ui.dp(this, 20), Ui.dp(this, 12), Ui.dp(this, 20), 0);
+        Ui.add(this, form, Ui.label(this, person.name), 0);
+        Ui.add(this, form, input, 8);
+        Runnable next = () -> { if (after != null) new android.os.Handler(getMainLooper()).post(after); };
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Новый участник")
+                .setView(form).setNegativeButton("Отмена", (d, w) -> next.run())
+                .setNeutralButton("Добавить сейчас, указать позже", (d, w) -> {
+                    addWithDebt(person, 0);
+                    next.run();
+                }).setPositiveButton("Добавить", null).create();
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            try {
+                long amount = Money.parse(input.getText().toString());
+                addWithDebt(person, amount);
+                dialog.dismiss();
+                next.run();
+            } catch (RuntimeException e) { Ui.error(this, e); }
+        }));
+        dialog.show();
+    }
+
+    private void addWithDebt(BillDocument.Person person, long amount) {
+        if (bill.people.size() >= 450) { Ui.error(this, new IllegalArgumentException("Не более 450 участников")); return; }
+        person.manualAmount = amount;
+        person.amount = amount;
+        bill.people.add(person);
+        try { bill.recalculateAmounts(); bill.total(); }
+        catch (RuntimeException e) { bill.people.remove(person); throw e; }
+        total.setText(Money.format(bill.total()).replace(" ₽", ""));
+        render();
+    }
+
+    private void promptNextContact(List<BillDocument.Person> additions, int index) {
+        if (index < additions.size())
+            promptDebt(additions.get(index), () -> promptNextContact(additions, index + 1));
+    }
+
     private void splitEvenly() {
         try {
             captureDraft();
             if (bill.people.isEmpty()) throw new IllegalArgumentException("Сначала добавьте участников");
             long amount = Money.parse(total.getText().toString());
             List<Long> shares = Money.split(amount, bill.people.size());
-            for (int i = 0; i < shares.size(); i++) bill.people.get(i).amount = shares.get(i);
-            bill.lines.clear();
+            if (bill.hasReceiptLines()) throw new IllegalStateException("Нельзя разделить общую сумму при наличии позиций чеков: измените ручные доли участников");
+            for (int i = 0; i < shares.size(); i++) {
+                bill.people.get(i).manualAmount = shares.get(i);
+                bill.people.get(i).amount = shares.get(i);
+            }
             render();
         } catch (RuntimeException e) { Ui.error(this, e); }
     }
@@ -229,20 +299,32 @@ public final class AfterContact extends AppCompatActivity {
     private void save() {
         if (saving) return;
         try {
+            if (saved) { commitPhoto(); return; }
             captureDraft();
             if (bill.name.isEmpty() || bill.people.isEmpty() || bill.people.size() > 450)
                 throw new IllegalArgumentException("Введите название и добавьте участников");
-            if (bill.total() == 0) throw new IllegalArgumentException("Сумма должна быть больше нуля");
+            if (!editing && bill.total() == 0) throw new IllegalArgumentException("Сумма должна быть больше нуля");
             if (!total.getText().toString().trim().isEmpty() && bill.total() != Money.parse(total.getText().toString()))
                 throw new IllegalArgumentException("Сумма долей не совпадает с общей суммой");
             saving = true;
-            repository.save(bill, (v, error) -> {
+            BillRepository.Result<Void> done = (v, error) -> {
                 saving = false;
                 if (error != null) { Ui.error(this, error); return; }
-                if (shareAfterSave.isChecked()) share();
-                finish();
-            });
-        } catch (RuntimeException e) { Ui.error(this, e); }
+                saved = true;
+                try { commitPhoto(); } catch (Exception e) { Ui.error(this, e); }
+            };
+            if (editing) repository.update(bill, done);
+            else repository.save(bill, done);
+        } catch (Exception e) { Ui.error(this, e); }
+    }
+
+    private void commitPhoto() throws Exception {
+        if (stagedPhoto != null) {
+            ReceiptPhotos.commit(this, bill.primaryReceipt(), stagedPhoto);
+            stagedPhoto = null;
+        }
+        if (shareAfterSave.isChecked()) share();
+        finish();
     }
 
     private void share() {
@@ -258,7 +340,21 @@ public final class AfterContact extends AppCompatActivity {
         catch (Exception ignored) { }
         state.putString("enteredTotal", total.getText().toString());
         state.putBoolean("share", shareAfterSave.isChecked());
+        state.putBoolean("saved", saved);
+        state.putString("stagedPhoto", stagedPhoto);
         super.onSaveInstanceState(state);
+    }
+
+    @Override protected void onDestroy() {
+        if (isFinishing() && !saved && stagedPhoto != null) {
+            try {
+                java.io.File expected = ReceiptPhotos.stage(this, bill.primaryReceipt());
+                if (expected.getCanonicalPath().equals(new java.io.File(stagedPhoto).getCanonicalPath())
+                        && expected.exists() && !expected.delete())
+                    android.util.Log.w("AfterContact", "Could not remove draft photo");
+            } catch (Exception e) { android.util.Log.w("AfterContact", "Could not clean draft photo", e); }
+        }
+        super.onDestroy();
     }
 
     @Override protected void onActivityResult(int request, int result, Intent data) {
@@ -267,8 +363,7 @@ public final class AfterContact extends AppCompatActivity {
         if (request == EDIT_RECEIPT) {
             try {
                 bill = BillDocument.fromJson(new JSONObject(data.getStringExtra("draft")));
-                List<Long> shares = ReceiptCalculator.allocate(bill.people.size(), bill.lines);
-                for (int i = 0; i < shares.size(); i++) bill.people.get(i).amount = shares.get(i);
+                stagedPhoto = data.getStringExtra("stagedPhoto");
                 total.setText(Money.format(bill.total()).replace(" ₽", ""));
                 render();
             } catch (Exception e) { Ui.error(this, e); }
@@ -293,10 +388,12 @@ public final class AfterContact extends AppCompatActivity {
                 Ui.error(this, new IllegalArgumentException("Не более 450 участников")); return;
             }
             captureDraft();
-            bill.people.addAll(additions);
-            bill.lines.clear(); // Assignee indices changed.
-            if (!total.getText().toString().trim().isEmpty()) splitEvenly();
-            else render();
+            if (editing) promptNextContact(additions, 0);
+            else {
+                bill.people.addAll(additions);
+                if (!total.getText().toString().trim().isEmpty() && !bill.hasReceiptLines()) splitEvenly();
+                else render();
+            }
         }
     }
 }

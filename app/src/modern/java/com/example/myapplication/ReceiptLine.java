@@ -26,10 +26,10 @@ public final class ReceiptLine {
         ReceiptLine line = new ReceiptLine();
         line.title = json.getString("title");
         line.amount = json.getLong("amountMinor");
-        line.left = (float) json.optDouble("left");
-        line.top = (float) json.optDouble("top");
-        line.right = (float) json.optDouble("right");
-        line.bottom = (float) json.optDouble("bottom");
+        line.left = (float) json.optDouble("left", 0);
+        line.top = (float) json.optDouble("top", 0);
+        line.right = (float) json.optDouble("right", 0);
+        line.bottom = (float) json.optDouble("bottom", 0);
         JSONArray people = json.getJSONArray("assignees");
         for (int i = 0; i < people.length(); i++) line.assignees.add(people.getInt(i));
         return line;

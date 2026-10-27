@@ -15,6 +15,7 @@ public final class MainWindow extends AppCompatActivity {
     private BillRepository repository;
     private LinearLayout body;
     private boolean updating;
+    private boolean refreshAfterEdit;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -28,6 +29,11 @@ public final class MainWindow extends AppCompatActivity {
         all.setGravity(Gravity.CENTER);
         Ui.add(this, footer, all, 3);
         load(false);
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (refreshAfterEdit) { refreshAfterEdit = false; load(true); }
     }
 
     private void load(boolean refresh) {
@@ -63,6 +69,18 @@ public final class MainWindow extends AppCompatActivity {
                 Ui.label(this, DemoSession.active(this) ? "Демо · на устройстве" : "На устройстве"), 1);
         Ui.addRow(this, statusRow, Ui.link(this, "Обновить", () -> load(true)), 0);
         Ui.add(this, body, statusRow, 12);
+        Ui.add(this, body, Ui.secondary(this, "✎  Редактировать счёт / добавить участников", () -> {
+            try {
+                Intent intent = new Intent(this, AfterContact.class)
+                        .putExtra("editDraft", bill.toJson().toString());
+                refreshAfterEdit = true;
+                startActivity(intent);
+            } catch (Exception e) { Ui.error(this, e); }
+        }), 12);
+        Ui.add(this, body, Ui.secondary(this, "▧  Чеки счёта", () -> {
+            refreshAfterEdit = true;
+            startActivity(new Intent(this, ReceiptOverviewActivity.class).putExtra("bill", bill.id));
+        }), 8);
         Ui.add(this, body, Ui.text(this, "Участники", 18, true), 20);
         Ui.add(this, body, Ui.label(this, "Нажмите на участника, чтобы отметить оплату."), 6);
 

@@ -30,4 +30,18 @@ public final class ReceiptCalculator {
         }
         return totals;
     }
+
+    public static List<Long> allocateAll(int participantCount, List<ReceiptDocument> receipts) {
+        List<Long> totals = new ArrayList<>();
+        for (int i = 0; i < participantCount; i++) totals.add(0L);
+        for (ReceiptDocument receipt : receipts) {
+            List<Long> shares = allocate(participantCount, receipt.lines);
+            for (int i = 0; i < shares.size(); i++) {
+                long total = Math.addExact(totals.get(i), shares.get(i));
+                Money.check(total);
+                totals.set(i, total);
+            }
+        }
+        return totals;
+    }
 }

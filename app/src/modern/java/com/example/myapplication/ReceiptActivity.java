@@ -8,11 +8,17 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,51 +30,106 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /** The original receipt stays in private app storage; only markup and shares go to the bill. */
 public final class ReceiptActivity extends AppCompatActivity {
     private static final int CAMERA = 201, PICK_IMAGE = 202;
     private BillDocument bill;
+    private ReceiptDocument receipt;
     private ReceiptImageView image;
-    private LinearLayout positions;
-    private File photo, pending;
+    private ListView positions;
+    private TextView count;
+    private EditText search;
+    private final List<ReceiptLine> visible = new ArrayList<>();
+    private BaseAdapter adapter;
+    private File photo, pending, staged;
+    private boolean applied;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         try {
             bill = BillDocument.fromJson(new JSONObject(state == null
                     ? getIntent().getStringExtra("draft") : state.getString("draft")));
-            File directory = new File(getFilesDir(), "receipts");
-            if (!directory.exists() && !directory.mkdirs()) throw new IllegalStateException("Не удалось создать папку чека");
-            photo = new File(directory, bill.id + ".jpg");
+            String selected = getIntent().getStringExtra("receiptId");
+            if (selected != null) for (ReceiptDocument item : bill.receipts)
+                if (item.id.equals(selected)) { receipt = item; break; }
+            if (receipt == null) {
+                if (selected != null) throw new IllegalStateException("Чек не найден");
+                receipt = bill.primaryReceipt();
+            }
+            photo = ReceiptPhotos.photo(this, receipt);
             if (state != null && state.getString("pending") != null) pending = new File(state.getString("pending"));
+            if (state != null && state.getString("staged") != null) staged = new File(state.getString("staged"));
         } catch (Exception e) { Ui.error(this, e); finish(); return; }
         LinearLayout root = Ui.page(this);
-        Ui.toolbar(this, root, "Чек", true, null);
+        Ui.toolbar(this, root, receipt.name, true, null);
         LinearLayout body = Ui.scroll(this, root);
         Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА · БЕЗ OCR"), 8);
         Ui.add(this, body, Ui.headline(this, "Отметьте позиции", 34), 10);
         Ui.add(this, body, Ui.label(this, "Выделите область пальцем, введите сумму и выберите людей."), 8);
+        Ui.add(this, body, Ui.secondary(this, "✎  Название чека", this::rename), 9);
         Ui.add(this, body, Ui.secondary(this, "Сфотографировать чек", this::takePhoto), 18);
         Ui.add(this, body, Ui.secondary(this, "Выбрать изображение", this::choosePhoto), 8);
         image = new ReceiptImageView(this);
         image.setOnSelection((left, top, right, bottom) -> edit(null, left, top, right, bottom));
         image.setOnExisting(this::editExisting);
         Ui.add(this, body, image, 15);
-        positions = Ui.column(this);
-        Ui.add(this, body, positions, 12);
+        count = Ui.text(this, "", 18, true);
+        Ui.add(this, body, count, 14);
+        search = Ui.input(this, "Поиск по позициям");
+        Ui.add(this, body, search, 8);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { render(); }
+            @Override public void afterTextChanged(Editable s) { }
+        });
+        positions = new ListView(this);
+        positions.setDividerHeight(0);
+        adapter = new BaseAdapter() {
+            @Override public int getCount() { return visible.size(); }
+            @Override public ReceiptLine getItem(int position) { return visible.get(position); }
+            @Override public long getItemId(int position) { return position; }
+            @Override public View getView(int position, View recycled, ViewGroup parent) {
+                TextView row = recycled instanceof TextView ? (TextView) recycled : Ui.text(ReceiptActivity.this, "", 16, false);
+                row.setMinimumHeight(Ui.dp(ReceiptActivity.this, 52));
+                ReceiptLine line = getItem(position);
+                row.setText(line.title + "  ·  " + Money.format(line.amount));
+                row.setContentDescription("Изменить позицию " + line.title);
+                return row;
+            }
+        };
+        positions.setAdapter(adapter);
+        positions.setOnItemClickListener((parent, view, position, id) -> editExisting(visible.get(position)));
+        Ui.add(this, body, positions, 8);
+        positions.getLayoutParams().height = Ui.dp(this, 280);
         Ui.add(this, Ui.footer(this, root), Ui.button(this, "Перенести доли в счёт", this::apply), 0);
         showPhoto();
         render();
     }
 
+    private void rename() {
+        EditText name = Ui.input(this, "Название чека");
+        name.setText(receipt.name);
+        LinearLayout form = Ui.column(this);
+        form.setPadding(Ui.dp(this, 20), Ui.dp(this, 12), Ui.dp(this, 20), 0);
+        Ui.add(this, form, name, 0);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Название чека").setView(form)
+                .setNegativeButton("Отмена", null).setPositiveButton("Сохранить", null).create();
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String value = name.getText().toString().trim();
+            if (value.isEmpty()) { Ui.error(this, new IllegalArgumentException("Введите название чека")); return; }
+            receipt.name = value;
+            dialog.dismiss();
+        }));
+        dialog.show();
+    }
+
     private void takePhoto() {
         try {
-            pending = new File(photo.getParentFile(), bill.id + "-capture.jpg");
+            pending = new File(photo.getParentFile(), receipt.photoFile + "-capture.jpg");
             Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".files", pending);
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
@@ -92,9 +153,9 @@ public final class ReceiptActivity extends AppCompatActivity {
         try {
             if (request == CAMERA) {
                 if (pending == null || !pending.exists() || pending.length() == 0) throw new IllegalStateException("Фото не получено");
-                replacePhoto(pending);
+                stagePhoto(pending);
             } else if (request == PICK_IMAGE && data != null && data.getData() != null) {
-                File temp = new File(photo.getParentFile(), bill.id + "-import.jpg");
+                File temp = new File(photo.getParentFile(), receipt.photoFile + "-import.jpg");
                 try {
                     try (InputStream input = getContentResolver().openInputStream(data.getData());
                          OutputStream output = new FileOutputStream(temp)) {
@@ -108,34 +169,41 @@ public final class ReceiptActivity extends AppCompatActivity {
                             output.write(buffer, 0, count);
                         }
                     }
-                    replacePhoto(temp);
+                    stagePhoto(temp);
                 } finally {
                     if (temp.exists() && !temp.delete()) android.util.Log.w("ReceiptActivity", "Could not remove partial import");
                 }
             } else return;
-            bill.lines.clear(); // Markup on an older image cannot match a new one.
+            receipt.lines.clear(); // Markup on an older image cannot match a new one.
             showPhoto(); render();
         } catch (Exception e) { Ui.error(this, e); }
     }
 
-    private void replacePhoto(File source) throws Exception {
-        Files.move(source.toPath(), photo.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    private void stagePhoto(File source) throws Exception {
+        BitmapFactory.Options bounds = new BitmapFactory.Options();
+        bounds.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(source.getPath(), bounds);
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw new IllegalArgumentException("Это не изображение");
+        File destination = ReceiptPhotos.stage(this, receipt);
+        java.nio.file.Files.move(source.toPath(), destination.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        staged = destination;
     }
 
     private void showPhoto() {
-        if (!photo.exists()) { image.setVisibility(View.GONE); return; }
+        File shown = staged != null && staged.exists() ? staged : photo;
+        if (!shown.exists()) { image.setVisibility(View.GONE); return; }
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(photo.getPath(), options);
+            BitmapFactory.decodeFile(shown.getPath(), options);
             if (options.outWidth <= 0 || options.outHeight <= 0) throw new IllegalArgumentException("Это не изображение");
             options.inSampleSize = 1;
             while (options.outWidth / options.inSampleSize > 1800 || options.outHeight / options.inSampleSize > 2400)
                 options.inSampleSize *= 2;
             options.inJustDecodeBounds = false;
-            Bitmap bitmap = BitmapFactory.decodeFile(photo.getPath(), options);
+            Bitmap bitmap = BitmapFactory.decodeFile(shown.getPath(), options);
             if (bitmap == null) throw new IllegalArgumentException("Не удалось открыть изображение");
-            int orientation = new ExifInterface(photo.getPath()).getAttributeInt(ExifInterface.TAG_ORIENTATION,
+            int orientation = new ExifInterface(shown.getPath()).getAttributeInt(ExifInterface.TAG_ORIENTATION,
                     ExifInterface.ORIENTATION_NORMAL);
             Matrix rotation = new Matrix();
             if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotation.postRotate(90);
@@ -146,7 +214,7 @@ public final class ReceiptActivity extends AppCompatActivity {
                 bitmap.recycle();
                 bitmap = corrected;
             }
-            image.setImage(bitmap, bill.lines);
+            image.setImage(bitmap, receipt.lines);
             image.setVisibility(View.VISIBLE);
         } catch (Exception e) { Ui.error(this, e); image.setVisibility(View.GONE); }
     }
@@ -176,7 +244,7 @@ public final class ReceiptActivity extends AppCompatActivity {
         AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Позиция чека").setView(form)
                 .setNegativeButton("Отмена", null);
         if (existing != null) dialog.setNeutralButton("Удалить", (d, w) -> {
-            bill.lines.remove(existing); render();
+            receipt.lines.remove(existing); render();
         });
         dialog.setPositiveButton("Сохранить", null);
         AlertDialog shown = dialog.create();
@@ -190,13 +258,13 @@ public final class ReceiptActivity extends AppCompatActivity {
                 line.left = left; line.top = top; line.right = right; line.bottom = bottom;
                 for (int i = 0; i < checkboxes.size(); i++) if (checkboxes.get(i).isChecked()) line.assignees.add(i);
                 if (line.assignees.isEmpty()) throw new IllegalArgumentException("Выберите хотя бы одного участника");
-                int position = existing == null ? bill.lines.size() : bill.lines.indexOf(existing);
-                if (existing != null) bill.lines.set(position, line);
-                else bill.lines.add(line);
-                try { ReceiptCalculator.allocate(bill.people.size(), bill.lines); }
+                int position = existing == null ? receipt.lines.size() : receipt.lines.indexOf(existing);
+                if (existing != null) receipt.lines.set(position, line);
+                else receipt.lines.add(line);
+                try { bill.recalculateAmounts(); }
                 catch (RuntimeException error) {
-                    if (existing != null) bill.lines.set(position, existing);
-                    else bill.lines.remove(position);
+                    if (existing != null) receipt.lines.set(position, existing);
+                    else receipt.lines.remove(position);
                     throw error;
                 }
                 shown.dismiss(); render();
@@ -206,22 +274,25 @@ public final class ReceiptActivity extends AppCompatActivity {
     }
 
     private void render() {
-        positions.removeAllViews();
-        Ui.add(this, positions, Ui.text(this, "Позиции · " + bill.lines.size(), 20, true), 0);
-        for (ReceiptLine line : bill.lines) {
-            LinearLayout card = Ui.card(this, positions);
-            Ui.add(this, card, Ui.text(this, line.title + " · " + Money.format(line.amount), 16, true), 0);
-            Ui.add(this, card, Ui.secondary(this, "Изменить", () -> editExisting(line)), 5);
-        }
+        if (positions == null) return;
+        count.setText("Позиции · " + receipt.lines.size());
+        String query = search.getText().toString().trim().toLowerCase(Locale.ROOT);
+        visible.clear();
+        for (ReceiptLine line : receipt.lines)
+            if (line.title.toLowerCase(Locale.ROOT).contains(query)) visible.add(line);
+        adapter.notifyDataSetChanged();
         if (image != null) image.invalidate();
     }
 
     private void apply() {
         try {
-            if (bill.lines.isEmpty()) throw new IllegalArgumentException("Добавьте хотя бы одну позицию чека");
-            List<Long> amounts = ReceiptCalculator.allocate(bill.people.size(), bill.lines);
-            for (int i = 0; i < amounts.size(); i++) bill.people.get(i).amount = amounts.get(i);
-            setResult(RESULT_OK, new Intent().putExtra("draft", bill.toJson().toString()));
+            if (receipt.lines.isEmpty() && (staged == null || !staged.exists()) && !photo.exists())
+                throw new IllegalArgumentException("Добавьте фото или хотя бы одну позицию чека");
+            bill.recalculateAmounts();
+            setResult(RESULT_OK, new Intent().putExtra("draft", bill.toJson().toString())
+                    .putExtra("receiptId", receipt.id)
+                    .putExtra("stagedPhoto", staged == null ? null : staged.getPath()));
+            applied = true;
             finish();
         } catch (Exception e) { Ui.error(this, e); }
     }
@@ -229,6 +300,15 @@ public final class ReceiptActivity extends AppCompatActivity {
     @Override protected void onSaveInstanceState(Bundle state) {
         try { state.putString("draft", bill.toJson().toString()); } catch (Exception ignored) { }
         if (pending != null) state.putString("pending", pending.getPath());
+        if (staged != null) state.putString("staged", staged.getPath());
         super.onSaveInstanceState(state);
+    }
+
+    @Override protected void onDestroy() {
+        if (isFinishing() && !applied) {
+            if (staged != null && staged.exists() && !staged.delete()) android.util.Log.w("ReceiptActivity", "Could not remove draft photo");
+            if (pending != null && pending.exists() && !pending.delete()) android.util.Log.w("ReceiptActivity", "Could not remove camera draft");
+        }
+        super.onDestroy();
     }
 }
