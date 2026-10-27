@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.os.Looper;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,6 +21,10 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowDialog;
 
 import java.util.Collections;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -98,6 +103,35 @@ public class UiFlowTest {
         assertNotNull(findText(root, "Участников: 2 · Доли: 90,00 ₽"));
     }
 
+    @Test public void pickerReturnsMultipleSelectionsEvenAfterFiltering() throws Exception {
+        ContactSelectionActivity picker = Robolectric.buildActivity(ContactSelectionActivity.class)
+                .create().start().resume().get();
+        Field field = ContactSelectionActivity.class.getDeclaredField("contacts");
+        field.setAccessible(true);
+        @SuppressWarnings("unchecked")
+        java.util.List<ContactDirectory.Contact> contacts = (java.util.List<ContactDirectory.Contact>) field.get(picker);
+        contacts.add(new ContactDirectory.Contact(1, "Анна", "+79991111111"));
+        contacts.add(new ContactDirectory.Contact(2, "Михаил", ""));
+        Field loaded = ContactSelectionActivity.class.getDeclaredField("loadedOnce");
+        loaded.setAccessible(true);
+        loaded.setBoolean(picker, true);
+        Method filter = ContactSelectionActivity.class.getDeclaredMethod("filter");
+        filter.setAccessible(true);
+        filter.invoke(picker);
+        View root = picker.findViewById(android.R.id.content);
+        ListView list = findList(root);
+        list.performItemClick(list.getAdapter().getView(0, null, list), 0, 1);
+        findInput(root, "Поиск по имени или номеру").setText("мих");
+        list.performItemClick(list.getAdapter().getView(0, null, list), 0, 2);
+        assertNotNull(findText(root, "Добавить (2)"));
+        findText(root, "Добавить (2)").performClick();
+        Intent result = Shadows.shadowOf(picker).getResultIntent();
+        assertEquals(new ArrayList<>(Arrays.asList("Анна", "Михаил")),
+                result.getStringArrayListExtra(ContactSelectionActivity.NAMES));
+        assertEquals(new ArrayList<>(Arrays.asList("+79991111111", "")),
+                result.getStringArrayListExtra(ContactSelectionActivity.PHONES));
+    }
+
     @Test public void receiptEditorAcceptsDraftWithoutPhoto() throws Exception {
         BillDocument bill = new BillDocument();
         bill.people.add(new BillDocument.Person("Анна", "", 0, false));
@@ -134,6 +168,18 @@ public class UiFlowTest {
             android.view.ViewGroup group = (android.view.ViewGroup) root;
             for (int i = 0; i < group.getChildCount(); i++) {
                 EditText found = findInput(group.getChildAt(i), hint);
+                if (found != null) return found;
+            }
+        }
+        return null;
+    }
+
+    private ListView findList(View root) {
+        if (root instanceof ListView) return (ListView) root;
+        if (root instanceof android.view.ViewGroup) {
+            android.view.ViewGroup group = (android.view.ViewGroup) root;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                ListView found = findList(group.getChildAt(i));
                 if (found != null) return found;
             }
         }

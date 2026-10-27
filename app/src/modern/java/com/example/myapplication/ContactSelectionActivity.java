@@ -3,12 +3,11 @@ package com.example.myapplication;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -21,9 +20,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
@@ -31,18 +30,22 @@ import java.util.Set;
 public final class ContactSelectionActivity extends AppCompatActivity {
     static final String NAMES = "selectedNames", PHONES = "selectedPhones";
     private static final int READ_CONTACTS = 1;
-    private final List<Contact> contacts = new ArrayList<>(), visible = new ArrayList<>();
-    private final LinkedHashMap<Long, Contact> selected = new LinkedHashMap<>();
+    private final List<ContactDirectory.Contact> contacts = new ArrayList<>(), visible = new ArrayList<>();
+    private final LinkedHashMap<Long, ContactDirectory.Contact> selected = new LinkedHashMap<>();
     private final Set<Long> restored = new HashSet<>();
     private ContactAdapter adapter;
     private EditText search;
     private TextView message;
     private android.widget.Button done;
     private int available;
+    private int loadGeneration;
+    private boolean permissionRequested;
+    private boolean loading, loadedOnce;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         available = Math.max(0, Math.min(450, getIntent().getIntExtra("available", 450)));
+        permissionRequested = state != null && state.getBoolean("permissionRequested");
         if (state != null && state.getLongArray("selectedIds") != null)
             for (long id : state.getLongArray("selectedIds")) restored.add(id);
 
@@ -57,10 +60,7 @@ public final class ContactSelectionActivity extends AppCompatActivity {
         Ui.add(this, column, search, 16);
         message = Ui.label(this, "Загружаем контакты…");
         Ui.add(this, column, message, 12);
-        message.setOnClickListener(v -> {
-            if (checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED)
-                requestContacts();
-        });
+        message.setOnClickListener(v -> requestContacts(true));
 
         ListView list = new ListView(this);
         list.setDividerHeight(0);
@@ -82,51 +82,64 @@ public final class ContactSelectionActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) { }
         });
         if (state != null) search.setText(state.getString("search", ""));
-        requestContacts();
+        requestContacts(false);
     }
 
-    private void requestContacts() {
+    private void requestContacts(boolean userInitiated) {
         if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED)
             loadContacts();
         else {
-            message.setText("Разрешите доступ к контактам, чтобы выбрать участников. Нажмите здесь для повторного запроса.");
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS);
+            loadGeneration++;
+            if (permissionRequested && !shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)) {
+                message.setText("Доступ к контактам отключён. Нажмите здесь, чтобы открыть настройки приложения и разрешить доступ.");
+                if (userInitiated) startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:" + getPackageName())));
+            } else {
+                message.setText("Разрешите доступ к контактам. После разрешения отметьте нужных людей в списке.");
+                permissionRequested = true;
+                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACTS);
+            }
         }
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (message != null && checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
+                && !loading && !loadedOnce) loadContacts();
     }
 
     @Override public void onRequestPermissionsResult(int request, String[] permissions, int[] grants) {
         super.onRequestPermissionsResult(request, permissions, grants);
         if (request == READ_CONTACTS) {
             if (grants.length > 0 && grants[0] == PackageManager.PERMISSION_GRANTED) loadContacts();
-            else message.setText("Доступ не предоставлен. Нажмите здесь, чтобы попробовать снова.");
+            else message.setText("Доступ не предоставлен. Нажмите здесь, чтобы повторить запрос или открыть настройки приложения.");
         }
     }
 
     private void loadContacts() {
         message.setText("Загружаем контакты…");
+        loading = true;
+        final int generation = ++loadGeneration;
         new Thread(() -> {
-            List<Contact> loaded = new ArrayList<>();
-            try (Cursor cursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    new String[]{ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
-                            ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY,
-                            ContactsContract.CommonDataKinds.Phone.NUMBER},
-                    null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME_PRIMARY + " ASC")) {
-                if (cursor == null) throw new IllegalStateException("Не удалось прочитать контакты");
-                Set<Long> seen = new HashSet<>();
-                while (cursor.moveToNext()) {
-                    long id = cursor.getLong(0);
-                    String name = cursor.getString(1);
-                    if (name != null && !name.trim().isEmpty() && seen.add(id))
-                        loaded.add(new Contact(id, name.trim(), cursor.getString(2)));
-                }
+            List<ContactDirectory.Contact> loaded;
+            try {
+                loaded = ContactDirectory.read(getContentResolver());
             } catch (Exception e) {
-                runOnUiThread(() -> { if (!isFinishing() && !isDestroyed()) message.setText("Контакты недоступны: " + e.getMessage()); });
+                runOnUiThread(() -> {
+                    if (generation != loadGeneration || isFinishing() || isDestroyed()) return;
+                    loading = false;
+                    message.setText("Контакты недоступны: " + e.getMessage() + ". Нажмите здесь, чтобы повторить.");
+                });
                 return;
             }
             runOnUiThread(() -> {
-                if (isFinishing() || isDestroyed()) return;
+                if (generation != loadGeneration || isFinishing() || isDestroyed()) return;
+                loading = false;
+                loadedOnce = true;
                 contacts.clear(); contacts.addAll(loaded);
-                for (Contact contact : contacts) if (restored.contains(contact.id)) selected.put(contact.id, contact);
+                restored.addAll(selected.keySet());
+                selected.clear();
+                for (ContactDirectory.Contact contact : contacts) if (restored.contains(contact.id)) selected.put(contact.id, contact);
                 restored.clear();
                 filter();
                 updateButton();
@@ -135,23 +148,25 @@ public final class ContactSelectionActivity extends AppCompatActivity {
     }
 
     private void filter() {
-        String query = search.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String query = search.getText().toString().trim();
         visible.clear();
-        for (Contact contact : contacts)
-            if (contact.name.toLowerCase(Locale.ROOT).contains(query) || contact.phone.contains(query))
+        for (ContactDirectory.Contact contact : contacts)
+            if (contact.matches(query))
                 visible.add(contact);
         adapter.notifyDataSetChanged();
-        message.setText(contacts.isEmpty() ? "Нет контактов с номером телефона" :
-                visible.isEmpty() ? "Ничего не найдено" : "Выбрано: " + selected.size());
+        if (!loadedOnce) return; // Keep permission, loading or error feedback visible while searching.
+        message.setText(contacts.isEmpty() ? "Контактов нет. Проверьте, что они сохранены на устройстве или синхронизированы." :
+                visible.isEmpty() ? "Ничего не найдено · выбрано: " + selected.size() :
+                        "Контактов: " + contacts.size() + " · выбрано: " + selected.size());
     }
 
-    private void toggle(Contact contact) {
+    private void toggle(ContactDirectory.Contact contact) {
         if (selected.containsKey(contact.id)) selected.remove(contact.id);
         else if (selected.size() < available) selected.put(contact.id, contact);
         else { Ui.error(this, new IllegalArgumentException("Можно выбрать не более " + available + " участников")); return; }
         adapter.notifyDataSetChanged();
         updateButton();
-        message.setText("Выбрано: " + selected.size());
+        message.setText("Контактов: " + contacts.size() + " · выбрано: " + selected.size());
     }
 
     private void updateButton() {
@@ -161,7 +176,7 @@ public final class ContactSelectionActivity extends AppCompatActivity {
 
     private void complete() {
         ArrayList<String> names = new ArrayList<>(), phones = new ArrayList<>();
-        for (Contact contact : selected.values()) { names.add(contact.name); phones.add(contact.phone); }
+        for (ContactDirectory.Contact contact : selected.values()) { names.add(contact.name); phones.add(contact.phone); }
         setResult(RESULT_OK, new Intent().putStringArrayListExtra(NAMES, names)
                 .putStringArrayListExtra(PHONES, phones));
         finish();
@@ -174,20 +189,13 @@ public final class ContactSelectionActivity extends AppCompatActivity {
         for (Long id : restored) ids[i++] = id;
         state.putLongArray("selectedIds", ids);
         state.putString("search", search.getText().toString());
+        state.putBoolean("permissionRequested", permissionRequested);
         super.onSaveInstanceState(state);
-    }
-
-    private static final class Contact {
-        final long id;
-        final String name, phone;
-        Contact(long id, String name, String phone) {
-            this.id = id; this.name = name; this.phone = phone == null ? "" : phone;
-        }
     }
 
     private final class ContactAdapter extends BaseAdapter {
         @Override public int getCount() { return visible.size(); }
-        @Override public Contact getItem(int position) { return visible.get(position); }
+        @Override public ContactDirectory.Contact getItem(int position) { return visible.get(position); }
         @Override public long getItemId(int position) { return getItem(position).id; }
 
         @Override public View getView(int position, View recycled, ViewGroup parent) {
@@ -218,10 +226,10 @@ public final class ContactSelectionActivity extends AppCompatActivity {
                 row = (LinearLayout) recycled;
                 views = (Row) row.getTag();
             }
-            Contact contact = getItem(position);
+            ContactDirectory.Contact contact = getItem(position);
             views.avatar.setText(contact.name.substring(0, contact.name.offsetByCodePoints(0, 1)).toUpperCase(Locale.ROOT));
             views.name.setText(contact.name);
-            views.phone.setText(contact.phone);
+            views.phone.setText(contact.phone.isEmpty() ? "Без номера" : contact.phone);
             views.check.setChecked(selected.containsKey(contact.id));
             row.setContentDescription(contact.name + ", " + contact.phone + (selected.containsKey(contact.id) ? ", выбран" : ", не выбран"));
             return row;
