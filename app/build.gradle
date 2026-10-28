@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 def demoSideBySide = project.hasProperty('demoSideBySide')
+def verificationApk = project.hasProperty('verificationApk')
 // A fresh clone can build and run the offline demo without private Firebase config.
 if (!demoSideBySide && file('google-services.json').exists()) {
     apply plugin: 'com.google.gms.google-services'
@@ -14,8 +15,8 @@ android {
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode 6
-        versionName '1.4.1'
+        versionCode verificationApk ? 7 : 6
+        versionName verificationApk ? '1.4.2-rc1' : '1.4.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
