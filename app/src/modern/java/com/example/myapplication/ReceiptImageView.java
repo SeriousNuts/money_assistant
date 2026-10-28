@@ -21,11 +21,12 @@ public final class ReceiptImageView extends View {
     private Existing existing;
     private float x0, y0, x1, y1;
     private boolean dragging;
+    private boolean selectionEnabled;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public ReceiptImageView(Context context) {
         super(context);
-        setContentDescription("Чек: выделите позицию пальцем или нажмите на ранее отмеченную");
+        setContentDescription("Фото чека: для выделения позиции включите ручную разметку");
     }
     public void setImage(Bitmap image, List<ReceiptLine> markup) {
         if (bitmap != null && bitmap != image) bitmap.recycle();
@@ -34,6 +35,14 @@ public final class ReceiptImageView extends View {
     Bitmap currentBitmap() { return bitmap; }
     public void setOnSelection(Selection listener) { selection = listener; }
     public void setOnExisting(Existing listener) { existing = listener; }
+    public void setSelectionEnabled(boolean enabled) {
+        selectionEnabled = enabled;
+        if (!enabled) dragging = false;
+        setContentDescription(enabled ? "Выделите позицию на фото пальцем" :
+                "Фото чека: для выделения позиции включите ручную разметку");
+        invalidate();
+    }
+    boolean isSelectionEnabled() { return selectionEnabled; }
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
         int width = MeasureSpec.getSize(widthSpec);
         int height = bitmap == null ? width : (int) ((long) width * bitmap.getHeight() / bitmap.getWidth());
@@ -50,7 +59,7 @@ public final class ReceiptImageView extends View {
         if (dragging) canvas.drawRect(x0, y0, x1, y1, paint);
     }
     @Override public boolean onTouchEvent(MotionEvent event) {
-        if (bitmap == null) return false;
+        if (bitmap == null || !selectionEnabled) return false;
         float x = Math.max(0, Math.min(getWidth(), event.getX()));
         float y = Math.max(0, Math.min(getHeight(), event.getY()));
         switch (event.getActionMasked()) {
@@ -62,7 +71,8 @@ public final class ReceiptImageView extends View {
             case MotionEvent.ACTION_UP:
                 dragging = false;
                 getParent().requestDisallowInterceptTouchEvent(false);
-                if (Math.abs(x - x0) < 12 && Math.abs(y - y0) < 12) {
+                float slop = 20 * getResources().getDisplayMetrics().density;
+                if (Math.abs(x - x0) < slop && Math.abs(y - y0) < slop) {
                     performClick();
                     float nx = x / getWidth(), ny = y / getHeight();
                     for (int i = lines.size() - 1; i >= 0; i--) {
@@ -72,7 +82,9 @@ public final class ReceiptImageView extends View {
                             invalidate(); return true;
                         }
                     }
+                    invalidate(); return true;
                 }
+                setSelectionEnabled(false);
                 if (selection != null) selection.selected(Math.min(x, x0) / getWidth(),
                         Math.min(y, y0) / getHeight(), Math.max(x, x0) / getWidth(), Math.max(y, y0) / getHeight());
                 invalidate(); return true;

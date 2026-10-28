@@ -11,19 +11,25 @@ final class ReceiptOcrParser {
     static final class Fragment {
         final String text;
         final int left, top, right, bottom;
+        final float confidence;
 
         Fragment(String text, int left, int top, int right, int bottom) {
+            this(text, left, top, right, bottom, 100);
+        }
+
+        Fragment(String text, int left, int top, int right, int bottom, float confidence) {
             this.text = text;
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
+            this.confidence = confidence;
         }
     }
 
-    private static final Pattern PRICE = Pattern.compile("(?<![0-9.,])([0-9]{1,7}(?:[.,][0-9]{2})?)\\s*[₽рp]?\\s*$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final Pattern PRICE = Pattern.compile("(?<![0-9.,])([0-9]{1,6}[.,][0-9]{2}|[0-9]{1,6}\\s*[₽рp])\\s*[₽рp]?\\s*$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern SUMMARY = Pattern.compile(
-            "(?iu).*(итог|всего|сумма|скидк|сдач|оплат|налич|карта|ндс|налог|касса|терминал|чек|дата|время|total|subtotal|change|tax|cash|discount).*"
+            "(?iu).*(итог|всего|сумма|скидк|сдач|оплат|налич|карта|ндс|налог|касс|терминал|чек|дата|время|инн|фн|фд|фп|ккт|рн|зн|фиск|адрес|поставщик|телефон|консоли|тип\\s*пост|спасибо|сайт|total|subtotal|change|tax|cash|discount|receipt|card).*"
     );
 
     static List<ReceiptLine> parse(List<Fragment> fragments, int width, int height) {
@@ -34,7 +40,8 @@ final class ReceiptOcrParser {
         List<Fragment> row = new ArrayList<>();
         int rowTop = 0, rowBottom = 0;
         for (Fragment part : sorted) {
-            if (part.text == null || part.text.trim().isEmpty() || part.right <= part.left || part.bottom <= part.top) continue;
+            if (part.text == null || part.text.trim().isEmpty() || part.right <= part.left || part.bottom <= part.top
+                    || part.confidence < 38) continue;
             if (!row.isEmpty() && Math.abs((part.top + part.bottom) - (rowTop + rowBottom))
                     > Math.max(part.bottom - part.top, rowBottom - rowTop)) {
                 append(row, width, height, positions);
@@ -62,12 +69,14 @@ final class ReceiptOcrParser {
         Matcher match = PRICE.matcher(text);
         if (!match.find()) return;
         String title = text.substring(0, match.start()).replaceAll("[.·:_-]+$", "").trim();
-        if (title.length() < 2 || SUMMARY.matcher(title).matches()) return;
+        if (title.length() < 3 || title.length() > 80 || SUMMARY.matcher(title).matches()
+                || title.matches(".*[0-9]{5,}.*")) return;
         int letters = 0;
         for (int i = 0; i < title.length(); i++) if (Character.isLetter(title.charAt(i))) letters++;
-        if (letters < 2) return;
+        if (letters < 3) return;
         long amount;
-        try { amount = Money.parse(match.group(1)); } catch (IllegalArgumentException e) { return; }
+        try { amount = Money.parse(match.group(1).replaceAll("(?iu)[₽рp]", "").trim()); }
+        catch (IllegalArgumentException e) { return; }
         if (amount == 0) return;
         ReceiptLine line = new ReceiptLine();
         line.title = title.replaceAll("\\s+", " ");

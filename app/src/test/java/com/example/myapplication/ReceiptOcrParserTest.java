@@ -47,4 +47,16 @@ public class ReceiptOcrParserTest {
         assertEquals("Чай", result.get(0).title);
         assertEquals(8050, result.get(1).amount);
     }
+
+    @Test public void excludesReceiptFooterCodesDatesAndLowConfidenceNoise() {
+        List<ReceiptLine> result = ReceiptOcrParser.parse(Arrays.asList(
+                part("ИНН поставщика 4400005628", 1, 1, 90, 10),
+                part("ИТОГ =8135.00", 1, 20, 90, 29),
+                part("Кассир Светлана 8135.00", 1, 40, 90, 49),
+                part("КОЛЬЦО 94014700 3802.00", 1, 60, 90, 69),
+                new ReceiptOcrParser.Fragment("Фанта 99.00", 1, 80, 90, 89, 12),
+                part("Кофе 149.00", 1, 100, 90, 109)), 100, 120);
+        assertEquals(1, result.size());
+        assertEquals("Кофе", result.get(0).title);
+    }
 }

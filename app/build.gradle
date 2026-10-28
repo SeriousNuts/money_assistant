@@ -15,8 +15,8 @@ android {
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode verificationApk ? 8 : 6
-        versionName verificationApk ? '1.4.2-rc2' : '1.4.1'
+        versionCode verificationApk ? 9 : 6
+        versionName verificationApk ? '1.4.2-rc3' : '1.4.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -45,7 +45,10 @@ dependencies {
     implementation 'androidx.core:core:1.6.0'
     implementation 'com.google.firebase:firebase-auth:20.0.4'
     implementation 'com.google.firebase:firebase-firestore:22.1.2'
-    implementation 'com.google.mlkit:text-recognition:16.0.1'
+    // 4.2.0 targets Java 11; newer AARs use Java 17, unsupported by AGP 4.1.3.
+    implementation 'cz.adaptech.tesseract4android:tesseract4android:4.2.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.12.2'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
 }

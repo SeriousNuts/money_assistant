@@ -25,12 +25,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.text.Text;
-import com.google.mlkit.vision.text.TextRecognizer;
-import com.google.mlkit.vision.text.TextRecognition;
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
-
 import org.json.JSONObject;
 
 import java.io.File;
@@ -40,6 +34,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /** The original receipt stays in private app storage; only markup and shares go to the bill. */
 public final class ReceiptActivity extends AppCompatActivity {
@@ -50,6 +46,9 @@ public final class ReceiptActivity extends AppCompatActivity {
     private ListView positions;
     private TextView count;
     private TextView ocrStatus;
+    private TextView manualMode;
+    private TextView cropModeButton;
+    private boolean cropMode;
     private EditText search;
     private final List<ReceiptLine> visible = new ArrayList<>();
     private BaseAdapter adapter;
@@ -58,7 +57,7 @@ public final class ReceiptActivity extends AppCompatActivity {
     private boolean applied;
     private boolean recognizing;
     private int ocrGeneration;
-    private TextRecognizer recognizer;
+    private final ExecutorService ocrWorker = Executors.newSingleThreadExecutor();
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -84,21 +83,33 @@ public final class ReceiptActivity extends AppCompatActivity {
         LinearLayout body = Ui.scroll(this, root);
         Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА"), 8);
         Ui.add(this, body, Ui.headline(this, "Отметьте позиции", 34), 10);
-        Ui.add(this, body, Ui.label(this, "После фото позиции появятся автоматически. Проверьте названия, суммы и участников; при необходимости выделите области пальцем."), 8);
+        Ui.add(this, body, Ui.label(this, "Снимайте один чек крупно и без перекрытий. Если в кадре есть другие чеки или фон, выделите область для распознавания. Проверьте суммы перед сохранением."), 8);
         Ui.add(this, body, Ui.secondary(this, "✎  Название чека", this::rename), 9);
         Ui.add(this, body, Ui.secondary(this, "Сфотографировать чек", this::takePhoto), 18);
         Ui.add(this, body, Ui.secondary(this, "Выбрать изображение", this::choosePhoto), 8);
         Ui.add(this, body, Ui.secondary(this, "Повторить распознавание", () -> {
             if (!receipt.lines.isEmpty()) new AlertDialog.Builder(this).setTitle("Заменить позиции?")
                     .setMessage("Текущая разметка будет заменена результатами распознавания. Фото останется прежним.")
-                    .setNegativeButton("Отмена", null).setPositiveButton("Распознать", (d, w) -> recognize()).show();
-            else recognize();
+                    .setNegativeButton("Отмена", null).setPositiveButton("Распознать", (d, w) -> recognize(true)).show();
+            else recognize(false);
         }), 8);
-        ocrStatus = Ui.label(this, "Распознавание работает на устройстве. Для русских названий возможны ошибки; проверьте результат.");
+        ocrStatus = Ui.label(this, "Русский и английский текст распознаётся на устройстве. Проверьте найденные позиции перед сохранением.");
         Ui.add(this, body, ocrStatus, 8);
+        manualMode = Ui.secondary(this, "Добавить позицию вручную", () -> toggleSelection(false));
+        Ui.add(this, body, manualMode, 8);
+        cropModeButton = Ui.secondary(this, "Распознать выделенную область", () -> toggleSelection(true));
+        Ui.add(this, body, cropModeButton, 8);
         image = new ReceiptImageView(this);
-        image.setOnSelection((left, top, right, bottom) -> edit(null, left, top, right, bottom));
-        image.setOnExisting(this::editExisting);
+        image.setOnSelection((left, top, right, bottom) -> {
+            boolean cropped = cropMode;
+            stopSelection();
+            if (cropped) recognizeCrop(left, top, right, bottom);
+            else edit(null, left, top, right, bottom);
+        });
+        image.setOnExisting(line -> {
+            stopSelection();
+            editExisting(line);
+        });
         Ui.add(this, body, image, 15);
         count = Ui.text(this, "", 18, true);
         Ui.add(this, body, count, 14);
@@ -150,6 +161,39 @@ public final class ReceiptActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private void toggleSelection(boolean crop) {
+        boolean enable = !image.isSelectionEnabled() || cropMode != crop;
+        cropMode = crop && enable;
+        image.setSelectionEnabled(enable);
+        manualMode.setText(enable && !crop ? "Отменить ручную разметку" : "Добавить позицию вручную");
+        cropModeButton.setText(enable && crop ? "Отменить выделение области" : "Распознать выделенную область");
+    }
+
+    private void stopSelection() {
+        image.setSelectionEnabled(false);
+        cropMode = false;
+        manualMode.setText("Добавить позицию вручную");
+        cropModeButton.setText("Распознать выделенную область");
+    }
+
+    private void recognizeCrop(float left, float top, float right, float bottom) {
+        Bitmap shown = image.currentBitmap();
+        if (shown == null) return;
+        Rect crop = new Rect(Math.max(0, (int) (left * shown.getWidth())),
+                Math.max(0, (int) (top * shown.getHeight())),
+                Math.min(shown.getWidth(), (int) (right * shown.getWidth())),
+                Math.min(shown.getHeight(), (int) (bottom * shown.getHeight())));
+        if (crop.width() < 80 || crop.height() < 80) {
+            ocrStatus.setText("Выделите пальцем весь текст одного чека, а не отдельную строку.");
+            return;
+        }
+        if (!receipt.lines.isEmpty()) new AlertDialog.Builder(this).setTitle("Заменить позиции?")
+                .setMessage("Разметка будет заменена позициями из выделенной области.")
+                .setNegativeButton("Отмена", null)
+                .setPositiveButton("Распознать", (d, w) -> recognize(true, crop)).show();
+        else recognize(false, crop);
+    }
+
     private void takePhoto() {
         try {
             pending = new File(photo.getParentFile(), receipt.photoFile + "-capture.jpg");
@@ -199,7 +243,7 @@ public final class ReceiptActivity extends AppCompatActivity {
             } else return;
             receipt.lines.clear(); // Markup on an older image cannot match a new one.
             showPhoto(); render();
-            recognize();
+            recognize(false);
         } catch (Exception e) { Ui.error(this, e); }
     }
 
@@ -245,52 +289,67 @@ public final class ReceiptActivity extends AppCompatActivity {
         } catch (Exception e) { Ui.error(this, e); image.setVisibility(View.GONE); }
     }
 
-    private void recognize() {
+    private void recognize(boolean replace) {
+        recognize(replace, null);
+    }
+
+    private void recognize(boolean replace, Rect crop) {
         Bitmap shown = image.currentBitmap();
         if (shown == null || shown.isRecycled() || image.getVisibility() != View.VISIBLE) {
             Ui.error(this, new IllegalStateException("Сначала сфотографируйте чек")); return;
         }
-        if (recognizer == null) recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-        float scale = Math.min(1f, Math.min(1200f / shown.getWidth(), 1800f / shown.getHeight()));
-        Bitmap input = scale < 1 ? Bitmap.createScaledBitmap(shown,
-                Math.max(1, Math.round(shown.getWidth() * scale)),
-                Math.max(1, Math.round(shown.getHeight() * scale)), true)
-                : shown.copy(Bitmap.Config.ARGB_8888, false);
+        Bitmap input = crop == null ? shown.copy(Bitmap.Config.ARGB_8888, false)
+                : Bitmap.createBitmap(shown, crop.left, crop.top, crop.width(), crop.height());
+        if (input == null) { Ui.error(this, new IllegalStateException("Не удалось прочитать фото")); return; }
+        final int fullWidth = shown.getWidth(), fullHeight = shown.getHeight();
+        final int x = crop == null ? 0 : crop.left, y = crop == null ? 0 : crop.top;
         final int generation = ++ocrGeneration;
+        final List<ReceiptLine> previous = new ArrayList<>(receipt.lines);
         recognizing = true;
-        ocrStatus.setText("Распознаём позиции на устройстве…");
-        recognizer.process(InputImage.fromBitmap(input, 0)).addOnSuccessListener(result -> {
-            if (generation != ocrGeneration || isFinishing() || isDestroyed()) return;
-            List<ReceiptOcrParser.Fragment> fragments = new ArrayList<>();
-            for (Text.TextBlock block : result.getTextBlocks())
-                for (Text.Line line : block.getLines()) {
-                    Rect box = line.getBoundingBox();
-                    if (box != null) fragments.add(new ReceiptOcrParser.Fragment(line.getText(),
-                            box.left, box.top, box.right, box.bottom));
-                }
-            List<ReceiptLine> found = ReceiptOcrParser.parse(fragments, input.getWidth(), input.getHeight());
-            if (found.isEmpty()) {
-                ocrStatus.setText("Позиции не найдены. Добавьте их вручную или повторите съёмку.");
-                return;
-            }
-            for (ReceiptLine line : found)
-                for (int i = 0; i < bill.people.size(); i++) line.assignees.add(i);
-            List<ReceiptLine> previous = new ArrayList<>(receipt.lines);
-            receipt.lines.clear();
-            receipt.lines.addAll(found);
+        ocrStatus.setText("Распознаём русский и английский текст на устройстве…");
+        ocrWorker.execute(() -> {
+            List<ReceiptLine> found = null;
+            String failure = null;
             try {
-                bill.recalculateAmounts();
-                ocrStatus.setText("Предложено позиций: " + found.size() + ". По умолчанию разделены между всеми. Проверьте суммы, названия и участников.");
-                render();
-            } catch (RuntimeException e) {
-                receipt.lines.clear(); receipt.lines.addAll(previous);
-                ocrStatus.setText("Результат не применён: " + e.getMessage());
-                render();
-            }
-        }).addOnFailureListener(e -> {
-            if (generation == ocrGeneration && !isFinishing() && !isDestroyed())
-                ocrStatus.setText("Не удалось распознать чек: " + e.getMessage() + ". Разметьте его вручную.");
-        }).addOnCompleteListener(task -> { input.recycle(); if (generation == ocrGeneration) recognizing = false; });
+                List<ReceiptOcrParser.Fragment> fragments = ReceiptOcrEngine.recognize(getApplicationContext(), input);
+                List<ReceiptOcrParser.Fragment> adjusted = new ArrayList<>();
+                for (ReceiptOcrParser.Fragment fragment : fragments)
+                    adjusted.add(new ReceiptOcrParser.Fragment(fragment.text,
+                            fragment.left + x, fragment.top + y, fragment.right + x, fragment.bottom + y,
+                            fragment.confidence));
+                found = ReceiptOcrParser.parse(adjusted, fullWidth, fullHeight);
+            } catch (Exception | UnsatisfiedLinkError e) {
+                failure = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
+            } finally { input.recycle(); }
+            final List<ReceiptLine> suggestions = found;
+            final String error = failure;
+            runOnUiThread(() -> {
+                if (generation != ocrGeneration || isFinishing() || isDestroyed()) return;
+                recognizing = false;
+                if (error != null) {
+                    ocrStatus.setText("Не удалось распознать чек: " + error + ". Можно разметить вручную.");
+                } else if (suggestions == null || suggestions.isEmpty()) {
+                    ocrStatus.setText("Надёжные позиции не найдены. Снимите чек крупнее или добавьте позиции вручную.");
+                } else if (!receipt.lines.equals(previous)) {
+                    ocrStatus.setText("Разметка уже изменена вручную. Для замены нажмите «Повторить распознавание».");
+                } else {
+                    for (ReceiptLine line : suggestions)
+                        for (int i = 0; i < bill.people.size(); i++) line.assignees.add(i);
+                    if (replace) receipt.lines.clear();
+                    receipt.lines.addAll(suggestions);
+                    try {
+                        bill.recalculateAmounts();
+                        ocrStatus.setText("Предложено позиций: " + suggestions.size()
+                                + ". По умолчанию разделены между всеми. Проверьте суммы и участников.");
+                    } catch (RuntimeException e) {
+                        receipt.lines.clear(); receipt.lines.addAll(previous);
+                        bill.recalculateAmounts();
+                        ocrStatus.setText("Результат не применён: " + e.getMessage());
+                    }
+                    render();
+                }
+            });
+        });
     }
 
     private void editExisting(ReceiptLine line) { edit(line, line.left, line.top, line.right, line.bottom); }
@@ -407,7 +466,7 @@ public final class ReceiptActivity extends AppCompatActivity {
 
     @Override protected void onDestroy() {
         ocrGeneration++;
-        if (recognizer != null) recognizer.close();
+        ocrWorker.shutdownNow();
         if (isFinishing() && !applied) {
             if (staged != null && !staged.getPath().equals(inheritedStage)
                     && staged.exists() && !staged.delete()) android.util.Log.w("ReceiptActivity", "Could not remove draft photo");
