@@ -17,8 +17,11 @@ public final class Money {
         String[] parts = value.split("\\.");
         try {
             long rubles = Long.parseLong(parts[0]);
-            long minor = Math.addExact(Math.multiplyExact(rubles, 100),
-                    parts.length == 1 ? 0 : Integer.parseInt((parts[1] + "0").substring(0, 2)));
+            int kopecks = parts.length == 1 ? 0 : Integer.parseInt((parts[1] + "0").substring(0, 2));
+            if (rubles > MAX_MINOR / 100 ||
+                    (rubles == MAX_MINOR / 100 && kopecks > MAX_MINOR % 100))
+                throw new IllegalArgumentException("Слишком большая сумма");
+            long minor = rubles * 100 + kopecks;
             check(minor);
             return minor;
         } catch (ArithmeticException | NumberFormatException e) {

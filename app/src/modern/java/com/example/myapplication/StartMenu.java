@@ -19,7 +19,8 @@ import java.util.List;
 
 public final class StartMenu extends AppCompatActivity {
     private BillRepository repository;
-    private LinearLayout cards, total, filters;
+    private BillDraftStore draftStore;
+    private LinearLayout cards, total, filters, draftsView;
     private TextView cacheStatus;
     private List<BillDocument> bills = new ArrayList<>();
     private int filter;
@@ -28,6 +29,7 @@ public final class StartMenu extends AppCompatActivity {
         super.onCreate(state);
         if (state != null) filter = state.getInt("filter", 0);
         repository = new BillRepository(this);
+        draftStore = new BillDraftStore(this);
         LinearLayout root = Ui.page(this);
         Ui.toolbar(this, root, "money assistant", false, () -> {
             View anchor = root.findViewWithTag("toolbarMenu");
@@ -58,6 +60,9 @@ public final class StartMenu extends AppCompatActivity {
         Ui.addRow(this, statusRow, Ui.link(this, "Обновить", () -> load(true)), 0);
         Ui.add(this, body, statusRow, 10);
 
+        draftsView = Ui.column(this);
+        Ui.add(this, body, draftsView, 8);
+
         cards = Ui.column(this);
         Ui.add(this, body, cards, 0);
         Ui.add(this, Ui.footer(this, root), Ui.button(this, "＋  Новый счёт", () ->
@@ -77,7 +82,47 @@ public final class StartMenu extends AppCompatActivity {
         super.onSaveInstanceState(state);
     }
 
-    @Override protected void onResume() { super.onResume(); load(false); }
+    @Override protected void onResume() { super.onResume(); load(false); showDrafts(); }
+
+    private void showDrafts() {
+        draftsView.removeAllViews();
+        try {
+            List<BillDraftStore.Draft> drafts = draftStore.list();
+            if (drafts.isEmpty()) return;
+            Ui.add(this, draftsView, Ui.text(this, "Незавершённые счета", 19, true), 14);
+            for (BillDraftStore.Draft draft : drafts) {
+                LinearLayout card = Ui.card(this, draftsView);
+                LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) card.getLayoutParams();
+                p.topMargin = Ui.dp(this, 8);
+                card.setLayoutParams(p);
+                Ui.add(this, card, Ui.text(this, draft.bill.name.isEmpty() ? "Без названия" : draft.bill.name, 16, true), 0);
+                Ui.add(this, card, Ui.label(this, "Черновик · участников: " + draft.bill.people.size()), 4);
+                LinearLayout actions = Ui.row(this);
+                Ui.addRow(this, actions, Ui.link(this, "Продолжить", () -> startActivity(
+                        new Intent(this, AfterContact.class).putExtra("draftId", draft.bill.id))), 1);
+                Ui.addRow(this, actions, Ui.link(this, "Удалить", () -> confirmDeleteDraft(draft)), 0);
+                Ui.add(this, card, actions, 5);
+            }
+        } catch (Exception e) { Ui.error(this, e); }
+    }
+
+    private void confirmDeleteDraft(BillDraftStore.Draft draft) {
+        new AlertDialog.Builder(this).setTitle("Удалить черновик?")
+                .setMessage("Несохранённый счёт и черновик его фото будут удалены")
+                .setNegativeButton("Отмена", null)
+                .setPositiveButton("Удалить", (d, w) -> {
+                    try {
+                        draftStore.remove(draft.bill.id);
+                        if (draft.stagedPhoto != null && !draft.bill.receipts.isEmpty()) {
+                            java.io.File stage = new java.io.File(draft.stagedPhoto);
+                            if (ReceiptPhotos.isStage(this, draft.bill.receipts.get(0), stage)
+                                    && stage.exists() && !stage.delete())
+                                android.util.Log.w("StartMenu", "Could not remove draft receipt photo");
+                        }
+                        showDrafts();
+                    } catch (Exception e) { Ui.error(this, e); }
+                }).show();
+    }
 
     private void load(boolean force) {
         repository.list(force, (found, error) -> {

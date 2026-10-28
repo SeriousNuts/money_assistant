@@ -7,7 +7,7 @@ if (!demoSideBySide && file('google-services.json').exists()) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     buildToolsVersion '30.0.2'
 
     defaultConfig {
@@ -15,8 +15,8 @@ android {
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode verificationApk ? 7 : 6
-        versionName verificationApk ? '1.4.2-rc1' : '1.4.1'
+        versionCode verificationApk ? 8 : 6
+        versionName verificationApk ? '1.4.2-rc2' : '1.4.1'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
@@ -45,6 +45,7 @@ dependencies {
     implementation 'androidx.core:core:1.6.0'
     implementation 'com.google.firebase:firebase-auth:20.0.4'
     implementation 'com.google.firebase:firebase-firestore:22.1.2'
+    implementation 'com.google.mlkit:text-recognition:16.0.1'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.robolectric:robolectric:4.12.2'
 }

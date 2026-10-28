@@ -25,10 +25,21 @@ final class ReceiptPhotos {
         return new File(directory(context), receipt.photoFile + ".stage");
     }
 
+    static File newStage(Context context, ReceiptDocument receipt) throws IOException {
+        return new File(directory(context), receipt.photoFile + ".stage-" + java.util.UUID.randomUUID());
+    }
+
+    static boolean isStage(Context context, ReceiptDocument receipt, File file) throws IOException {
+        String name = file.getName();
+        return (name.equals(receipt.photoFile + ".stage") ||
+                name.matches(java.util.regex.Pattern.quote(receipt.photoFile + ".stage-") + "[a-f0-9-]{36}"))
+                && directory(context).getCanonicalFile().equals(file.getCanonicalFile().getParentFile());
+    }
+
     static void commit(Context context, ReceiptDocument receipt, String stagePath) throws IOException {
         if (stagePath == null) return;
-        File expected = stage(context, receipt);
-        if (!expected.getCanonicalPath().equals(new File(stagePath).getCanonicalPath()) || !expected.isFile())
+        File expected = new File(stagePath);
+        if (!isStage(context, receipt, expected) || !expected.isFile())
             throw new IOException("Черновик фотографии недоступен");
         Files.move(expected.toPath(), photo(context, receipt).toPath(), StandardCopyOption.REPLACE_EXISTING);
     }

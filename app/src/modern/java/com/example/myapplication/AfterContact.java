@@ -25,6 +25,7 @@ public final class AfterContact extends AppCompatActivity {
     private static final int EDIT_RECEIPT = 101;
     private BillDocument bill = new BillDocument();
     private BillRepository repository;
+    private BillDraftStore draftStore;
     private LinearLayout people;
     private EditText title, total;
     private TextView summary;
@@ -37,6 +38,7 @@ public final class AfterContact extends AppCompatActivity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         repository = new BillRepository(this);
+        draftStore = new BillDraftStore(this);
         editing = getIntent().hasExtra("editDraft");
         if (state != null) {
             saved = state.getBoolean("saved");
@@ -46,6 +48,13 @@ public final class AfterContact extends AppCompatActivity {
             bill = BillDocument.fromJson(new JSONObject(state != null
                     ? state.getString("draft") : getIntent().getStringExtra("editDraft")));
         } catch (JSONException | NullPointerException e) { Ui.error(this, e); finish(); return; }
+        BillDraftStore.Draft restoredDraft = null;
+        if (state == null && !editing && getIntent().hasExtra("draftId")) try {
+            restoredDraft = draftStore.get(getIntent().getStringExtra("draftId"));
+            if (restoredDraft == null) throw new IllegalStateException("Черновик не найден");
+            bill = restoredDraft.bill;
+            stagedPhoto = restoredDraft.stagedPhoto;
+        } catch (Exception e) { Ui.error(this, e); finish(); return; }
 
         LinearLayout root = Ui.page(this);
         Ui.toolbar(this, root, editing ? "Редактировать счёт" : "Новый счёт", true, null);
@@ -68,6 +77,7 @@ public final class AfterContact extends AppCompatActivity {
         total.setMinHeight(Ui.dp(this, 58));
         total.setMaxWidth(Ui.dp(this, 240));
         if (state != null) total.setText(state.getString("enteredTotal", ""));
+        else if (restoredDraft != null) total.setText(restoredDraft.enteredTotal);
         else if (editing) total.setText(Money.format(bill.total()).replace(" ₽", ""));
         LinearLayout moneyRow = Ui.row(this);
         moneyRow.addView(total, new LinearLayout.LayoutParams(-2, Ui.dp(this, 58)));
@@ -110,6 +120,8 @@ public final class AfterContact extends AppCompatActivity {
                 if (bill.people.isEmpty()) throw new IllegalArgumentException("Сначала добавьте участников");
                 Intent intent = new Intent(this, ReceiptActivity.class);
                 intent.putExtra("draft", bill.toJson().toString());
+                intent.putExtra("draftPhoto", stagedPhoto);
+                intent.putExtra("preserveOnBack", true);
                 startActivityForResult(intent, EDIT_RECEIPT);
             } catch (Exception e) { Ui.error(this, e); }
         }), 16);
@@ -120,6 +132,7 @@ public final class AfterContact extends AppCompatActivity {
         shareAfterSave.setTextColor(Ui.subdued(this));
         shareAfterSave.setTextSize(14);
         if (state != null) shareAfterSave.setChecked(state.getBoolean("share", false));
+        else if (restoredDraft != null) shareAfterSave.setChecked(restoredDraft.share);
         Ui.add(this, footer, shareAfterSave, 0);
         Ui.add(this, footer, Ui.button(this, editing ? "Сохранить изменения" : "Сохранить счёт", this::save), 6);
         render();
@@ -323,8 +336,22 @@ public final class AfterContact extends AppCompatActivity {
             ReceiptPhotos.commit(this, bill.primaryReceipt(), stagedPhoto);
             stagedPhoto = null;
         }
+        if (!editing) draftStore.remove(bill.id);
         if (shareAfterSave.isChecked()) share();
         finish();
+    }
+
+    private void saveDraft() throws Exception {
+        captureDraft();
+        draftStore.save(new BillDraftStore.Draft(bill, total.getText().toString(),
+                shareAfterSave.isChecked(), stagedPhoto));
+    }
+
+    @Override protected void onPause() {
+        if (!editing && !saved && title != null && shareAfterSave != null) try {
+            saveDraft();
+        } catch (Exception e) { Ui.error(this, e); }
+        super.onPause();
     }
 
     private void share() {
@@ -345,27 +372,22 @@ public final class AfterContact extends AppCompatActivity {
         super.onSaveInstanceState(state);
     }
 
-    @Override protected void onDestroy() {
-        if (isFinishing() && !saved && stagedPhoto != null) {
-            try {
-                java.io.File expected = ReceiptPhotos.stage(this, bill.primaryReceipt());
-                if (expected.getCanonicalPath().equals(new java.io.File(stagedPhoto).getCanonicalPath())
-                        && expected.exists() && !expected.delete())
-                    android.util.Log.w("AfterContact", "Could not remove draft photo");
-            } catch (Exception e) { android.util.Log.w("AfterContact", "Could not clean draft photo", e); }
-        }
-        super.onDestroy();
-    }
-
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
         if (result != RESULT_OK || data == null) return;
         if (request == EDIT_RECEIPT) {
             try {
+                String oldStage = stagedPhoto;
                 bill = BillDocument.fromJson(new JSONObject(data.getStringExtra("draft")));
                 stagedPhoto = data.getStringExtra("stagedPhoto");
                 total.setText(Money.format(bill.total()).replace(" ₽", ""));
                 render();
+                saveDraft();
+                if (oldStage != null && !oldStage.equals(stagedPhoto)) try {
+                    java.io.File old = new java.io.File(oldStage);
+                    if (ReceiptPhotos.isStage(this, bill.primaryReceipt(), old) && old.exists() && !old.delete())
+                        android.util.Log.w("AfterContact", "Could not remove superseded draft photo");
+                } catch (Exception e) { android.util.Log.w("AfterContact", "Could not clean draft photo", e); }
             } catch (Exception e) { Ui.error(this, e); }
         } else if (request == PICK_CONTACT) {
             ArrayList<String> names = data.getStringArrayListExtra(ContactSelectionActivity.NAMES);

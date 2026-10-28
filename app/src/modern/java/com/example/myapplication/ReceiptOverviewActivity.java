@@ -185,8 +185,8 @@ public final class ReceiptOverviewActivity extends AppCompatActivity {
 
     private void discardPending() {
         if (pendingStage != null && pendingEdit != null) try {
-            File photo = ReceiptPhotos.stage(this, pendingEdit);
-            if (photo.getCanonicalPath().equals(new File(pendingStage).getCanonicalPath()) && photo.exists()
+            File photo = new File(pendingStage);
+            if (ReceiptPhotos.isStage(this, pendingEdit, photo) && photo.exists()
                     && !photo.delete()) android.util.Log.w("ReceiptOverview", "Could not remove draft photo");
         } catch (Exception e) { android.util.Log.w("ReceiptOverview", "Could not clean draft photo", e); }
         pendingDraft = null;

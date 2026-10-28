@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -42,11 +49,16 @@ public final class ReceiptActivity extends AppCompatActivity {
     private ReceiptImageView image;
     private ListView positions;
     private TextView count;
+    private TextView ocrStatus;
     private EditText search;
     private final List<ReceiptLine> visible = new ArrayList<>();
     private BaseAdapter adapter;
     private File photo, pending, staged;
+    private String inheritedStage;
     private boolean applied;
+    private boolean recognizing;
+    private int ocrGeneration;
+    private TextRecognizer recognizer;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -61,18 +73,29 @@ public final class ReceiptActivity extends AppCompatActivity {
                 receipt = bill.primaryReceipt();
             }
             photo = ReceiptPhotos.photo(this, receipt);
+            inheritedStage = state == null ? getIntent().getStringExtra("draftPhoto") : state.getString("inheritedStage");
             if (state != null && state.getString("pending") != null) pending = new File(state.getString("pending"));
             if (state != null && state.getString("staged") != null) staged = new File(state.getString("staged"));
+            else if (inheritedStage != null && ReceiptPhotos.isStage(this, receipt, new File(inheritedStage)))
+                staged = new File(inheritedStage);
         } catch (Exception e) { Ui.error(this, e); finish(); return; }
         LinearLayout root = Ui.page(this);
         Ui.toolbar(this, root, receipt.name, true, null);
         LinearLayout body = Ui.scroll(this, root);
-        Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА · БЕЗ OCR"), 8);
+        Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА"), 8);
         Ui.add(this, body, Ui.headline(this, "Отметьте позиции", 34), 10);
-        Ui.add(this, body, Ui.label(this, "Выделите область пальцем, введите сумму и выберите людей."), 8);
+        Ui.add(this, body, Ui.label(this, "После фото позиции появятся автоматически. Проверьте названия, суммы и участников; при необходимости выделите области пальцем."), 8);
         Ui.add(this, body, Ui.secondary(this, "✎  Название чека", this::rename), 9);
         Ui.add(this, body, Ui.secondary(this, "Сфотографировать чек", this::takePhoto), 18);
         Ui.add(this, body, Ui.secondary(this, "Выбрать изображение", this::choosePhoto), 8);
+        Ui.add(this, body, Ui.secondary(this, "Повторить распознавание", () -> {
+            if (!receipt.lines.isEmpty()) new AlertDialog.Builder(this).setTitle("Заменить позиции?")
+                    .setMessage("Текущая разметка будет заменена результатами распознавания. Фото останется прежним.")
+                    .setNegativeButton("Отмена", null).setPositiveButton("Распознать", (d, w) -> recognize()).show();
+            else recognize();
+        }), 8);
+        ocrStatus = Ui.label(this, "Распознавание работает на устройстве. Для русских названий возможны ошибки; проверьте результат.");
+        Ui.add(this, body, ocrStatus, 8);
         image = new ReceiptImageView(this);
         image.setOnSelection((left, top, right, bottom) -> edit(null, left, top, right, bottom));
         image.setOnExisting(this::editExisting);
@@ -96,7 +119,7 @@ public final class ReceiptActivity extends AppCompatActivity {
                 TextView row = recycled instanceof TextView ? (TextView) recycled : Ui.text(ReceiptActivity.this, "", 16, false);
                 row.setMinimumHeight(Ui.dp(ReceiptActivity.this, 52));
                 ReceiptLine line = getItem(position);
-                row.setText(line.title + "  ·  " + Money.format(line.amount));
+                row.setText((line.autoDetected ? "◇ " : "") + line.title + "  ·  " + Money.format(line.amount));
                 row.setContentDescription("Изменить позицию " + line.title);
                 return row;
             }
@@ -176,6 +199,7 @@ public final class ReceiptActivity extends AppCompatActivity {
             } else return;
             receipt.lines.clear(); // Markup on an older image cannot match a new one.
             showPhoto(); render();
+            recognize();
         } catch (Exception e) { Ui.error(this, e); }
     }
 
@@ -184,8 +208,10 @@ public final class ReceiptActivity extends AppCompatActivity {
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(source.getPath(), bounds);
         if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw new IllegalArgumentException("Это не изображение");
-        File destination = ReceiptPhotos.stage(this, receipt);
+        File destination = ReceiptPhotos.newStage(this, receipt);
         java.nio.file.Files.move(source.toPath(), destination.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        if (staged != null && !staged.getPath().equals(inheritedStage) && staged.exists() && !staged.delete())
+            android.util.Log.w("ReceiptActivity", "Could not remove superseded draft photo");
         staged = destination;
     }
 
@@ -217,6 +243,54 @@ public final class ReceiptActivity extends AppCompatActivity {
             image.setImage(bitmap, receipt.lines);
             image.setVisibility(View.VISIBLE);
         } catch (Exception e) { Ui.error(this, e); image.setVisibility(View.GONE); }
+    }
+
+    private void recognize() {
+        Bitmap shown = image.currentBitmap();
+        if (shown == null || shown.isRecycled() || image.getVisibility() != View.VISIBLE) {
+            Ui.error(this, new IllegalStateException("Сначала сфотографируйте чек")); return;
+        }
+        if (recognizer == null) recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
+        float scale = Math.min(1f, Math.min(1200f / shown.getWidth(), 1800f / shown.getHeight()));
+        Bitmap input = scale < 1 ? Bitmap.createScaledBitmap(shown,
+                Math.max(1, Math.round(shown.getWidth() * scale)),
+                Math.max(1, Math.round(shown.getHeight() * scale)), true)
+                : shown.copy(Bitmap.Config.ARGB_8888, false);
+        final int generation = ++ocrGeneration;
+        recognizing = true;
+        ocrStatus.setText("Распознаём позиции на устройстве…");
+        recognizer.process(InputImage.fromBitmap(input, 0)).addOnSuccessListener(result -> {
+            if (generation != ocrGeneration || isFinishing() || isDestroyed()) return;
+            List<ReceiptOcrParser.Fragment> fragments = new ArrayList<>();
+            for (Text.TextBlock block : result.getTextBlocks())
+                for (Text.Line line : block.getLines()) {
+                    Rect box = line.getBoundingBox();
+                    if (box != null) fragments.add(new ReceiptOcrParser.Fragment(line.getText(),
+                            box.left, box.top, box.right, box.bottom));
+                }
+            List<ReceiptLine> found = ReceiptOcrParser.parse(fragments, input.getWidth(), input.getHeight());
+            if (found.isEmpty()) {
+                ocrStatus.setText("Позиции не найдены. Добавьте их вручную или повторите съёмку.");
+                return;
+            }
+            for (ReceiptLine line : found)
+                for (int i = 0; i < bill.people.size(); i++) line.assignees.add(i);
+            List<ReceiptLine> previous = new ArrayList<>(receipt.lines);
+            receipt.lines.clear();
+            receipt.lines.addAll(found);
+            try {
+                bill.recalculateAmounts();
+                ocrStatus.setText("Предложено позиций: " + found.size() + ". По умолчанию разделены между всеми. Проверьте суммы, названия и участников.");
+                render();
+            } catch (RuntimeException e) {
+                receipt.lines.clear(); receipt.lines.addAll(previous);
+                ocrStatus.setText("Результат не применён: " + e.getMessage());
+                render();
+            }
+        }).addOnFailureListener(e -> {
+            if (generation == ocrGeneration && !isFinishing() && !isDestroyed())
+                ocrStatus.setText("Не удалось распознать чек: " + e.getMessage() + ". Разметьте его вручную.");
+        }).addOnCompleteListener(task -> { input.recycle(); if (generation == ocrGeneration) recognizing = false; });
     }
 
     private void editExisting(ReceiptLine line) { edit(line, line.left, line.top, line.right, line.bottom); }
@@ -286,6 +360,22 @@ public final class ReceiptActivity extends AppCompatActivity {
 
     private void apply() {
         try {
+            if (recognizing) throw new IllegalStateException("Дождитесь окончания распознавания");
+            boolean unreviewed = false;
+            for (ReceiptLine line : receipt.lines) if (line.autoDetected) { unreviewed = true; break; }
+            if (unreviewed) {
+                new AlertDialog.Builder(this).setTitle("Проверьте распознанные позиции")
+                        .setMessage("Названия и суммы могут быть неточными. Все найденные позиции пока назначены всем участникам. Вы проверили расчёт?")
+                        .setNegativeButton("Проверить", null)
+                        .setPositiveButton("Перенести", (d, w) -> applyConfirmed()).show();
+                return;
+            }
+            applyConfirmed();
+        } catch (Exception e) { Ui.error(this, e); }
+    }
+
+    private void applyConfirmed() {
+        try {
             if (receipt.lines.isEmpty() && (staged == null || !staged.exists()) && !photo.exists())
                 throw new IllegalArgumentException("Добавьте фото или хотя бы одну позицию чека");
             bill.recalculateAmounts();
@@ -297,16 +387,30 @@ public final class ReceiptActivity extends AppCompatActivity {
         } catch (Exception e) { Ui.error(this, e); }
     }
 
+    @Override public void finish() {
+        if (!applied && bill != null && receipt != null && getIntent().getBooleanExtra("preserveOnBack", false)) try {
+            setResult(RESULT_OK, new Intent().putExtra("draft", bill.toJson().toString())
+                    .putExtra("receiptId", receipt.id)
+                    .putExtra("stagedPhoto", staged == null ? null : staged.getPath()));
+            applied = true;
+        } catch (Exception e) { Ui.error(this, e); }
+        super.finish();
+    }
+
     @Override protected void onSaveInstanceState(Bundle state) {
         try { state.putString("draft", bill.toJson().toString()); } catch (Exception ignored) { }
         if (pending != null) state.putString("pending", pending.getPath());
         if (staged != null) state.putString("staged", staged.getPath());
+        state.putString("inheritedStage", inheritedStage);
         super.onSaveInstanceState(state);
     }
 
     @Override protected void onDestroy() {
+        ocrGeneration++;
+        if (recognizer != null) recognizer.close();
         if (isFinishing() && !applied) {
-            if (staged != null && staged.exists() && !staged.delete()) android.util.Log.w("ReceiptActivity", "Could not remove draft photo");
+            if (staged != null && !staged.getPath().equals(inheritedStage)
+                    && staged.exists() && !staged.delete()) android.util.Log.w("ReceiptActivity", "Could not remove draft photo");
             if (pending != null && pending.exists() && !pending.delete()) android.util.Log.w("ReceiptActivity", "Could not remove camera draft");
         }
         super.onDestroy();

@@ -28,6 +28,7 @@ import org.robolectric.shadows.ShadowDialog;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
@@ -154,7 +155,9 @@ public class ReceiptOverviewTest {
         Method stage = ReceiptActivity.class.getDeclaredMethod("stagePhoto", File.class);
         stage.setAccessible(true);
         stage.invoke(first.get(), next);
-        File staged = ReceiptPhotos.stage(context, receipt);
+        Field stageField = ReceiptActivity.class.getDeclaredField("staged");
+        stageField.setAccessible(true);
+        File staged = (File) stageField.get(first.get());
         assertTrue(staged.exists());
         assertTrue(Arrays.equals(before, Files.readAllBytes(old.toPath())));
         Bundle saved = new Bundle();
@@ -166,6 +169,27 @@ public class ReceiptOverviewTest {
         second.pause().stop().destroy();
         assertFalse(staged.exists());
         assertTrue(Arrays.equals(before, Files.readAllBytes(old.toPath())));
+    }
+
+    @Test public void backFromNewBillKeepsPhotoAndMarkupForDraft() throws Exception {
+        ReceiptDocument receipt = bill.primaryReceipt();
+        Intent intent = new Intent(context, ReceiptActivity.class)
+                .putExtra("draft", bill.toJson().toString()).putExtra("preserveOnBack", true);
+        ActivityController<ReceiptActivity> controller = Robolectric.buildActivity(ReceiptActivity.class, intent)
+                .create().start().resume();
+        File incoming = new File(ReceiptPhotos.directory(context), "new-draft-photo.jpg");
+        writeImage(incoming, android.graphics.Color.GREEN);
+        Method stage = ReceiptActivity.class.getDeclaredMethod("stagePhoto", File.class);
+        stage.setAccessible(true);
+        stage.invoke(controller.get(), incoming);
+        controller.get().finish();
+        Intent result = Shadows.shadowOf(controller.get()).getResultIntent();
+        assertEquals(Activity.RESULT_OK, Shadows.shadowOf(controller.get()).getResultCode());
+        assertNotNull(result.getStringExtra("draft"));
+        File savedStage = new File(result.getStringExtra("stagedPhoto"));
+        controller.pause().stop().destroy();
+        assertTrue(savedStage.isFile());
+        assertTrue(ReceiptPhotos.isStage(context, receipt, savedStage));
     }
 
     private void writeImage(File path, int color) throws Exception {

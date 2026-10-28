@@ -31,6 +31,7 @@ public final class ReceiptImageView extends View {
         if (bitmap != null && bitmap != image) bitmap.recycle();
         bitmap = image; lines = markup; requestLayout(); invalidate();
     }
+    Bitmap currentBitmap() { return bitmap; }
     public void setOnSelection(Selection listener) { selection = listener; }
     public void setOnExisting(Existing listener) { existing = listener; }
     @Override protected void onMeasure(int widthSpec, int heightSpec) {

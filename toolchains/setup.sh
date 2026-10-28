@@ -22,6 +22,6 @@ JAVA_HOME="$(find "$JDKS" -maxdepth 1 -type d -name 'jdk-21*' | sort -V | tail -
 export JAVA_HOME
 export PATH="$JAVA_HOME/bin:$PATH"
 "$SDK/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$SDK" \
-    'platforms;android-30' 'build-tools;30.0.2' 'platform-tools'
+    'platforms;android-30' 'platforms;android-33' 'build-tools;30.0.2' 'platform-tools'
 printf 'sdk.dir=%s\n' "$SDK" > local.properties
 echo 'Run: source toolchains/activate.sh'
