@@ -93,6 +93,7 @@ public final class ReceiptActivity extends AppCompatActivity {
                     .setNegativeButton("Отмена", null).setPositiveButton("Распознать", (d, w) -> recognize(true)).show();
             else recognize(false);
         }), 8);
+        Ui.add(this, body, Ui.secondary(this, "☁  Распознать через Gemini (онлайн)", this::offerCloudRecognition), 8);
         ocrStatus = Ui.label(this, "Русский и английский текст распознаётся на устройстве. Проверьте найденные позиции перед сохранением.");
         Ui.add(this, body, ocrStatus, 8);
         manualMode = Ui.secondary(this, "Добавить позицию вручную", () -> toggleSelection(false));
@@ -291,6 +292,97 @@ public final class ReceiptActivity extends AppCompatActivity {
 
     private void recognize(boolean replace) {
         recognize(replace, null);
+    }
+
+    private void offerCloudRecognition() {
+        if (image.currentBitmap() == null || image.getVisibility() != View.VISIBLE) {
+            Ui.error(this, new IllegalStateException("Сначала сфотографируйте чек")); return;
+        }
+        if (recognizing) {
+            Ui.error(this, new IllegalStateException("Дождитесь окончания распознавания")); return;
+        }
+        String apiKey;
+        try { apiKey = ReceiptAiKey.load(this); }
+        catch (Exception e) { ReceiptAiKey.clear(this); apiKey = null; }
+        if (apiKey == null) { askCloudKey(); return; }
+        String key = apiKey;
+        new AlertDialog.Builder(this).setTitle("Отправить фото в Gemini?")
+                .setMessage("Только после подтверждения фото чека отправится в Google для распознавания. "
+                        + "Бесплатная квота ограничена; Google может использовать данные бесплатного тарифа "
+                        + "для улучшения продуктов. Текущие позиции будут заменены лишь при успешном ответе. "
+                        + "Проверьте суммы перед сохранением.")
+                .setNegativeButton("Отмена", null)
+                .setNeutralButton("Удалить ключ", (d, w) -> { ReceiptAiKey.clear(this); askCloudKey(); })
+                .setPositiveButton("Отправить фото", (d, w) -> recognizeCloud(key)).show();
+    }
+
+    private void askCloudKey() {
+        LinearLayout form = Ui.column(this);
+        form.setPadding(Ui.dp(this, 20), 0, Ui.dp(this, 20), 0);
+        Ui.add(this, form, Ui.label(this, "Нужен собственный API-ключ Google AI Studio (бесплатный тариф). "
+                + "Фото отправится в Google только после нажатия «Сохранить и отправить». "
+                + "В бесплатном тарифе данные могут использоваться для улучшения продуктов Google; "
+                + "при включённом биллинге запрос может быть платным. "
+                + "Текущие позиции заменятся только после успешного ответа. "
+                + "Ключ хранится зашифрованным на этом устройстве и не включается в APK."), 0);
+        EditText input = Ui.input(this, "API-ключ Gemini");
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        Ui.add(this, form, input, 12);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Распознавание Gemini")
+                .setView(form).setNegativeButton("Отмена", null)
+                .setPositiveButton("Сохранить и отправить", null).create();
+        dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            try {
+                String key = input.getText().toString().trim();
+                ReceiptAiKey.save(this, key);
+                dialog.dismiss();
+                recognizeCloud(key);
+            } catch (Exception e) { Ui.error(this, e); }
+        }));
+        dialog.show();
+    }
+
+    private void recognizeCloud(String key) {
+        Bitmap shown = image.currentBitmap();
+        if (shown == null || shown.isRecycled()) return;
+        Bitmap input = shown.copy(Bitmap.Config.ARGB_8888, false);
+        if (input == null) { Ui.error(this, new IllegalStateException("Не удалось прочитать фото")); return; }
+        final int generation = ++ocrGeneration;
+        final List<ReceiptLine> previous = new ArrayList<>(receipt.lines);
+        recognizing = true;
+        ocrStatus.setText("Отправляем фото в Gemini и ждём распознавания…");
+        ocrWorker.execute(() -> {
+            List<ReceiptLine> suggestions = null;
+            String error = null;
+            try { suggestions = GeminiReceiptClient.recognize(key, input); }
+            catch (Exception e) { error = e.getMessage() == null ? "Нет ответа" : e.getMessage(); }
+            finally { input.recycle(); }
+            final List<ReceiptLine> found = suggestions;
+            final String failure = error;
+            runOnUiThread(() -> {
+                if (generation != ocrGeneration || isFinishing() || isDestroyed()) return;
+                recognizing = false;
+                if (failure != null) ocrStatus.setText("Gemini: " + failure + " Разметка сохранена; доступен офлайн-режим.");
+                else if (found == null || found.isEmpty()) ocrStatus.setText("Gemini не нашёл товары. Позиции не изменены.");
+                else if (!receipt.lines.equals(previous)) ocrStatus.setText("Позиции уже изменены вручную. Ответ Gemini не применён.");
+                else {
+                    for (ReceiptLine line : found)
+                        for (int i = 0; i < bill.people.size(); i++) line.assignees.add(i);
+                    receipt.lines.clear();
+                    receipt.lines.addAll(found);
+                    try {
+                        bill.recalculateAmounts();
+                        ocrStatus.setText("Gemini предложил " + found.size() + " позиций. "
+                                + "По умолчанию они разделены между всеми. Проверьте список, суммы и участников.");
+                    } catch (RuntimeException e) {
+                        receipt.lines.clear(); receipt.lines.addAll(previous);
+                        bill.recalculateAmounts();
+                        ocrStatus.setText("Ответ Gemini не применён: " + e.getMessage());
+                    }
+                    render();
+                }
+            });
+        });
     }
 
     private void recognize(boolean replace, Rect crop) {
