@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -90,5 +91,24 @@ public class GeminiReceiptClientTest {
             assertEquals("test-key", connection.get().getRequestProperty("x-goog-api-key"));
             assertTrue(new JSONObject(sent.toString("UTF-8")).has("contents"));
         } finally { photo.recycle(); }
+    }
+
+    @Test public void distinguishesInvalidKeyFromBadSchemaWithoutLeakingProviderBody() {
+        String invalid = "{\"error\":{\"status\":\"INVALID_ARGUMENT\",\"message\":\"API key not valid. secret-marker\","
+                + "\"details\":[{\"reason\":\"API_KEY_INVALID\"}]}}";
+        String invalidMessage = GeminiReceiptClient.apiError(400, body(invalid)).getMessage();
+        assertTrue(invalidMessage.contains("API-ключ"));
+        assertFalse(invalidMessage.contains("secret-marker"));
+        String schema = "{\"error\":{\"status\":\"INVALID_ARGUMENT\","
+                + "\"message\":\"Unknown name at responseSchema secret-marker\"}}";
+        String schemaMessage = GeminiReceiptClient.apiError(400, body(schema)).getMessage();
+        assertTrue(schemaMessage.contains("формат ответа"));
+        assertFalse(schemaMessage.contains("secret-marker"));
+        assertTrue(GeminiReceiptClient.apiError(400, body("{\"error\":{\"status\":\"FAILED_PRECONDITION\"}}"))
+                .getMessage().contains("тариф"));
+    }
+
+    private static InputStream body(String value) {
+        return new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
     }
 }

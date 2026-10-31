@@ -44,9 +44,7 @@ final class GeminiReceiptClient {
             connection.setFixedLengthStreamingMode(request.length);
             try (OutputStream stream = connection.getOutputStream()) { stream.write(request); }
             int status = connection.getResponseCode();
-            if (status == 429) throw new IOException("Бесплатный лимит Gemini исчерпан. Повторите позже или используйте офлайн-режим.");
-            if (status == 401 || status == 403) throw new IOException("Проверьте API-ключ Gemini и доступность модели для вашего аккаунта.");
-            if (status != 200) throw new IOException("Gemini недоступен (HTTP " + status + "). Повторите позже или используйте офлайн-режим.");
+            if (status != 200) throw apiError(status, connection.getErrorStream());
             try (InputStream stream = connection.getInputStream()) {
                 ByteArrayOutputStream response = new ByteArrayOutputStream();
                 byte[] chunk = new byte[8192];
@@ -58,6 +56,45 @@ final class GeminiReceiptClient {
                 return parseResponse(new JSONObject(response.toString("UTF-8")));
             }
         } finally { connection.disconnect(); }
+    }
+
+    /** Return a useful diagnosis without ever showing the server's raw response (which may contain secrets). */
+    static IOException apiError(int status, InputStream errorStream) {
+        String category = "", reason = "", detail = "";
+        if (errorStream != null) try (InputStream stream = errorStream) {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            byte[] chunk = new byte[4096];
+            int length;
+            while (bytes.size() < 16384 && (length = stream.read(chunk, 0, Math.min(chunk.length, 16384 - bytes.size()))) != -1)
+                bytes.write(chunk, 0, length);
+            JSONObject error = new JSONObject(bytes.toString("UTF-8")).optJSONObject("error");
+            if (error != null) {
+                category = error.optString("status", "");
+                detail = error.optString("message", "");
+                JSONArray details = error.optJSONArray("details");
+                if (details != null) for (int i = 0; i < details.length(); i++) {
+                    JSONObject entry = details.optJSONObject(i);
+                    if (entry != null && entry.has("reason")) { reason = entry.optString("reason"); break; }
+                }
+            }
+        } catch (Exception ignored) { /* Never expose raw error bodies, request data or API keys. */ }
+        if ("API_KEY_INVALID".equals(reason) || "API_KEY_INVALID".equals(category)
+                || detail.contains("API key not valid"))
+            return new IOException("Gemini отклонил API-ключ (HTTP " + status
+                    + "). Отзовите опубликованный ключ и создайте новый в Google AI Studio.");
+        if (status == 400 && "FAILED_PRECONDITION".equals(category))
+            return new IOException("Бесплатный тариф Gemini недоступен для этого проекта или региона (HTTP 400). Проверьте условия в AI Studio.");
+        if (status == 429) return new IOException("Лимит Gemini исчерпан (HTTP 429). Повторите позже или используйте офлайн-режим.");
+        if (status == 401 || status == 403)
+            return new IOException("Нет доступа к Gemini (HTTP " + status + "). Проверьте ключ и настройки проекта в AI Studio.");
+        if (status == 404)
+            return new IOException("Выбранная модель Gemini недоступна проекту (HTTP 404). Нужна проверка доступных моделей.");
+        if (status == 400 && "INVALID_ARGUMENT".equals(category))
+            return new IOException("Gemini отклонил запрос (HTTP 400, INVALID_ARGUMENT). "
+                    + (detail.contains("responseSchema") || detail.contains("response_schema")
+                    ? "Сервер не принял формат ответа модели. Обновите приложение."
+                    : "Возможна ошибка ключа или параметров модели. Проверьте доступ в AI Studio."));
+        return new IOException("Gemini недоступен (HTTP " + status + "). Повторите позже или используйте офлайн-режим.");
     }
 
     static JSONObject request(Bitmap bitmap) throws Exception {
