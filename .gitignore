@@ -17,3 +17,7 @@ app/FirebaseService.json
 **/build/
 *.apk
 local.properties
+# Private receipt samples for local OCR verification; never commit photos or QR codes.
+toolchains/photo_*.jpg
+toolchains/photo_*.jpeg
+toolchains/photo_*.png
