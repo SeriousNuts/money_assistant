@@ -23,6 +23,8 @@ final class GeminiReceiptClient {
             + "и итоговую стоимость КАЖДОЙ позиции в рублях. Читай кириллицу. "
             + "Если количество больше одного, возьми стоимость всей позиции, а не цену за единицу. "
             + "Не добавляй ИТОГО, налог, скидку, сдачу, адрес, банковскую операцию или выдуманные товары. "
+            + "Если на фото видны и кассовый чек, и платёжный слип терминала, учитывай только товары кассового чека; "
+            + "не дублируй суммы из слипа. Номер заказа и строки НДС не являются товарами. "
             + "Если текст неразборчив, пропусти позицию. Для каждой позиции верни name и price как строку "
             + "в рублях с двумя знаками после запятой. Не считай сумму чека позицией.";
 
@@ -141,7 +143,10 @@ final class GeminiReceiptClient {
             JSONObject item = items.optJSONObject(i);
             if (item == null) continue;
             String name = item.optString("name", "").trim().replaceAll("\\s+", " ");
-            if (name.length() < 2 || name.length() > 80 || name.matches("(?iu)^(итог|всего|сумма|ндс|скидка|сдача|оплата|total|tax|change|discount).*")) continue;
+            if (name.length() < 2 || name.length() > 80 || name.matches("(?iu)^(итог|всего|сумма|ндс|скидка|сдача|оплата|под сбербанк|терминал|комиссия|плат[её]ж|номер заказа|заказ в пакете|total|tax|change|discount).*")) continue;
+            int letters = 0;
+            for (int j = 0; j < name.length(); j++) if (Character.isLetter(name.charAt(j))) letters++;
+            if (letters < 2) continue;
             long price;
             try { price = Money.parse(item.optString("price", "")); }
             catch (IllegalArgumentException ignored) { continue; }

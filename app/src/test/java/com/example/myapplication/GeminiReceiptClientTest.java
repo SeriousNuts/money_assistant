@@ -33,6 +33,8 @@ public class GeminiReceiptClientTest {
         JSONObject request = GeminiReceiptClient.request(photo);
         JSONArray parts = request.getJSONArray("contents").getJSONObject(0).getJSONArray("parts");
         assertTrue(parts.getJSONObject(0).getString("text").contains("кассового чека"));
+        assertTrue(parts.getJSONObject(0).getString("text").contains("платёжный слип"));
+        assertTrue(parts.getJSONObject(0).getString("text").contains("Номер заказа"));
         JSONObject data = parts.getJSONObject(1).getJSONObject("inline_data");
         assertEquals("image/jpeg", data.getString("mime_type"));
         assertTrue(data.getString("data").length() > 30);
@@ -106,6 +108,35 @@ public class GeminiReceiptClientTest {
         assertFalse(schemaMessage.contains("secret-marker"));
         assertTrue(GeminiReceiptClient.apiError(400, body("{\"error\":{\"status\":\"FAILED_PRECONDITION\"}}"))
                 .getMessage().contains("тариф"));
+    }
+
+    @Test public void excludesPaymentSlipAndOrderNumberFromExampleReceipts() throws Exception {
+        // Synthetic model responses based on totals, NOT OCR of the private attached photos.
+        JSONObject first = new JSONObject().put("items", new JSONArray()
+                .put(new JSONObject().put("name", "Товар А").put("price", "3802.00"))
+                .put(new JSONObject().put("name", "Товар Б").put("price", "4333.00"))
+                .put(new JSONObject().put("name", "ПОД СБЕРБАНК").put("price", "8135.00"))
+                .put(new JSONObject().put("name", "ИТОГО").put("price", "8135.00")));
+        List<ReceiptLine> firstItems = GeminiReceiptClient.parseItems(first);
+        assertEquals(2, firstItems.size());
+        assertEquals(813500L, sum(firstItems));
+        JSONObject second = new JSONObject().put("items", new JSONArray()
+                .put(new JSONObject().put("name", "Позиция А").put("price", "126.64"))
+                .put(new JSONObject().put("name", "Позиция Б").put("price", "72.36"))
+                .put(new JSONObject().put("name", "Позиция В").put("price", "245.00"))
+                .put(new JSONObject().put("name", "Позиция Г").put("price", "57.00"))
+                .put(new JSONObject().put("name", "Номер заказа 2464").put("price", "2464.00"))
+                .put(new JSONObject().put("name", "2464").put("price", "2464.00"))
+                .put(new JSONObject().put("name", "Сумма НДС 22%").put("price", "67.51")));
+        List<ReceiptLine> secondItems = GeminiReceiptClient.parseItems(second);
+        assertEquals(4, secondItems.size());
+        assertEquals(50100L, sum(secondItems));
+    }
+
+    private static long sum(List<ReceiptLine> items) {
+        long total = 0;
+        for (ReceiptLine item : items) total += item.amount;
+        return total;
     }
 
     private static InputStream body(String value) {
