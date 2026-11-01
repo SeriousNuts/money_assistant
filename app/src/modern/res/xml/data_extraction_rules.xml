@@ -1,0 +1,10 @@
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="receipts/" />
+        <exclude domain="sharedpref" path="receipt-ai.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="receipts/" />
+        <exclude domain="sharedpref" path="receipt-ai.xml" />
+    </device-transfer>
+</data-extraction-rules>

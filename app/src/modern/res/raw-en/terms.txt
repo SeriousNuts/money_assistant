@@ -11,7 +11,7 @@ BEFORE PUBLICATION: the rights holder must provide its legal name, contact detai
 
 4. Accounts and sync. Demo data stays on your device. Account bill and participant data are synchronized through Firebase. Receipt photos are not synchronized between devices. Gemini online OCR sends a particular photo only after separate confirmation; you supply your own API key.
 
-5. Availability and changes. Network, Firebase, camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. A cloud account deletion procedure must be provided before public release.
+5. Availability and changes. Network, Firebase, camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. Partial cloud account deletion is available in the account menu, but a complete process must be verified and published before public release.
 
 6. Liability. The app is provided “as is” to the extent allowed by applicable law without limiting mandatory consumer rights. You must verify amounts and agree on payment with the other participants yourself.
 

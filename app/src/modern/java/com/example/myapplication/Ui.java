@@ -7,6 +7,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
+import android.graphics.Insets;
+import android.view.WindowInsets;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -61,6 +64,12 @@ public final class Ui {
         a.getWindow().setNavigationBarColor(background(a));
         a.getWindow().getDecorView().setSystemUiVisibility(dark(a) ? 0 :
                 View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        if (Build.VERSION.SDK_INT >= 35) root.setOnApplyWindowInsetsListener((view, insets) -> {
+            Insets bars = insets.getInsets(WindowInsets.Type.systemBars());
+            Insets keyboard = insets.getInsets(WindowInsets.Type.ime());
+            view.setPadding(0, bars.top, 0, Math.max(bars.bottom, keyboard.bottom));
+            return insets;
+        });
         a.setContentView(root);
         return root;
     }

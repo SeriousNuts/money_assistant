@@ -65,4 +65,11 @@
     <string name="bills_filter_empty">Нет счетов для выбранного фильтра</string>
     <string name="delete_bill_title">Удалить счёт?</string>
     <string name="delete_bill_message">%1$s и все его участники будут удалены</string>
+    <string name="delete_account">Удалить облачный аккаунт</string>
+    <string name="delete_account_title">Удалить аккаунт и облачные счета?</string>
+    <string name="delete_account_warning">Это действие необратимо. Для подтверждения введите пароль. Приложение удалит документы вашего аккаунта в Firestore и затем учётную запись Firebase. Если возникнет ошибка, часть данных может остаться: повторите запрос или обратитесь в поддержку. Данные других устройств, подколлекции и кэш требуют отдельной проверки.</string>
+    <string name="delete_account_password">Пароль от аккаунта</string>
+    <string name="delete_account_busy">Удаление аккаунта…</string>
+    <string name="delete_account_done">Аккаунт удалён. Для очистки кэша Firestore можно также очистить данные приложения в настройках Android.</string>
+    <string name="delete_account_error">Удаление не завершено: %1$s</string>
 </resources>

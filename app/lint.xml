@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Historical 1.2 checkout retained for reference only. app/src/modern/java is compiled. -->
+    <issue id="all">
+        <ignore path="src/main/java/" />
+    </issue>
+</lint>

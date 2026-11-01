@@ -14,6 +14,9 @@ n*.iml
 github.properties
 app/google-services.json
 app/FirebaseService.json
+signing.properties
+*.jks
+*.keystore
 **/build/
 *.apk
 local.properties

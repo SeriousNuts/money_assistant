@@ -3,13 +3,19 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-[[ $# -eq 0 || ($# -eq 1 && $1 == '--plan') ]] || { echo 'Usage: toolchains/build-tagged.sh [--plan]' >&2; exit 2; }
+[[ $# -eq 0 || ($# -eq 1 && ($1 == '--plan' || $1 == '--store')) ]] || {
+    echo 'Usage: toolchains/build-tagged.sh [--plan|--store]' >&2; exit 2;
+}
 [[ -z "$(git status --porcelain --untracked-files=normal)" ]] || {
     echo 'Commit your source changes before creating a tagged build.' >&2; exit 1;
 }
-git fetch --quiet origin master --tags
-[[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/master)" ]] || {
-    echo 'Push the current master commit to origin before building.' >&2; exit 1;
+branch=$(git symbolic-ref --short HEAD)
+[[ $branch == release/1.4.2 ]] || {
+    echo 'Verification tags must be built from release/1.4.2, not master.' >&2; exit 1;
+}
+git fetch --quiet origin "$branch" --tags
+[[ "$(git rev-parse HEAD)" == "$(git rev-parse "origin/$branch")" ]] || {
+    echo "Push the current $branch commit to origin before building." >&2; exit 1;
 }
 remote_tags=$(git ls-remote --tags origin 'refs/tags/1.4.2-*') || exit 1
 max=0
@@ -27,6 +33,25 @@ if [[ ${1:-} == '--plan' ]]; then
     echo "Next tag: $tag, Android versionCode: $code (nothing built or pushed)"
     exit 0
 fi
+if [[ ${1:-} == '--store' ]]; then
+    for name in STORE_FILE STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+        variable="MONEY_RELEASE_$name"
+        [[ -n ${!variable:-} ]] || { echo "$variable must be set for a store release." >&2; exit 1; }
+    done
+    [[ $MONEY_RELEASE_STORE_FILE == /* && -f $MONEY_RELEASE_STORE_FILE ]] || {
+        echo 'MONEY_RELEASE_STORE_FILE must point to an existing absolute file path.' >&2; exit 1;
+    }
+    [[ ${MONEY_PRIVACY_POLICY_URL:-} =~ ^https://[^[:space:]]+$ &&
+       ${MONEY_ACCOUNT_DELETION_URL:-} =~ ^https://[^[:space:]]+$ ]] || {
+        echo 'Provide public HTTPS MONEY_PRIVACY_POLICY_URL and MONEY_ACCOUNT_DELETION_URL.' >&2; exit 1;
+    }
+    if grep -REq '\[(ФИО|УКАЗАТЬ|LEGAL NAME|PROVIDE|SPECIFY)' app/src/modern/res/raw*/{privacy,terms}.txt; then
+        echo 'Replace and review legal placeholders before a store release.' >&2; exit 1
+    fi
+    [[ -f app/google-services.json ]] || {
+        echo 'Store release with cloud login requires private app/google-services.json.' >&2; exit 1;
+    }
+fi
 git rev-parse --verify "refs/tags/$tag" >/dev/null 2>&1 && {
     echo "Local tag $tag already exists; resolve it before retrying." >&2; exit 1;
 }
@@ -39,8 +64,17 @@ bash gradlew --no-daemon --max-workers=2 :app:assembleDebug -PbuildNumber="$numb
 cp app/build/outputs/apk/debug/app-debug.apk "build/verification/money-assistant-$tag-full.apk"
 for variant in demo full; do
     apk="build/verification/money-assistant-$tag-$variant.apk"
-    "$ANDROID_HOME/build-tools/30.0.2/apksigner" verify "$apk"
+    "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
 done
+if [[ ${1:-} == '--store' ]]; then
+    bash gradlew --no-daemon --max-workers=2 :app:assembleRelease :app:bundleRelease \
+        -PbuildNumber="$number" -PreleaseSigning=true
+    apk="build/verification/money-assistant-$tag-rustore.apk"
+    aab="build/verification/money-assistant-$tag-play.aab"
+    cp app/build/outputs/apk/release/app-release.apk "$apk"
+    cp app/build/outputs/bundle/release/app-release.aab "$aab"
+    bash toolchains/verify-store-artifacts.sh "$apk" "$aab"
+fi
 git tag -a "$tag" -m "Verified Money Assistant $tag (versionCode $code)"
 if ! git push origin "refs/tags/$tag"; then
     echo "Build succeeded but tag push failed. Local tag $tag remains; check GitHub before retrying." >&2
@@ -48,4 +82,8 @@ if ! git push origin "refs/tags/$tag"; then
 fi
 cp "build/verification/money-assistant-$tag-demo.apk" \
    "build/verification/money-assistant-$tag-full.apk" "$(dirname "$PWD")/"
-echo "Published $tag and copied both APKs to $(dirname "$PWD")/"
+if [[ ${1:-} == '--store' ]]; then
+    cp "$apk" "$aab" "$(dirname "$PWD")/"
+    echo 'Compare the Play App signing key certificate with the RuStore APK certificate.'
+fi
+echo "Published $tag; copied verification APKs to $(dirname "$PWD")/"

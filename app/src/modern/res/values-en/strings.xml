@@ -65,4 +65,11 @@
     <string name="bills_filter_empty">No bills match this filter</string>
     <string name="delete_bill_title">Delete bill?</string>
     <string name="delete_bill_message">%1$s and all its participants will be deleted</string>
+    <string name="delete_account">Delete cloud account</string>
+    <string name="delete_account_title">Delete account and cloud bills?</string>
+    <string name="delete_account_warning">This cannot be undone. Enter your password to confirm. The app will delete documents in your Firestore account and then your Firebase account. If an error occurs, some data may remain: retry or contact support. Data on other devices, subcollections and cache require separate verification.</string>
+    <string name="delete_account_password">Account password</string>
+    <string name="delete_account_busy">Deleting account…</string>
+    <string name="delete_account_done">Account deleted. To remove Firestore cache, you may also clear app storage in Android settings.</string>
+    <string name="delete_account_error">Deletion incomplete: %1$s</string>
 </resources>

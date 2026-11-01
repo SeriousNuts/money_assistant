@@ -3,6 +3,8 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.text.InputType;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -23,6 +25,7 @@ public final class StartMenu extends BaseActivity {
     private TextView cacheStatus;
     private List<BillDocument> bills = new ArrayList<>();
     private int filter;
+    private boolean deletingAccount;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -41,6 +44,11 @@ public final class StartMenu extends BaseActivity {
             menu.getMenu().add(getString(R.string.legal_menu)).setOnMenuItemClickListener(item -> {
                 startActivity(new Intent(this, LegalActivity.class)); return true;
             });
+            if (!DemoSession.active(this) && !FirebaseApp.getApps(this).isEmpty()
+                    && FirebaseAuth.getInstance().getCurrentUser() != null)
+                menu.getMenu().add(getString(R.string.delete_account)).setOnMenuItemClickListener(item -> {
+                    confirmDeleteAccount(); return true;
+                });
             menu.getMenu().add(getString(R.string.logout)).setOnMenuItemClickListener(item -> { signOut(); return true; });
             menu.show();
         });
@@ -77,9 +85,60 @@ public final class StartMenu extends BaseActivity {
     }
 
     private void signOut() {
+        if (deletingAccount) return;
         DemoSession.set(this, false);
         if (!FirebaseApp.getApps(this).isEmpty()) FirebaseAuth.getInstance().signOut();
         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+        finish();
+    }
+
+    private void confirmDeleteAccount() {
+        if (deletingAccount) return;
+        EditText password = Ui.input(this, getString(R.string.delete_account_password));
+        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        LinearLayout form = Ui.column(this);
+        form.setPadding(Ui.dp(this, 20), 0, Ui.dp(this, 20), 0);
+        Ui.add(this, form, Ui.label(this, getString(R.string.delete_account_warning)), 8);
+        Ui.add(this, form, password, 12);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.delete_account_title)
+                .setView(form).setNegativeButton(R.string.cancel_action, null)
+                .setPositiveButton(R.string.delete_action, null).create();
+        dialog.setCancelable(false);
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener(view -> {
+                    if (deletingAccount) return;
+                    if (password.length() == 0) {
+                        password.setError(getString(R.string.delete_account_password)); return;
+                    }
+                    deletingAccount = true;
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
+                    password.setEnabled(false);
+                    cacheStatus.setText(R.string.delete_account_busy);
+                    AccountDeletion.start(this, password.getText().toString(), (unused, error) -> {
+                        password.getText().clear();
+                        deletingAccount = false;
+                        if (isFinishing() || isDestroyed()) return;
+                        dialog.dismiss();
+                        if (error == null) {
+                            new AlertDialog.Builder(this).setMessage(R.string.delete_account_done)
+                                    .setPositiveButton(android.R.string.ok, (d, w) -> openLogin()).show();
+                        } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+                            new AlertDialog.Builder(this).setMessage(getString(R.string.delete_account_error, error.getMessage()))
+                                    .setPositiveButton(android.R.string.ok, (d, w) -> openLogin()).show();
+                        } else {
+                            new AlertDialog.Builder(this).setMessage(getString(R.string.delete_account_error, error.getMessage()))
+                                    .setPositiveButton(android.R.string.ok, null).show();
+                            load(true);
+                        }
+                    });
+                }));
+        dialog.show();
+    }
+
+    private void openLogin() {
+        startActivity(new Intent(this, MainActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
         finish();
     }
 

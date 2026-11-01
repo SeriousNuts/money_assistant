@@ -28,6 +28,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -51,6 +52,23 @@ public class UiFlowTest {
         assertNotNull(findText(root, "Новый счёт"));
         assertNotNull(findText(root, "В процессе"));
         assertNotNull(findText(root, "Закрытые"));
+    }
+
+    @Test public void deletionRefusesDemoWithoutConnectingToFirebase() {
+        final Exception[] error = {null};
+        AccountDeletion.start(RuntimeEnvironment.getApplication(), "password", (unused, failure) -> error[0] = failure);
+        assertNotNull(error[0]);
+        assertTrue(error[0].getMessage().contains("Демо"));
+        StartMenu home = Robolectric.buildActivity(StartMenu.class).create().start().resume().get();
+        assertFalse(home.isFinishing());
+    }
+
+    @Test public void partialDeletionFailureKeepsCauseAndSuggestsRetry() {
+        Exception cause = new IllegalStateException("network unavailable");
+        assertTrue(AccountDeletion.deletionError(0, cause) == cause);
+        Exception partial = AccountDeletion.deletionError(250, cause);
+        assertTrue(partial.getMessage().contains("Повторите"));
+        assertTrue(partial.getCause() == cause);
     }
 
     @Test public void editorOffersReceiptAndEqualSplitWithoutFirebase() {

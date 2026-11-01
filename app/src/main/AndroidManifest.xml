@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.myapplication">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -11,6 +10,7 @@
     <application
         android:allowBackup="true"
         android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@drawable/app_icon"
         android:label="${appLabel}"
         android:supportsRtl="true"

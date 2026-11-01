@@ -14,6 +14,6 @@ Data handling:
 
 The app does not include its own advertising or analytics SDKs. Firebase and optional Gemini are third-party providers; actual transmissions, logs and retention must be verified before completing Play Data safety. Sharing a bill via Android's Share menu is initiated by you and delivered to the recipient you choose.
 
-Deletion: you may remove on-device data using Android system settings (“Clear storage”). The app does not yet provide completed deletion of the cloud account and all related data: both an in-app deletion mechanism and an external web request page must be implemented BEFORE PUBLICATION. Retention periods and request handling: [SPECIFY AFTER IMPLEMENTATION].
+Deletion: you may remove on-device data using Android system settings (“Clear storage”). The cloud account menu offers password-confirmed deletion of documents in the account's Firestore collection and then Firebase Auth; this may not delete subcollections, data on other devices or local cache. This is not a complete process for all associated data: a verified server-side mechanism and an external web request page are needed BEFORE PUBLICATION. Retention periods and request handling: [SPECIFY AFTER IMPLEMENTATION].
 
 Privacy contact: [PROVIDE A WORKING CONTACT ADDRESS BEFORE PUBLICATION]. Publish the final policy at a stable public URL and keep it aligned with actual app behavior.
