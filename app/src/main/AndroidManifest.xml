@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -15,6 +16,8 @@
         android:label="${appLabel}"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!-- Cloud sign-in is disabled in this release; do not initialize Firebase on launch. -->
+        <provider android:name="com.google.firebase.provider.FirebaseInitProvider" tools:node="remove" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.files"
@@ -28,7 +31,6 @@
         <activity android:name=".AfterContact" android:exported="false" />
         <activity android:name=".MainWindow" android:exported="false" />
         <activity android:name=".StartMenu" android:exported="false" />
-        <activity android:name=".SignUpActivity" android:exported="false" />
         <activity android:name=".LegalActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

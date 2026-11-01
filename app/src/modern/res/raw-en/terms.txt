@@ -9,9 +9,9 @@ BEFORE PUBLICATION: the rights holder must provide its legal name, contact detai
 
 3. Data. You are responsible for lawful use of other people's names, phone numbers and expenses, and for obtaining any necessary permission before submitting a receipt to an external AI service. Offline OCR and manual entry do not send photos to the AI service. Review all extracted items and calculations before relying on them.
 
-4. Accounts and sync. Demo data stays on your device. Account bill and participant data are synchronized through Firebase. Receipt photos are not synchronized between devices. Gemini online OCR sends a particular photo only after separate confirmation; you supply your own API key.
+4. Accounts and sync. Sign-in and registration are temporarily disabled. Bills and photos stay on this device and are not synchronized. Data from previously registered accounts is not accessible in this release. Gemini online OCR sends a particular photo only after separate confirmation; you supply your own API key.
 
-5. Availability and changes. Network, Firebase, camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. Partial cloud account deletion is available in the account menu, but a complete process must be verified and published before public release.
+5. Availability and changes. Camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. A deletion process for existing cloud accounts must be verified and published before public release.
 
 6. Liability. The app is provided “as is” to the extent allowed by applicable law without limiting mandatory consumer rights. You must verify amounts and agree on payment with the other participants yourself.
 

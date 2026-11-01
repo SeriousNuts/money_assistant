@@ -19,7 +19,7 @@ import java.util.Map;
 
 /** Private on-device ledger. A deletion never recreates the example on next login. */
 public final class DemoLedger implements Serializable {
-    // Matches the serialized DemoLedger bundled in the 1.2 APK.
+    // Preserve the serial UID for on-device data migration across app updates.
     private static final long serialVersionUID = 1L;
     private Map<String, Map<String, Object>> documents;
     private transient AtomicFile file;

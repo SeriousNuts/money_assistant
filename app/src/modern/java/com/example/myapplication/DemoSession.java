@@ -3,8 +3,6 @@ package com.example.myapplication;
 import android.content.Context;
 
 public final class DemoSession {
-    public static final String EMAIL = "demo@money.local";
-    public static final String PASSWORD = "demo123";
     private static final String PREF = "demo_session";
     private DemoSession() { }
 

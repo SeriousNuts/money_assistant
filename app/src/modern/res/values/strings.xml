@@ -9,21 +9,9 @@
     <string name="continue_action">Продолжить</string>
     <string name="legal_required">Сначала прочитайте документы и подтвердите согласие</string>
     <string name="legal_menu">Документы и конфиденциальность</string>
-    <string name="main_title">Делить счёт стало проще.</string>
-    <string name="main_subtitle">Создавайте счета, распределяйте траты и отмечайте оплаты.</string>
-    <string name="email_hint">Электронная почта</string>
-    <string name="password_hint">Пароль</string>
-    <string name="sign_in">Войти</string>
-    <string name="try_demo">Попробовать без регистрации</string>
-    <string name="create_account">Создать аккаунт</string>
-    <string name="demo_private">Демоданные хранятся только на этом устройстве.</string>
-    <string name="signup_title">Новый аккаунт</string>
-    <string name="signup_password">Пароль (не менее 6 символов)</string>
-    <string name="signup_button">Зарегистрироваться</string>
     <string name="bills_title">Общие счета</string>
     <string name="bills_subtitle">Меньше расчётов. Больше хороших встреч.</string>
     <string name="new_bill">＋  Новый счёт</string>
-    <string name="logout">Выйти</string>
     <string name="drafts_title">Незавершённые счета</string>
     <string name="resume_action">Продолжить</string>
     <string name="delete_action">Удалить</string>
@@ -43,10 +31,7 @@
     <string name="receipt_apply">Перенести доли в счёт</string>
     <string name="receipt_manual">Добавить позицию вручную</string>
     <string name="receipt_crop">Распознать выделенную область</string>
-    <string name="demo_account">Тестовый аккаунт</string>
-    <string name="personal_account">Личный аккаунт</string>
-    <string name="demo_device">Демо · на устройстве</string>
-    <string name="on_device">На устройстве</string>
+    <string name="local_device">Локально · на устройстве</string>
     <string name="no_connection">Нет сохранённых счетов или связи</string>
     <string name="draft_unnamed">Без названия</string>
     <string name="draft_people">Черновик · участников: %1$d</string>
@@ -65,11 +50,4 @@
     <string name="bills_filter_empty">Нет счетов для выбранного фильтра</string>
     <string name="delete_bill_title">Удалить счёт?</string>
     <string name="delete_bill_message">%1$s и все его участники будут удалены</string>
-    <string name="delete_account">Удалить облачный аккаунт</string>
-    <string name="delete_account_title">Удалить аккаунт и облачные счета?</string>
-    <string name="delete_account_warning">Это действие необратимо. Для подтверждения введите пароль. Приложение удалит документы вашего аккаунта в Firestore и затем учётную запись Firebase. Если возникнет ошибка, часть данных может остаться: повторите запрос или обратитесь в поддержку. Данные других устройств, подколлекции и кэш требуют отдельной проверки.</string>
-    <string name="delete_account_password">Пароль от аккаунта</string>
-    <string name="delete_account_busy">Удаление аккаунта…</string>
-    <string name="delete_account_done">Аккаунт удалён. Для очистки кэша Firestore можно также очистить данные приложения в настройках Android.</string>
-    <string name="delete_account_error">Удаление не завершено: %1$s</string>
 </resources>

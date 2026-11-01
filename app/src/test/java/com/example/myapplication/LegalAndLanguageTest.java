@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
@@ -56,7 +57,7 @@ public class LegalAndLanguageTest {
         assertTrue(LegalActivity.accepted(context));
     }
 
-    @Test public void englishLocaleHasEnglishLegalDocumentAndMainScreen() throws Exception {
+    @Test public void englishLocaleOpensLocalBillsWithoutSignIn() throws Exception {
         context.getSharedPreferences("app-language", Context.MODE_PRIVATE).edit().putString("language", "en").commit();
         Context english = AppLanguage.wrap(context);
         assertEquals("Privacy policy", english.getString(R.string.privacy_title));
@@ -67,7 +68,14 @@ public class LegalAndLanguageTest {
         }
         context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 1).commit();
         MainActivity entry = Robolectric.buildActivity(MainActivity.class).create().start().resume().get();
-        assertNotNull(find(entry.findViewById(android.R.id.content), "Split bills with ease"));
+        assertTrue(DemoSession.active(context));
+        Intent next = Shadows.shadowOf(entry).getNextStartedActivity();
+        assertEquals(StartMenu.class.getName(), next.getComponent().getClassName());
+        StartMenu bills = Robolectric.buildActivity(StartMenu.class, next).create().start().resume().get();
+        View screen = bills.findViewById(android.R.id.content);
+        assertNotNull(find(screen, "Shared bills"));
+        assertNull(find(screen, "Sign in"));
+        assertNull(find(screen, "Sign up"));
     }
 
     private TextView find(View root, String text) {

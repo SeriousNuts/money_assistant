@@ -12,10 +12,7 @@ def signingEnvironment = ['MONEY_RELEASE_STORE_FILE', 'MONEY_RELEASE_STORE_PASSW
                           'MONEY_RELEASE_KEY_ALIAS', 'MONEY_RELEASE_KEY_PASSWORD']
 if (releaseSigning && signingEnvironment.any { !System.getenv(it) })
     throw new GradleException('Set all MONEY_RELEASE_* environment variables for the owner-supplied signing key.')
-// A fresh clone can build and run the offline demo without private Firebase config.
-if (!demoSideBySide && file('google-services.json').exists()) {
-    apply plugin: 'com.google.gms.google-services'
-}
+// Firebase configuration is intentionally not applied while sign-in is disabled.
 
 android {
     namespace 'com.example.myapplication'
@@ -32,7 +29,7 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
-    // Preserve the original checkout for reference; only the rebuilt application is compiled.
+    // Current application sources and resources live in src/modern.
     sourceSets {
         main.java.srcDirs = ['src/modern/java']
         main.res.srcDirs = ['src/modern/res']

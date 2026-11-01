@@ -103,7 +103,7 @@ public final class BillRepository {
             if (bill.name.isEmpty()) bill.name = document.getString("Chartname") == null ? "Без названия" : document.getString("Chartname");
             if (document.getTimestamp("createdAt") != null) bill.createdAt = document.getTimestamp("createdAt").toDate().getTime();
             BillDocument current = bill;
-            // 1.2 stored members in separate documents and had no ledgerJson field.
+            // Older cloud documents stored members separately and had no ledgerJson field.
             cloud.collection(uid()).whereEqualTo("ParentChart", bill.id).get(Source.CACHE)
                     .addOnCompleteListener(cached -> {
                         int expected = 0;

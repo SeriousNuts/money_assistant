@@ -9,21 +9,9 @@
     <string name="continue_action">Continue</string>
     <string name="legal_required">Read both documents and accept the terms first</string>
     <string name="legal_menu">Legal documents and privacy</string>
-    <string name="main_title">Split bills with ease.</string>
-    <string name="main_subtitle">Create bills, split expenses and track payments.</string>
-    <string name="email_hint">Email address</string>
-    <string name="password_hint">Password</string>
-    <string name="sign_in">Sign in</string>
-    <string name="try_demo">Try without an account</string>
-    <string name="create_account">Create an account</string>
-    <string name="demo_private">Demo data is stored on this device.</string>
-    <string name="signup_title">New account</string>
-    <string name="signup_password">Password (at least 6 characters)</string>
-    <string name="signup_button">Sign up</string>
     <string name="bills_title">Shared bills</string>
     <string name="bills_subtitle">Less accounting, more time together.</string>
     <string name="new_bill">＋  New bill</string>
-    <string name="logout">Sign out</string>
     <string name="drafts_title">Unfinished bills</string>
     <string name="resume_action">Continue</string>
     <string name="delete_action">Delete</string>
@@ -43,10 +31,7 @@
     <string name="receipt_apply">Add shares to bill</string>
     <string name="receipt_manual">Add item manually</string>
     <string name="receipt_crop">Recognize selected area</string>
-    <string name="demo_account">Demo account</string>
-    <string name="personal_account">Personal account</string>
-    <string name="demo_device">Demo · on this device</string>
-    <string name="on_device">On this device</string>
+    <string name="local_device">Local · on this device</string>
     <string name="no_connection">No saved bills or network connection</string>
     <string name="draft_unnamed">Untitled</string>
     <string name="draft_people">Draft · participants: %1$d</string>
@@ -65,11 +50,4 @@
     <string name="bills_filter_empty">No bills match this filter</string>
     <string name="delete_bill_title">Delete bill?</string>
     <string name="delete_bill_message">%1$s and all its participants will be deleted</string>
-    <string name="delete_account">Delete cloud account</string>
-    <string name="delete_account_title">Delete account and cloud bills?</string>
-    <string name="delete_account_warning">This cannot be undone. Enter your password to confirm. The app will delete documents in your Firestore account and then your Firebase account. If an error occurs, some data may remain: retry or contact support. Data on other devices, subcollections and cache require separate verification.</string>
-    <string name="delete_account_password">Account password</string>
-    <string name="delete_account_busy">Deleting account…</string>
-    <string name="delete_account_done">Account deleted. To remove Firestore cache, you may also clear app storage in Android settings.</string>
-    <string name="delete_account_error">Deletion incomplete: %1$s</string>
 </resources>

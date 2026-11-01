@@ -21,7 +21,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import java.util.Locale;
 
-/** Spacing, typography and surfaces shared by the light/dark screens of design 1.2. */
+/** Spacing, typography and surfaces shared by the light/dark screens. */
 public final class Ui {
     private Ui() { }
 

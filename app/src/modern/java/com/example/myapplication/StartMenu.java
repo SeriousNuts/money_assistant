@@ -3,17 +3,12 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.text.InputType;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +20,6 @@ public final class StartMenu extends BaseActivity {
     private TextView cacheStatus;
     private List<BillDocument> bills = new ArrayList<>();
     private int filter;
-    private boolean deletingAccount;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -36,20 +30,13 @@ public final class StartMenu extends BaseActivity {
         Ui.toolbar(this, root, "money assistant", false, () -> {
             View anchor = root.findViewWithTag("toolbarMenu");
             PopupMenu menu = new PopupMenu(this, anchor);
-            menu.getMenu().add(getString(DemoSession.active(this)
-                    ? R.string.demo_account : R.string.personal_account)).setEnabled(false);
+            menu.getMenu().add(getString(R.string.local_device)).setEnabled(false);
             menu.getMenu().add(getString(R.string.language)).setOnMenuItemClickListener(item -> {
                 Ui.chooseLanguage(this); return true;
             });
             menu.getMenu().add(getString(R.string.legal_menu)).setOnMenuItemClickListener(item -> {
                 startActivity(new Intent(this, LegalActivity.class)); return true;
             });
-            if (!DemoSession.active(this) && !FirebaseApp.getApps(this).isEmpty()
-                    && FirebaseAuth.getInstance().getCurrentUser() != null)
-                menu.getMenu().add(getString(R.string.delete_account)).setOnMenuItemClickListener(item -> {
-                    confirmDeleteAccount(); return true;
-                });
-            menu.getMenu().add(getString(R.string.logout)).setOnMenuItemClickListener(item -> { signOut(); return true; });
             menu.show();
         });
         LinearLayout body = Ui.scroll(this, root);
@@ -69,7 +56,7 @@ public final class StartMenu extends BaseActivity {
         Ui.add(this, body, scroller, 24);
 
         LinearLayout statusRow = Ui.row(this);
-        cacheStatus = Ui.label(this, getString(DemoSession.active(this) ? R.string.demo_device : R.string.on_device));
+        cacheStatus = Ui.label(this, getString(R.string.local_device));
         Ui.addRow(this, statusRow, cacheStatus, 1);
         Ui.addRow(this, statusRow, Ui.link(this, getString(R.string.refresh_action), () -> load(true)), 0);
         Ui.add(this, body, statusRow, 10);
@@ -82,64 +69,6 @@ public final class StartMenu extends BaseActivity {
         Ui.add(this, Ui.footer(this, root), Ui.button(this, getString(R.string.new_bill), () ->
                 startActivity(new Intent(this, AfterContact.class))), 0);
         render();
-    }
-
-    private void signOut() {
-        if (deletingAccount) return;
-        DemoSession.set(this, false);
-        if (!FirebaseApp.getApps(this).isEmpty()) FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-        finish();
-    }
-
-    private void confirmDeleteAccount() {
-        if (deletingAccount) return;
-        EditText password = Ui.input(this, getString(R.string.delete_account_password));
-        password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        LinearLayout form = Ui.column(this);
-        form.setPadding(Ui.dp(this, 20), 0, Ui.dp(this, 20), 0);
-        Ui.add(this, form, Ui.label(this, getString(R.string.delete_account_warning)), 8);
-        Ui.add(this, form, password, 12);
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.delete_account_title)
-                .setView(form).setNegativeButton(R.string.cancel_action, null)
-                .setPositiveButton(R.string.delete_action, null).create();
-        dialog.setCancelable(false);
-        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                .setOnClickListener(view -> {
-                    if (deletingAccount) return;
-                    if (password.length() == 0) {
-                        password.setError(getString(R.string.delete_account_password)); return;
-                    }
-                    deletingAccount = true;
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);
-                    password.setEnabled(false);
-                    cacheStatus.setText(R.string.delete_account_busy);
-                    AccountDeletion.start(this, password.getText().toString(), (unused, error) -> {
-                        password.getText().clear();
-                        deletingAccount = false;
-                        if (isFinishing() || isDestroyed()) return;
-                        dialog.dismiss();
-                        if (error == null) {
-                            new AlertDialog.Builder(this).setMessage(R.string.delete_account_done)
-                                    .setPositiveButton(android.R.string.ok, (d, w) -> openLogin()).show();
-                        } else if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-                            new AlertDialog.Builder(this).setMessage(getString(R.string.delete_account_error, error.getMessage()))
-                                    .setPositiveButton(android.R.string.ok, (d, w) -> openLogin()).show();
-                        } else {
-                            new AlertDialog.Builder(this).setMessage(getString(R.string.delete_account_error, error.getMessage()))
-                                    .setPositiveButton(android.R.string.ok, null).show();
-                            load(true);
-                        }
-                    });
-                }));
-        dialog.show();
-    }
-
-    private void openLogin() {
-        startActivity(new Intent(this, MainActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-        finish();
     }
 
     @Override protected void onSaveInstanceState(Bundle state) {
@@ -193,7 +122,7 @@ public final class StartMenu extends BaseActivity {
         repository.list(force, (found, error) -> {
             if (found != null) {
                 bills = found;
-                cacheStatus.setText(getString(DemoSession.active(this) ? R.string.demo_device : R.string.on_device));
+                cacheStatus.setText(R.string.local_device);
                 render();
             } else {
                 cacheStatus.setText(R.string.no_connection);

@@ -48,9 +48,6 @@ if [[ ${1:-} == '--store' ]]; then
     if grep -REq '\[(ФИО|УКАЗАТЬ|LEGAL NAME|PROVIDE|SPECIFY)' app/src/modern/res/raw*/{privacy,terms}.txt; then
         echo 'Replace and review legal placeholders before a store release.' >&2; exit 1
     fi
-    [[ -f app/google-services.json ]] || {
-        echo 'Store release with cloud login requires private app/google-services.json.' >&2; exit 1;
-    }
 fi
 git rev-parse --verify "refs/tags/$tag" >/dev/null 2>&1 && {
     echo "Local tag $tag already exists; resolve it before retrying." >&2; exit 1;
