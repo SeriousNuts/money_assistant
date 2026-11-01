@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import java.util.Locale;
 
 /** Spacing, typography and surfaces shared by the light/dark screens of design 1.2. */
@@ -239,5 +240,15 @@ public final class Ui {
 
     public static void error(Activity a, Exception e) {
         Toast.makeText(a, e == null ? "Не удалось выполнить операцию" : e.getMessage(), Toast.LENGTH_LONG).show();
+    }
+
+    public static void chooseLanguage(Activity a) {
+        new AlertDialog.Builder(a).setTitle(R.string.language)
+                .setSingleChoiceItems(new String[]{a.getString(R.string.russian), a.getString(R.string.english)},
+                        "en".equals(AppLanguage.selected(a)) ? 1 : 0,
+                        (dialog, index) -> {
+                            dialog.dismiss();
+                            AppLanguage.change(a, index == 0 ? "ru" : "en");
+                        }).setNegativeButton(android.R.string.cancel, null).show();
     }
 }

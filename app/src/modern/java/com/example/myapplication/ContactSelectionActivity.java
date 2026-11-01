@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,7 +26,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /** Multi-select contacts locally; the editor receives only the chosen names and phone numbers. */
-public final class ContactSelectionActivity extends AppCompatActivity {
+public final class ContactSelectionActivity extends BaseActivity {
     static final String NAMES = "selectedNames", PHONES = "selectedPhones";
     private static final int READ_CONTACTS = 1;
     private final List<ContactDirectory.Contact> contacts = new ArrayList<>(), visible = new ArrayList<>();

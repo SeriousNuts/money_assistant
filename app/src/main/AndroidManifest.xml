@@ -29,6 +29,7 @@
         <activity android:name=".MainWindow" android:exported="false" />
         <activity android:name=".StartMenu" android:exported="false" />
         <activity android:name=".SignUpActivity" android:exported="false" />
+        <activity android:name=".LegalActivity" android:exported="false" />
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

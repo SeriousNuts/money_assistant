@@ -22,7 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import org.json.JSONObject;
@@ -38,7 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /** The original receipt stays in private app storage; only markup and shares go to the bill. */
-public final class ReceiptActivity extends AppCompatActivity {
+public final class ReceiptActivity extends BaseActivity {
     private static final int CAMERA = 201, PICK_IMAGE = 202;
     private BillDocument bill;
     private ReceiptDocument receipt;
@@ -82,11 +81,11 @@ public final class ReceiptActivity extends AppCompatActivity {
         Ui.toolbar(this, root, receipt.name, true, null);
         LinearLayout body = Ui.scroll(this, root);
         Ui.add(this, body, Ui.kicker(this, "РАЗМЕТКА ЧЕКА"), 8);
-        Ui.add(this, body, Ui.headline(this, "Отметьте позиции", 34), 10);
+        Ui.add(this, body, Ui.headline(this, getString(R.string.receipt_title), 34), 10);
         Ui.add(this, body, Ui.label(this, "Снимайте один чек крупно и без перекрытий. Если в кадре есть другие чеки или фон, выделите область для распознавания. Проверьте суммы перед сохранением."), 8);
         Ui.add(this, body, Ui.secondary(this, "✎  Название чека", this::rename), 9);
-        Ui.add(this, body, Ui.secondary(this, "Сфотографировать чек", this::takePhoto), 18);
-        Ui.add(this, body, Ui.secondary(this, "Выбрать изображение", this::choosePhoto), 8);
+        Ui.add(this, body, Ui.secondary(this, getString(R.string.receipt_camera), this::takePhoto), 18);
+        Ui.add(this, body, Ui.secondary(this, getString(R.string.receipt_import), this::choosePhoto), 8);
         Ui.add(this, body, Ui.secondary(this, "Повторить распознавание", () -> {
             if (!receipt.lines.isEmpty()) new AlertDialog.Builder(this).setTitle("Заменить позиции?")
                     .setMessage("Текущая разметка будет заменена результатами распознавания. Фото останется прежним.")
@@ -96,9 +95,9 @@ public final class ReceiptActivity extends AppCompatActivity {
         Ui.add(this, body, Ui.secondary(this, "☁  Распознать через Gemini (онлайн)", this::offerCloudRecognition), 8);
         ocrStatus = Ui.label(this, "Русский и английский текст распознаётся на устройстве. Проверьте найденные позиции перед сохранением.");
         Ui.add(this, body, ocrStatus, 8);
-        manualMode = Ui.secondary(this, "Добавить позицию вручную", () -> toggleSelection(false));
+        manualMode = Ui.secondary(this, getString(R.string.receipt_manual), () -> toggleSelection(false));
         Ui.add(this, body, manualMode, 8);
-        cropModeButton = Ui.secondary(this, "Распознать выделенную область", () -> toggleSelection(true));
+        cropModeButton = Ui.secondary(this, getString(R.string.receipt_crop), () -> toggleSelection(true));
         Ui.add(this, body, cropModeButton, 8);
         image = new ReceiptImageView(this);
         image.setOnSelection((left, top, right, bottom) -> {
@@ -114,7 +113,7 @@ public final class ReceiptActivity extends AppCompatActivity {
         Ui.add(this, body, image, 15);
         count = Ui.text(this, "", 18, true);
         Ui.add(this, body, count, 14);
-        search = Ui.input(this, "Поиск по позициям");
+        search = Ui.input(this, getString(R.string.receipt_search));
         Ui.add(this, body, search, 8);
         search.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -140,7 +139,7 @@ public final class ReceiptActivity extends AppCompatActivity {
         positions.setOnItemClickListener((parent, view, position, id) -> editExisting(visible.get(position)));
         Ui.add(this, body, positions, 8);
         positions.getLayoutParams().height = Ui.dp(this, 280);
-        Ui.add(this, Ui.footer(this, root), Ui.button(this, "Перенести доли в счёт", this::apply), 0);
+        Ui.add(this, Ui.footer(this, root), Ui.button(this, getString(R.string.receipt_apply), this::apply), 0);
         showPhoto();
         render();
     }

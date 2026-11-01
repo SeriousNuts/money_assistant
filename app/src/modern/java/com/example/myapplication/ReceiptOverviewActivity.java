@@ -6,14 +6,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONObject;
 
 import java.io.File;
 
 /** Compact receipt overview; an unsaved receipt is never added to the stored bill. */
-public final class ReceiptOverviewActivity extends AppCompatActivity {
+public final class ReceiptOverviewActivity extends BaseActivity {
     private static final int EDIT = 301;
     private BillRepository repository;
     private BillDocument bill;

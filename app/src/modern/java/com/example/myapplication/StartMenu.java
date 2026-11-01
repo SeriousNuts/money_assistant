@@ -9,7 +9,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class StartMenu extends AppCompatActivity {
+public final class StartMenu extends BaseActivity {
     private BillRepository repository;
     private BillDraftStore draftStore;
     private LinearLayout cards, total, filters, draftsView;
@@ -34,13 +33,20 @@ public final class StartMenu extends AppCompatActivity {
         Ui.toolbar(this, root, "money assistant", false, () -> {
             View anchor = root.findViewWithTag("toolbarMenu");
             PopupMenu menu = new PopupMenu(this, anchor);
-            menu.getMenu().add(DemoSession.active(this) ? "Тестовый аккаунт" : "Личный аккаунт").setEnabled(false);
-            menu.getMenu().add("Выйти").setOnMenuItemClickListener(item -> { signOut(); return true; });
+            menu.getMenu().add(getString(DemoSession.active(this)
+                    ? R.string.demo_account : R.string.personal_account)).setEnabled(false);
+            menu.getMenu().add(getString(R.string.language)).setOnMenuItemClickListener(item -> {
+                Ui.chooseLanguage(this); return true;
+            });
+            menu.getMenu().add(getString(R.string.legal_menu)).setOnMenuItemClickListener(item -> {
+                startActivity(new Intent(this, LegalActivity.class)); return true;
+            });
+            menu.getMenu().add(getString(R.string.logout)).setOnMenuItemClickListener(item -> { signOut(); return true; });
             menu.show();
         });
         LinearLayout body = Ui.scroll(this, root);
-        Ui.add(this, body, Ui.headline(this, "Общие счета", 36), 8);
-        Ui.add(this, body, Ui.label(this, "Меньше расчётов. Больше хороших встреч."), 10);
+        Ui.add(this, body, Ui.headline(this, getString(R.string.bills_title), 36), 8);
+        Ui.add(this, body, Ui.label(this, getString(R.string.bills_subtitle)), 10);
 
         total = Ui.card(this, body);
         LinearLayout.LayoutParams summaryLayout = (LinearLayout.LayoutParams) total.getLayoutParams();
@@ -55,9 +61,9 @@ public final class StartMenu extends AppCompatActivity {
         Ui.add(this, body, scroller, 24);
 
         LinearLayout statusRow = Ui.row(this);
-        cacheStatus = Ui.label(this, DemoSession.active(this) ? "Демо · на устройстве" : "На устройстве");
+        cacheStatus = Ui.label(this, getString(DemoSession.active(this) ? R.string.demo_device : R.string.on_device));
         Ui.addRow(this, statusRow, cacheStatus, 1);
-        Ui.addRow(this, statusRow, Ui.link(this, "Обновить", () -> load(true)), 0);
+        Ui.addRow(this, statusRow, Ui.link(this, getString(R.string.refresh_action), () -> load(true)), 0);
         Ui.add(this, body, statusRow, 10);
 
         draftsView = Ui.column(this);
@@ -65,7 +71,7 @@ public final class StartMenu extends AppCompatActivity {
 
         cards = Ui.column(this);
         Ui.add(this, body, cards, 0);
-        Ui.add(this, Ui.footer(this, root), Ui.button(this, "＋  Новый счёт", () ->
+        Ui.add(this, Ui.footer(this, root), Ui.button(this, getString(R.string.new_bill), () ->
                 startActivity(new Intent(this, AfterContact.class))), 0);
         render();
     }
@@ -89,28 +95,28 @@ public final class StartMenu extends AppCompatActivity {
         try {
             List<BillDraftStore.Draft> drafts = draftStore.list();
             if (drafts.isEmpty()) return;
-            Ui.add(this, draftsView, Ui.text(this, "Незавершённые счета", 19, true), 14);
+            Ui.add(this, draftsView, Ui.text(this, getString(R.string.drafts_title), 19, true), 14);
             for (BillDraftStore.Draft draft : drafts) {
                 LinearLayout card = Ui.card(this, draftsView);
                 LinearLayout.LayoutParams p = (LinearLayout.LayoutParams) card.getLayoutParams();
                 p.topMargin = Ui.dp(this, 8);
                 card.setLayoutParams(p);
-                Ui.add(this, card, Ui.text(this, draft.bill.name.isEmpty() ? "Без названия" : draft.bill.name, 16, true), 0);
-                Ui.add(this, card, Ui.label(this, "Черновик · участников: " + draft.bill.people.size()), 4);
+                Ui.add(this, card, Ui.text(this, draft.bill.name.isEmpty() ? getString(R.string.draft_unnamed) : draft.bill.name, 16, true), 0);
+                Ui.add(this, card, Ui.label(this, getString(R.string.draft_people, draft.bill.people.size())), 4);
                 LinearLayout actions = Ui.row(this);
-                Ui.addRow(this, actions, Ui.link(this, "Продолжить", () -> startActivity(
+                Ui.addRow(this, actions, Ui.link(this, getString(R.string.resume_action), () -> startActivity(
                         new Intent(this, AfterContact.class).putExtra("draftId", draft.bill.id))), 1);
-                Ui.addRow(this, actions, Ui.link(this, "Удалить", () -> confirmDeleteDraft(draft)), 0);
+                Ui.addRow(this, actions, Ui.link(this, getString(R.string.delete_action), () -> confirmDeleteDraft(draft)), 0);
                 Ui.add(this, card, actions, 5);
             }
         } catch (Exception e) { Ui.error(this, e); }
     }
 
     private void confirmDeleteDraft(BillDraftStore.Draft draft) {
-        new AlertDialog.Builder(this).setTitle("Удалить черновик?")
-                .setMessage("Несохранённый счёт и черновик его фото будут удалены")
-                .setNegativeButton("Отмена", null)
-                .setPositiveButton("Удалить", (d, w) -> {
+        new AlertDialog.Builder(this).setTitle(R.string.draft_delete_title)
+                .setMessage(R.string.draft_delete_message)
+                .setNegativeButton(R.string.cancel_action, null)
+                .setPositiveButton(R.string.delete_action, (d, w) -> {
                     try {
                         draftStore.remove(draft.bill.id);
                         if (draft.stagedPhoto != null && !draft.bill.receipts.isEmpty()) {
@@ -128,10 +134,10 @@ public final class StartMenu extends AppCompatActivity {
         repository.list(force, (found, error) -> {
             if (found != null) {
                 bills = found;
-                cacheStatus.setText(DemoSession.active(this) ? "Демо · на устройстве" : "На устройстве");
+                cacheStatus.setText(getString(DemoSession.active(this) ? R.string.demo_device : R.string.on_device));
                 render();
             } else {
-                cacheStatus.setText("Нет сохранённых счетов или связи");
+                cacheStatus.setText(R.string.no_connection);
                 Ui.error(this, error);
             }
         });
@@ -139,7 +145,8 @@ public final class StartMenu extends AppCompatActivity {
 
     private void renderFilters() {
         filters.removeAllViews();
-        String[] names = {"Все", "В процессе", "Закрытые"};
+        String[] names = {getString(R.string.filter_all), getString(R.string.filter_open),
+                getString(R.string.filter_closed)};
         for (int i = 0; i < names.length; i++) {
             final int choice = i;
             TextView chip = Ui.chip(this, names[i], filter == i, () -> { filter = choice; render(); });
@@ -158,10 +165,10 @@ public final class StartMenu extends AppCompatActivity {
             owed += remaining;
             if (remaining > 0) open++;
         }
-        Ui.add(this, total, Ui.kicker(this, "ОСТАЛОСЬ СОБРАТЬ"), 0);
+        Ui.add(this, total, Ui.kicker(this, getString(R.string.remaining_total)), 0);
         Ui.add(this, total, Ui.headline(this, Money.format(owed), 42), 12);
-        Ui.add(this, total, Ui.label(this, bills.isEmpty() ? "Начните с первого общего счёта" :
-                open == 0 ? "Все счета закрыты. Вы в расчёте." : "Незакрытых счетов: " + open), 12);
+        Ui.add(this, total, Ui.label(this, bills.isEmpty() ? getString(R.string.start_bill) :
+                open == 0 ? getString(R.string.all_paid) : getString(R.string.open_count, open)), 12);
 
         for (BillDocument bill : bills) {
             boolean closed = bill.total() > 0 && bill.paid() >= bill.total();
@@ -179,28 +186,28 @@ public final class StartMenu extends AppCompatActivity {
             Ui.addRow(this, header, name, 1);
             TextView more = Ui.text(this, "⋮", 23, false);
             more.setGravity(android.view.Gravity.CENTER);
-            more.setContentDescription("Меню счёта " + bill.name);
+            more.setContentDescription(getString(R.string.bill_menu, bill.name));
             header.addView(more, new LinearLayout.LayoutParams(Ui.dp(this, 32), Ui.dp(this, 36)));
             more.setOnClickListener(v -> {
                 PopupMenu menu = new PopupMenu(this, more);
-                menu.getMenu().add("Удалить счёт").setOnMenuItemClickListener(item -> { confirmDelete(bill); return true; });
+                menu.getMenu().add(getString(R.string.delete_bill)).setOnMenuItemClickListener(item -> { confirmDelete(bill); return true; });
                 menu.show();
             });
             Ui.add(this, card, header, 0);
-            Ui.add(this, card, Ui.label(this, "Участников: " + bill.people.size()), 6);
+            Ui.add(this, card, Ui.label(this, getString(R.string.people_count, bill.people.size())), 6);
             Ui.add(this, card, Ui.headline(this, Money.format(bill.total()), 32), 21);
             View bar = Ui.progress(this, bill.paid(), bill.total());
             LinearLayout.LayoutParams barParams = new LinearLayout.LayoutParams(-1, Ui.dp(this, 4));
             barParams.topMargin = Ui.dp(this, 20);
             card.addView(bar, barParams);
-            TextView percent = Ui.label(this, bill.total() == 0 ? "0% оплачено" :
-                    bill.paid() * 100 / bill.total() + "% оплачено");
+            TextView percent = Ui.label(this, getString(R.string.paid_percent,
+                    bill.total() == 0 ? 0 : bill.paid() * 100 / bill.total()));
             percent.setTextSize(12);
             percent.setGravity(android.view.Gravity.RIGHT);
             Ui.add(this, card, percent, 4);
         }
-        if (shown == 0) Ui.add(this, cards, Ui.label(this, bills.isEmpty() ?
-                "Здесь пока нет счетов. Создайте первый!" : "Нет счетов для выбранного фильтра"), 24);
+        if (shown == 0) Ui.add(this, cards, Ui.label(this, getString(bills.isEmpty() ?
+                R.string.bills_empty : R.string.bills_filter_empty)), 24);
     }
 
     private void open(BillDocument bill) {
@@ -210,9 +217,9 @@ public final class StartMenu extends AppCompatActivity {
     }
 
     private void confirmDelete(BillDocument bill) {
-        new AlertDialog.Builder(this).setTitle("Удалить счёт?")
-                .setMessage(bill.name + " и все его участники будут удалены")
-                .setNegativeButton("Отмена", null).setPositiveButton("Удалить", (d, w) ->
+        new AlertDialog.Builder(this).setTitle(R.string.delete_bill_title)
+                .setMessage(getString(R.string.delete_bill_message, bill.name))
+                .setNegativeButton(R.string.cancel_action, null).setPositiveButton(R.string.delete_action, (d, w) ->
                         repository.delete(bill, (v, error) -> {
                             if (error != null) Ui.error(this, error);
                             else load(true);

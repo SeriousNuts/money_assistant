@@ -8,9 +8,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
-public final class MainWindow extends AppCompatActivity {
+public final class MainWindow extends BaseActivity {
     private BillDocument bill;
     private BillRepository repository;
     private LinearLayout body;

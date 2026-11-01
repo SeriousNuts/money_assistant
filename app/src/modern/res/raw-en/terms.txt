@@ -1,0 +1,18 @@
+DRAFT MONEY ASSISTANT LICENSE AGREEMENT
+Revision: November 1, 2026
+
+BEFORE PUBLICATION: the rights holder must provide its legal name, contact details and applicable law, and arrange legal review. This draft is not legal advice.
+
+1. Parties. Rights holder: [LEGAL NAME, COUNTRY, CONTACT]. User: the person installing and using Money Assistant.
+
+2. License. The rights holder grants a limited, non-exclusive, non-transferable right to use the app on the user's devices for its intended features. The app helps split shared expenses. It is not a bank, payment processor, accountant or legal advisor and does not transfer money.
+
+3. Data. You are responsible for lawful use of other people's names, phone numbers and expenses, and for obtaining any necessary permission before submitting a receipt to an external AI service. Offline OCR and manual entry do not send photos to the AI service. Review all extracted items and calculations before relying on them.
+
+4. Accounts and sync. Demo data stays on your device. Account bill and participant data are synchronized through Firebase. Receipt photos are not synchronized between devices. Gemini online OCR sends a particular photo only after separate confirmation; you supply your own API key.
+
+5. Availability and changes. Network, Firebase, camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. A cloud account deletion procedure must be provided before public release.
+
+6. Liability. The app is provided “as is” to the extent allowed by applicable law without limiting mandatory consumer rights. You must verify amounts and agree on payment with the other participants yourself.
+
+7. Contact and applicable law. [PROVIDE RIGHTS HOLDER CONTACT AND APPLICABLE LAW BEFORE PUBLICATION]. Data practices are described in the separate privacy policy.

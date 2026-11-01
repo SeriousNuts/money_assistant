@@ -1,6 +1,10 @@
 apply plugin: 'com.android.application'
 def demoSideBySide = project.hasProperty('demoSideBySide')
-def verificationApk = project.hasProperty('verificationApk')
+if (project.hasProperty('verificationApk') && !project.hasProperty('buildNumber')) {
+    throw new GradleException('Use toolchains/build-tagged.sh; -PverificationApk no longer creates version numbers.')
+}
+def buildNumber = project.hasProperty('buildNumber') ? Integer.parseInt(project.property('buildNumber').toString()) : 0
+if (buildNumber < 0 || buildNumber > 100000) throw new GradleException('Invalid buildNumber')
 // A fresh clone can build and run the offline demo without private Firebase config.
 if (!demoSideBySide && file('google-services.json').exists()) {
     apply plugin: 'com.google.gms.google-services'
@@ -15,8 +19,8 @@ android {
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 30
-        versionCode verificationApk ? 12 : 6
-        versionName verificationApk ? '1.4.2-rc6' : '1.4.1'
+        versionCode buildNumber == 0 ? 6 : 12 + buildNumber
+        versionName buildNumber == 0 ? '1.4.1' : "1.4.2-${buildNumber}"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 

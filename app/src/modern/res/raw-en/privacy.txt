@@ -1,0 +1,19 @@
+DRAFT MONEY ASSISTANT PRIVACY POLICY
+Revision: November 1, 2026
+
+BEFORE PUBLICATION: provide the controller's identity, a working contact address, public privacy/account-deletion URLs, retention periods and legal bases for the relevant jurisdictions. Audit actual network traffic and SDK behavior before making Play Data safety declarations.
+
+Data controller: [LEGAL NAME, ADDRESS, COUNTRY, CONTACT EMAIL].
+
+Data handling:
+• Firebase Authentication handles the email and credentials you provide to create or use an account; the app does not store your password in plain text.
+• Names, selected participants' phone numbers, bill titles, amounts, receipt items and payment states are used to split expenses. Account bills and participants are synchronized through Firebase Firestore. Demo data stays on the device.
+• Contacts access is requested only when choosing people. Names and phone numbers you select become bill data and may be synchronized in account mode. The broad READ_CONTACTS permission and picker need review for Google Play.
+• Receipt photos and offline OCR remain in private on-device storage; photos are not synced to Firestore. If you separately confirm online OCR for a photo, a reduced copy is sent over HTTPS to Google Gemini. Google service terms and the plan tied to your own API key apply. Do not submit others' private receipts without a lawful basis; review the results.
+• Your Gemini API key is protected locally with Android Keystore, removable in the app and not included in the APK. It is provided to Google for requests. Receipt images and the key are excluded from Android backup; other local data may be included when device backup is enabled.
+
+The app does not include its own advertising or analytics SDKs. Firebase and optional Gemini are third-party providers; actual transmissions, logs and retention must be verified before completing Play Data safety. Sharing a bill via Android's Share menu is initiated by you and delivered to the recipient you choose.
+
+Deletion: you may remove on-device data using Android system settings (“Clear storage”). The app does not yet provide completed deletion of the cloud account and all related data: both an in-app deletion mechanism and an external web request page must be implemented BEFORE PUBLICATION. Retention periods and request handling: [SPECIFY AFTER IMPLEMENTATION].
+
+Privacy contact: [PROVIDE A WORKING CONTACT ADDRESS BEFORE PUBLICATION]. Publish the final policy at a stable public URL and keep it aligned with actual app behavior.

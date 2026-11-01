@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,7 +19,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class AfterContact extends AppCompatActivity {
+public final class AfterContact extends BaseActivity {
     static final int PICK_CONTACT = 100;
     private static final int EDIT_RECEIPT = 101;
     private BillDocument bill = new BillDocument();
@@ -57,9 +56,9 @@ public final class AfterContact extends AppCompatActivity {
         } catch (Exception e) { Ui.error(this, e); finish(); return; }
 
         LinearLayout root = Ui.page(this);
-        Ui.toolbar(this, root, editing ? "Редактировать счёт" : "Новый счёт", true, null);
+        Ui.toolbar(this, root, editing ? "Редактировать счёт" : getString(R.string.new_bill_title), true, null);
         LinearLayout body = Ui.scroll(this, root);
-        title = Ui.input(this, "Название счёта");
+        title = Ui.input(this, getString(R.string.bill_name_hint));
         title.setText(bill.name);
         Ui.add(this, body, title, 8);
 
@@ -95,7 +94,7 @@ public final class AfterContact extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) { }
         });
 
-        Ui.add(this, body, Ui.text(this, "Участники", 18, true), 21);
+        Ui.add(this, body, Ui.text(this, getString(R.string.participants_title), 18, true), 21);
         LinearLayout actions = Ui.row(this);
         TextView add = Ui.link(this, "＋  Добавить", () -> addPerson("", ""));
         Ui.addRow(this, actions, add, 1);
@@ -114,7 +113,7 @@ public final class AfterContact extends AppCompatActivity {
         Ui.add(this, body, people, 7);
         if (editing) Ui.add(this, body, Ui.label(this,
                 "Чеки сохраняются при изменении счёта. Для правки фото откройте экран чеков после сохранения."), 16);
-        else Ui.add(this, body, Ui.secondary(this, "▧  Фото и разметка чека", () -> {
+        else Ui.add(this, body, Ui.secondary(this, getString(R.string.receipt_photo), () -> {
             try {
                 captureDraft();
                 if (bill.people.isEmpty()) throw new IllegalArgumentException("Сначала добавьте участников");
@@ -134,7 +133,7 @@ public final class AfterContact extends AppCompatActivity {
         if (state != null) shareAfterSave.setChecked(state.getBoolean("share", false));
         else if (restoredDraft != null) shareAfterSave.setChecked(restoredDraft.share);
         Ui.add(this, footer, shareAfterSave, 0);
-        Ui.add(this, footer, Ui.button(this, editing ? "Сохранить изменения" : "Сохранить счёт", this::save), 6);
+        Ui.add(this, footer, Ui.button(this, editing ? "Сохранить изменения" : getString(R.string.save_bill), this::save), 6);
         render();
     }
 
