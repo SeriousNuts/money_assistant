@@ -64,12 +64,22 @@ for variant in demo full; do
     "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify "$apk"
 done
 if [[ ${1:-} == '--store' ]]; then
-    bash gradlew --no-daemon --max-workers=2 :app:assembleRelease :app:bundleRelease \
+    # Both artifacts use the same package/version/signing config, but only RuStore
+    # defaults the optional online OCR choice to Cloud.ru. Copy between builds.
+    bash gradlew --no-daemon --max-workers=2 :app:bundleRelease \
         -PbuildNumber="$number" -PreleaseSigning=true
-    apk="build/verification/money-assistant-$tag-rustore.apk"
+    grep -Fq '>gemini</string>' app/build/generated/res/resValues/release/values/gradleResValues.xml || {
+        echo 'Play AAB must default to Gemini; no tag was created.' >&2; exit 1;
+    }
     aab="build/verification/money-assistant-$tag-play.aab"
-    cp app/build/outputs/apk/release/app-release.apk "$apk"
     cp app/build/outputs/bundle/release/app-release.aab "$aab"
+    bash gradlew --no-daemon --max-workers=2 :app:assembleRelease \
+        -PbuildNumber="$number" -PreleaseSigning=true -PrustoreDistribution=true
+    grep -Fq '>cloud</string>' app/build/generated/res/resValues/release/values/gradleResValues.xml || {
+        echo 'RuStore APK must default to Cloud.ru; no tag was created.' >&2; exit 1;
+    }
+    apk="build/verification/money-assistant-$tag-rustore.apk"
+    cp app/build/outputs/apk/release/app-release.apk "$apk"
     bash toolchains/verify-store-artifacts.sh "$apk" "$aab"
 fi
 git tag -a "$tag" -m "Verified Money Assistant $tag (versionCode $code)"

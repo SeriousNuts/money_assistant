@@ -24,7 +24,26 @@ public class ReceiptAiKeyDeviceTest {
             assertEquals("test-placeholder-not-a-real-key", ReceiptAiKey.load(context));
             String stored = context.getSharedPreferences("receipt-ai", Context.MODE_PRIVATE).getString("key", "");
             assertFalse(stored.contains("test-placeholder"));
-        } finally { ReceiptAiKey.clear(context); }
+        } finally { ReceiptAiKey.clear(context, ReceiptProvider.GEMINI); }
         assertNull(ReceiptAiKey.load(context));
+    }
+
+    @Test public void cloudAndGeminiKeysStaySeparate() throws Exception {
+        Context context = InstrumentationRegistry.getTargetContext();
+        assumeTrue(ReceiptAiKey.load(context, ReceiptProvider.GEMINI) == null
+                && ReceiptAiKey.load(context, ReceiptProvider.CLOUD) == null);
+        try {
+            ReceiptAiKey.save(context, ReceiptProvider.GEMINI, "fake-gemini-key");
+            ReceiptAiKey.save(context, ReceiptProvider.CLOUD, "fake-cloud-key");
+            assertEquals("fake-cloud-key", ReceiptAiKey.load(context, ReceiptProvider.CLOUD));
+            assertFalse(context.getSharedPreferences("receipt-ai", Context.MODE_PRIVATE)
+                    .getString("cloud-key", "").contains("fake-cloud-key"));
+            ReceiptAiKey.clear(context, ReceiptProvider.CLOUD);
+            assertNull(ReceiptAiKey.load(context, ReceiptProvider.CLOUD));
+            assertEquals("fake-gemini-key", ReceiptAiKey.load(context, ReceiptProvider.GEMINI));
+        } finally {
+            ReceiptAiKey.clear(context, ReceiptProvider.CLOUD);
+            ReceiptAiKey.clear(context, ReceiptProvider.GEMINI);
+        }
     }
 }

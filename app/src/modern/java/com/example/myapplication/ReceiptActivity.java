@@ -47,6 +47,7 @@ public final class ReceiptActivity extends BaseActivity {
     private TextView ocrStatus;
     private TextView manualMode;
     private TextView cropModeButton;
+    private TextView providerButton, onlineButton;
     private boolean cropMode;
     private EditText search;
     private final List<ReceiptLine> visible = new ArrayList<>();
@@ -92,7 +93,11 @@ public final class ReceiptActivity extends BaseActivity {
                     .setNegativeButton("Отмена", null).setPositiveButton("Распознать", (d, w) -> recognize(true)).show();
             else recognize(false);
         }), 8);
-        Ui.add(this, body, Ui.secondary(this, "☁  Распознать через Gemini (онлайн)", this::offerCloudRecognition), 8);
+        providerButton = Ui.secondary(this, "", this::chooseCloudProvider);
+        Ui.add(this, body, providerButton, 8);
+        onlineButton = Ui.secondary(this, "", this::offerCloudRecognition);
+        Ui.add(this, body, onlineButton, 8);
+        showCloudProvider();
         ocrStatus = Ui.label(this, "Русский и английский текст распознаётся на устройстве. Проверьте найденные позиции перед сохранением.");
         Ui.add(this, body, ocrStatus, 8);
         manualMode = Ui.secondary(this, getString(R.string.receipt_manual), () -> toggleSelection(false));
@@ -293,6 +298,25 @@ public final class ReceiptActivity extends BaseActivity {
         recognize(replace, null);
     }
 
+    private void showCloudProvider() {
+        String label = ReceiptProvider.selected(this).label;
+        providerButton.setText(getString(R.string.online_ocr_provider, label));
+        onlineButton.setText(getString(R.string.online_ocr_action, label));
+    }
+
+    private void chooseCloudProvider() {
+        ReceiptProvider[] providers = ReceiptProvider.values();
+        String[] names = new String[providers.length];
+        for (int i = 0; i < providers.length; i++) names[i] = providers[i].label;
+        new AlertDialog.Builder(this).setTitle(R.string.online_ocr_choose)
+                .setSingleChoiceItems(names, ReceiptProvider.selected(this).ordinal(), (dialog, choice) -> {
+                    if (!ReceiptProvider.select(this, providers[choice])) {
+                        Ui.error(this, new IllegalStateException("Не удалось сохранить выбор провайдера"));
+                    } else showCloudProvider();
+                    dialog.dismiss();
+                }).setNegativeButton(R.string.cancel_action, null).show();
+    }
+
     private void offerCloudRecognition() {
         if (image.currentBitmap() == null || image.getVisibility() != View.VISIBLE) {
             Ui.error(this, new IllegalStateException("Сначала сфотографируйте чек")); return;
@@ -300,48 +324,45 @@ public final class ReceiptActivity extends BaseActivity {
         if (recognizing) {
             Ui.error(this, new IllegalStateException("Дождитесь окончания распознавания")); return;
         }
+        ReceiptProvider provider = ReceiptProvider.selected(this);
         String apiKey;
-        try { apiKey = ReceiptAiKey.load(this); }
-        catch (Exception e) { ReceiptAiKey.clear(this); apiKey = null; }
-        if (apiKey == null) { askCloudKey(); return; }
+        try { apiKey = ReceiptAiKey.load(this, provider); }
+        catch (Exception e) { ReceiptAiKey.clear(this, provider); apiKey = null; }
+        if (apiKey == null) { askCloudKey(provider); return; }
         String key = apiKey;
-        new AlertDialog.Builder(this).setTitle("Отправить фото в Gemini?")
-                .setMessage("Только после подтверждения фото чека отправится в Google для распознавания. "
-                        + "Бесплатная квота ограничена; Google может использовать данные бесплатного тарифа "
-                        + "для улучшения продуктов. Текущие позиции будут заменены лишь при успешном ответе. "
-                        + "Проверьте суммы перед сохранением.")
-                .setNegativeButton("Отмена", null)
-                .setNeutralButton("Удалить ключ", (d, w) -> { ReceiptAiKey.clear(this); askCloudKey(); })
-                .setPositiveButton("Отправить фото", (d, w) -> recognizeCloud(key)).show();
+        new AlertDialog.Builder(this).setTitle(getString(R.string.online_ocr_confirm, provider.label))
+                .setMessage(provider == ReceiptProvider.CLOUD
+                        ? R.string.online_ocr_cloud_consent : R.string.online_ocr_gemini_consent)
+                .setNegativeButton(R.string.cancel_action, null)
+                .setNeutralButton(R.string.online_ocr_remove_key, (d, w) -> {
+                    ReceiptAiKey.clear(this, provider); askCloudKey(provider);
+                }).setPositiveButton(R.string.online_ocr_send, (d, w) -> recognizeCloud(key, provider)).show();
     }
 
-    private void askCloudKey() {
+    private void askCloudKey(ReceiptProvider provider) {
         LinearLayout form = Ui.column(this);
         form.setPadding(Ui.dp(this, 20), 0, Ui.dp(this, 20), 0);
-        Ui.add(this, form, Ui.label(this, "Нужен собственный API-ключ Google AI Studio (бесплатный тариф). "
-                + "Фото отправится в Google только после нажатия «Сохранить и отправить». "
-                + "В бесплатном тарифе данные могут использоваться для улучшения продуктов Google; "
-                + "при включённом биллинге запрос может быть платным. "
-                + "Текущие позиции заменятся только после успешного ответа. "
-                + "Ключ хранится зашифрованным на этом устройстве и не включается в APK."), 0);
-        EditText input = Ui.input(this, "API-ключ Gemini");
+        Ui.add(this, form, Ui.label(this, getString(provider == ReceiptProvider.CLOUD
+                ? R.string.online_ocr_cloud_key : R.string.online_ocr_gemini_key)), 0);
+        EditText input = Ui.input(this, getString(R.string.online_ocr_key_hint, provider.label));
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         Ui.add(this, form, input, 12);
-        AlertDialog dialog = new AlertDialog.Builder(this).setTitle("Распознавание Gemini")
-                .setView(form).setNegativeButton("Отмена", null)
-                .setPositiveButton("Сохранить и отправить", null).create();
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(provider.label)
+                .setView(form).setNegativeButton(R.string.cancel_action, null)
+                .setPositiveButton(R.string.online_ocr_save_send, null).create();
         dialog.setOnShowListener(d -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             try {
                 String key = input.getText().toString().trim();
-                ReceiptAiKey.save(this, key);
+                ReceiptAiKey.save(this, provider, key);
+                input.getText().clear();
                 dialog.dismiss();
-                recognizeCloud(key);
+                recognizeCloud(key, provider);
             } catch (Exception e) { Ui.error(this, e); }
         }));
         dialog.show();
     }
 
-    private void recognizeCloud(String key) {
+    private void recognizeCloud(String key, ReceiptProvider provider) {
         Bitmap shown = image.currentBitmap();
         if (shown == null || shown.isRecycled()) return;
         Bitmap input = shown.copy(Bitmap.Config.ARGB_8888, false);
@@ -349,11 +370,12 @@ public final class ReceiptActivity extends BaseActivity {
         final int generation = ++ocrGeneration;
         final List<ReceiptLine> previous = new ArrayList<>(receipt.lines);
         recognizing = true;
-        ocrStatus.setText("Отправляем фото в Gemini и ждём распознавания…");
+        ocrStatus.setText(getString(R.string.online_ocr_sending, provider.label));
         ocrWorker.execute(() -> {
             List<ReceiptLine> suggestions = null;
             String error = null;
-            try { suggestions = GeminiReceiptClient.recognize(key, input); }
+            try { suggestions = provider == ReceiptProvider.CLOUD
+                    ? CloudReceiptClient.recognize(key, input) : GeminiReceiptClient.recognize(key, input); }
             catch (Exception e) { error = e.getMessage() == null ? "Нет ответа" : e.getMessage(); }
             finally { input.recycle(); }
             final List<ReceiptLine> found = suggestions;
@@ -361,9 +383,9 @@ public final class ReceiptActivity extends BaseActivity {
             runOnUiThread(() -> {
                 if (generation != ocrGeneration || isFinishing() || isDestroyed()) return;
                 recognizing = false;
-                if (failure != null) ocrStatus.setText("Gemini: " + failure + " Разметка сохранена; доступен офлайн-режим.");
-                else if (found == null || found.isEmpty()) ocrStatus.setText("Gemini не нашёл товары. Позиции не изменены.");
-                else if (!receipt.lines.equals(previous)) ocrStatus.setText("Позиции уже изменены вручную. Ответ Gemini не применён.");
+                if (failure != null) ocrStatus.setText(provider.label + ": " + failure + " Разметка сохранена; доступен офлайн-режим.");
+                else if (found == null || found.isEmpty()) ocrStatus.setText(provider.label + " не нашёл товары. Позиции не изменены.");
+                else if (!receipt.lines.equals(previous)) ocrStatus.setText("Позиции уже изменены вручную. Ответ " + provider.label + " не применён.");
                 else {
                     for (ReceiptLine line : found)
                         for (int i = 0; i < bill.people.size(); i++) line.assignees.add(i);
@@ -371,12 +393,12 @@ public final class ReceiptActivity extends BaseActivity {
                     receipt.lines.addAll(found);
                     try {
                         bill.recalculateAmounts();
-                        ocrStatus.setText("Gemini предложил " + found.size() + " позиций. "
+                        ocrStatus.setText(provider.label + " предложил " + found.size() + " позиций. "
                                 + "По умолчанию они разделены между всеми. Проверьте список, суммы и участников.");
                     } catch (RuntimeException e) {
                         receipt.lines.clear(); receipt.lines.addAll(previous);
                         bill.recalculateAmounts();
-                        ocrStatus.setText("Ответ Gemini не применён: " + e.getMessage());
+                        ocrStatus.setText("Ответ " + provider.label + " не применён: " + e.getMessage());
                     }
                     render();
                 }

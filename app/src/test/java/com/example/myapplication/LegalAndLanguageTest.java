@@ -66,7 +66,7 @@ public class LegalAndLanguageTest {
             assertTrue(policy.read(heading) > 0);
             assertTrue(new String(heading, StandardCharsets.UTF_8).startsWith("DRAFT MONEY ASSISTANT"));
         }
-        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 1).commit();
+        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 2).commit();
         MainActivity entry = Robolectric.buildActivity(MainActivity.class).create().start().resume().get();
         assertTrue(DemoSession.active(context));
         Intent next = Shadows.shadowOf(entry).getNextStartedActivity();
@@ -76,6 +76,13 @@ public class LegalAndLanguageTest {
         assertNotNull(find(screen, "Shared bills"));
         assertNull(find(screen, "Sign in"));
         assertNull(find(screen, "Sign up"));
+    }
+
+    @Test public void existingAcceptanceMustBeRenewedForNewOnlineProvider() {
+        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 1).commit();
+        MainActivity entry = Robolectric.buildActivity(MainActivity.class).create().start().resume().get();
+        assertEquals(LegalActivity.class.getName(),
+                Shadows.shadowOf(entry).getNextStartedActivity().getComponent().getClassName());
     }
 
     private TextView find(View root, String text) {

@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 def demoSideBySide = project.hasProperty('demoSideBySide')
+def rustoreDistribution = project.hasProperty('rustoreDistribution')
 if (project.hasProperty('verificationApk') && !project.hasProperty('buildNumber')) {
     throw new GradleException('Use toolchains/build-tagged.sh; -PverificationApk no longer creates version numbers.')
 }
@@ -21,6 +22,7 @@ android {
 
     defaultConfig {
         applicationId demoSideBySide ? 'com.example.myapplication.preview' : 'com.example.myapplication'
+        resValue 'string', 'default_online_ocr_provider', rustoreDistribution ? 'cloud' : 'gemini'
         manifestPlaceholders = [appLabel: demoSideBySide ? 'Money Assistant (тест)' : 'Money Assistant']
         minSdkVersion 28
         targetSdkVersion 36

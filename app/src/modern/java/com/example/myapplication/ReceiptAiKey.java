@@ -19,19 +19,27 @@ final class ReceiptAiKey {
     private static final String PREFS = "receipt-ai";
 
     static void save(Context context, String apiKey) throws Exception {
+        save(context, ReceiptProvider.GEMINI, apiKey);
+    }
+
+    static void save(Context context, ReceiptProvider provider, String apiKey) throws Exception {
         String value = apiKey.trim();
-        if (value.isEmpty()) throw new IllegalArgumentException("Введите API-ключ Gemini");
+        if (value.isEmpty()) throw new IllegalArgumentException("Введите API-ключ " + provider.label);
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.ENCRYPT_MODE, key());
         byte[] encrypted = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
-                .putString("iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
-                .putString("key", Base64.encodeToString(encrypted, Base64.NO_WRAP)).apply();
+                .putString(field(provider, "iv"), Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
+                .putString(field(provider, "key"), Base64.encodeToString(encrypted, Base64.NO_WRAP)).apply();
     }
 
     static String load(Context context) throws Exception {
-        String iv = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("iv", null);
-        String stored = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString("key", null);
+        return load(context, ReceiptProvider.GEMINI);
+    }
+
+    static String load(Context context, ReceiptProvider provider) throws Exception {
+        String iv = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(field(provider, "iv"), null);
+        String stored = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(field(provider, "key"), null);
         if (iv == null || stored == null) return null;
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE, key(),
@@ -41,6 +49,16 @@ final class ReceiptAiKey {
 
     static void clear(Context context) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().clear().apply();
+    }
+
+    static void clear(Context context, ReceiptProvider provider) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .remove(field(provider, "iv")).remove(field(provider, "key")).apply();
+    }
+
+    private static String field(ReceiptProvider provider, String field) {
+        // Preserve the existing Gemini key for users updating the app.
+        return provider == ReceiptProvider.GEMINI ? field : "cloud-" + field;
     }
 
     private static SecretKey key() throws Exception {

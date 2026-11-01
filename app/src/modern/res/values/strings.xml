@@ -50,4 +50,17 @@
     <string name="bills_filter_empty">Нет счетов для выбранного фильтра</string>
     <string name="delete_bill_title">Удалить счёт?</string>
     <string name="delete_bill_message">%1$s и все его участники будут удалены</string>
+    <string name="online_ocr_provider">Онлайн-провайдер: %1$s · изменить</string>
+    <string name="online_ocr_action">☁  Распознать онлайн через %1$s</string>
+    <string name="online_ocr_choose">Выбрать провайдера OCR</string>
+    <string name="online_ocr_confirm">Отправить фото в %1$s?</string>
+    <string name="online_ocr_cloud_consent">Только после подтверждения уменьшенное фото чека будет отправлено в сервис Cloud.ru для обработки моделью deepseek-ai/DeepSeek-OCR-2. Запросы могут быть платными по тарифу вашего проекта. Не отправляйте персональные данные третьих лиц без разрешения. Позиции будут заменены только после успешного ответа; проверьте их перед сохранением.</string>
+    <string name="online_ocr_gemini_consent">Только после подтверждения уменьшенное фото чека отправится в Google для распознавания. Бесплатная квота ограничена; Google может использовать данные бесплатного тарифа для улучшения продуктов. Позиции заменятся лишь после успешного ответа. Проверьте суммы перед сохранением.</string>
+    <string name="online_ocr_cloud_key">Нужен собственный API-ключ Cloud.ru Foundation Models с доступом к DeepSeek-OCR-2. Фото будет отправлено в Cloud.ru только после нажатия «Сохранить и отправить»; запрос может быть платным. Ключ хранится зашифрованным на устройстве и не входит в APK.</string>
+    <string name="online_ocr_gemini_key">Нужен собственный API-ключ Google AI Studio. Фото будет отправлено в Google только после нажатия «Сохранить и отправить». Возможны квоты, использование данных на бесплатном тарифе и оплата при включённом биллинге. Ключ зашифрован на устройстве и не включён в APK.</string>
+    <string name="online_ocr_key_hint">API-ключ %1$s</string>
+    <string name="online_ocr_remove_key">Удалить ключ</string>
+    <string name="online_ocr_send">Отправить фото</string>
+    <string name="online_ocr_save_send">Сохранить и отправить</string>
+    <string name="online_ocr_sending">Отправляем фото в %1$s…</string>
 </resources>

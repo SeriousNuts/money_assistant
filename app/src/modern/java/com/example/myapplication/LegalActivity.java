@@ -15,7 +15,8 @@ import java.nio.charset.StandardCharsets;
 
 /** Both legal drafts remain available in the app; the first-run gate records a local acknowledgement. */
 public final class LegalActivity extends BaseActivity {
-    private static final int AGREEMENT_VERSION = 1;
+    // New third-party OCR provider changes where receipt photos may be sent.
+    private static final int AGREEMENT_VERSION = 2;
     private boolean termsOpened, privacyOpened;
 
     static boolean accepted(android.content.Context context) {

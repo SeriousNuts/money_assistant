@@ -158,6 +158,12 @@ public class UiFlowTest {
         ReceiptActivity activity = Robolectric.buildActivity(ReceiptActivity.class, intent)
                 .create().start().resume().get();
         assertNotNull(findText(activity.findViewById(android.R.id.content), "Сфотографировать чек"));
+        View screen = activity.findViewById(android.R.id.content);
+        findText(screen, "Онлайн-провайдер:").performClick();
+        AlertDialog choice = (AlertDialog) ShadowDialog.getLatestDialog();
+        choice.getListView().performItemClick(choice.getListView().getAdapter().getView(1, null, choice.getListView()), 1, 1);
+        assertEquals(ReceiptProvider.CLOUD, ReceiptProvider.selected(activity));
+        assertNotNull(findText(screen, "Распознать онлайн через Cloud.ru"));
     }
 
     @Test @Config(sdk = 28, qualifiers = "w393dp-h852dp-night")

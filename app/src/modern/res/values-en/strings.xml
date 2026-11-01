@@ -50,4 +50,17 @@
     <string name="bills_filter_empty">No bills match this filter</string>
     <string name="delete_bill_title">Delete bill?</string>
     <string name="delete_bill_message">%1$s and all its participants will be deleted</string>
+    <string name="online_ocr_provider">Online provider: %1$s · change</string>
+    <string name="online_ocr_action">☁  Recognize online with %1$s</string>
+    <string name="online_ocr_choose">Choose OCR provider</string>
+    <string name="online_ocr_confirm">Send photo to %1$s?</string>
+    <string name="online_ocr_cloud_consent">Only after confirmation will a reduced receipt photo be sent to Cloud.ru for processing with deepseek-ai/DeepSeek-OCR-2. Requests may incur charges under your project’s plan. Do not send other people’s personal data without permission. Items are replaced only after a successful response; review them before saving.</string>
+    <string name="online_ocr_gemini_consent">Only after confirmation will a reduced receipt photo be sent to Google. Free quotas are limited; Google may use data submitted under free plans to improve its products. Items are replaced only after a successful response. Review amounts before saving.</string>
+    <string name="online_ocr_cloud_key">Enter your own Cloud.ru Foundation Models API key with access to DeepSeek-OCR-2. A photo is sent to Cloud.ru only when you tap “Save and send”; the request may cost money. The key is encrypted on this device and never included in the APK.</string>
+    <string name="online_ocr_gemini_key">Enter your own Google AI Studio API key. A photo is sent to Google only when you tap “Save and send”. Free-plan limits, use of data and charges with billing may apply. The key is encrypted on this device and never included in the APK.</string>
+    <string name="online_ocr_key_hint">%1$s API key</string>
+    <string name="online_ocr_remove_key">Delete key</string>
+    <string name="online_ocr_send">Send photo</string>
+    <string name="online_ocr_save_send">Save and send</string>
+    <string name="online_ocr_sending">Sending photo to %1$s…</string>
 </resources>
