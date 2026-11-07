@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -13,10 +14,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-/** Both legal drafts remain available in the app; the first-run gate records a local acknowledgement. */
+/** Both legal documents remain available offline; the policy is also linked online. */
 public final class LegalActivity extends BaseActivity {
-    // New third-party OCR provider changes where receipt photos may be sent.
-    private static final int AGREEMENT_VERSION = 2;
+    static final String POLICY_URL = "https://moneyassistantpolicy.duckdns.org/privacy/";
+    // Renew acknowledgement when the published alpha policy replaces the old draft.
+    private static final int AGREEMENT_VERSION = 3;
     private boolean termsOpened, privacyOpened;
 
     static boolean accepted(android.content.Context context) {
@@ -40,6 +42,10 @@ public final class LegalActivity extends BaseActivity {
                 () -> showDocument(R.raw.terms, R.string.terms_title, true)), 24);
         Ui.add(this, body, Ui.secondary(this, getString(R.string.privacy_title),
                 () -> showDocument(R.raw.privacy, R.string.privacy_title, false)), 12);
+        Ui.add(this, body, Ui.secondary(this, getString(R.string.privacy_online), () -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(POLICY_URL))); }
+            catch (Exception e) { Ui.error(this, e); }
+        }), 12);
         if (required) {
             CheckBox agree = new CheckBox(this);
             agree.setText(R.string.accept_terms);

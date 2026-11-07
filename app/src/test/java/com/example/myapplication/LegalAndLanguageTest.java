@@ -64,9 +64,9 @@ public class LegalAndLanguageTest {
         try (InputStream policy = english.getResources().openRawResource(R.raw.privacy)) {
             byte[] heading = new byte[40];
             assertTrue(policy.read(heading) > 0);
-            assertTrue(new String(heading, StandardCharsets.UTF_8).startsWith("DRAFT MONEY ASSISTANT"));
+            assertTrue(new String(heading, StandardCharsets.UTF_8).startsWith("MONEY ASSISTANT PRIVACY POLICY"));
         }
-        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 2).commit();
+        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 3).commit();
         MainActivity entry = Robolectric.buildActivity(MainActivity.class).create().start().resume().get();
         assertTrue(DemoSession.active(context));
         Intent next = Shadows.shadowOf(entry).getNextStartedActivity();
@@ -78,11 +78,26 @@ public class LegalAndLanguageTest {
         assertNull(find(screen, "Sign up"));
     }
 
-    @Test public void existingAcceptanceMustBeRenewedForNewOnlineProvider() {
-        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 1).commit();
+    @Test public void existingAcceptanceMustBeRenewedForPublishedPolicy() {
+        context.getSharedPreferences("legal-acceptance", Context.MODE_PRIVATE).edit().putInt("version", 2).commit();
         MainActivity entry = Robolectric.buildActivity(MainActivity.class).create().start().resume().get();
         assertEquals(LegalActivity.class.getName(),
                 Shadows.shadowOf(entry).getNextStartedActivity().getComponent().getClassName());
+    }
+
+    @Test public void onlinePolicyOpensSameHttpsAddressAsPublishedDocument() throws Exception {
+        LegalActivity legal = Robolectric.buildActivity(LegalActivity.class).create().start().resume().get();
+        findClickable(legal.findViewById(android.R.id.content), "Открыть политику на сайте").performClick();
+        Intent opened = Shadows.shadowOf(legal).getNextStartedActivity();
+        assertEquals(Intent.ACTION_VIEW, opened.getAction());
+        assertEquals(LegalActivity.POLICY_URL, opened.getDataString());
+        try (InputStream policy = context.getResources().openRawResource(R.raw.privacy)) {
+            java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = policy.read(buffer)) != -1) bytes.write(buffer, 0, count);
+            assertTrue(bytes.toString("UTF-8").contains(LegalActivity.POLICY_URL));
+        }
     }
 
     private TextView find(View root, String text) {

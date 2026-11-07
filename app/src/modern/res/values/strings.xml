@@ -4,7 +4,8 @@
     <string name="english">English</string>
     <string name="terms_title">Лицензионное соглашение</string>
     <string name="privacy_title">Политика конфиденциальности</string>
-    <string name="legal_notice">Перед использованием ознакомьтесь с условиями и обработкой данных. Для публикации юридические сведения разработчика должны быть заполнены.</string>
+    <string name="privacy_online">Открыть политику на сайте</string>
+    <string name="legal_notice">Перед использованием ознакомьтесь с условиями и обработкой данных. Онлайн-распознавание отправляет фото выбранному провайдеру только после вашего подтверждения.</string>
     <string name="accept_terms">Я прочитал(а) соглашение и политику конфиденциальности и принимаю условия использования</string>
     <string name="continue_action">Продолжить</string>
     <string name="legal_required">Сначала прочитайте документы и подтвердите согласие</string>

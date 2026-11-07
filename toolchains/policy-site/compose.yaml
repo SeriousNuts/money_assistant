@@ -1,0 +1,22 @@
+services:
+  policy:
+    image: caddy:2.10.2-alpine
+    container_name: money-assistant-policy
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./site:/srv/site:ro
+      - policy_data:/data
+      - policy_config:/config
+
+volumes:
+  policy_data:
+  policy_config:

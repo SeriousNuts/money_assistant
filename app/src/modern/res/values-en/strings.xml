@@ -4,7 +4,8 @@
     <string name="english">English</string>
     <string name="terms_title">License agreement</string>
     <string name="privacy_title">Privacy policy</string>
-    <string name="legal_notice">Read the terms and data practices before using the app. The developer’s legal details must be completed before publication.</string>
+    <string name="privacy_online">Open privacy policy online</string>
+    <string name="legal_notice">Read the terms and data practices before using the app. Online OCR sends a photo to the selected provider only after your confirmation.</string>
     <string name="accept_terms">I have read the agreement and privacy policy and accept the terms of use</string>
     <string name="continue_action">Continue</string>
     <string name="legal_required">Read both documents and accept the terms first</string>
