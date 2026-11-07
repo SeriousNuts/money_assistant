@@ -1,9 +1,9 @@
 DRAFT MONEY ASSISTANT PRIVACY POLICY
-Revision: November 1, 2026
+Revision: November 7, 2026
 
-BEFORE PUBLICATION: provide the controller's identity, a working contact address, public privacy/deletion-request URLs for existing accounts, retention periods and legal bases for the relevant jurisdictions. Audit actual network traffic and SDK behavior before making Play Data safety declarations.
+BEFORE PUBLICATION: provide the controller's postal address and country, public privacy/deletion-request URLs for existing accounts, retention periods and legal bases for the relevant jurisdictions. Audit actual network traffic and SDK behavior before making Play Data safety declarations.
 
-Data controller: [LEGAL NAME, ADDRESS, COUNTRY, CONTACT EMAIL].
+Data controller: Тепляков Илья Андреевич (Ilya Andreevich Teplyakov); address: [SPECIFY ADDRESS]; country: [SPECIFY COUNTRY]; email: i@iteplyakov.ru; phone: +79232390866.
 
 Data handling:
 • Sign-in, registration and cloud sync are disabled in this release. Previously created accounts and their data may remain on Firebase servers; the local version cannot access or delete them.
@@ -16,4 +16,4 @@ The app does not include its own advertising or analytics SDKs. Firebase remains
 
 Deletion: you may remove on-device data using Android system settings (“Clear storage”). Existing cloud accounts are not accessible in this release; clearing app storage does not delete them from the server. A verified server-side process and an external deletion-request page are needed BEFORE PUBLICATION. Retention periods and request handling: [SPECIFY AFTER IMPLEMENTATION].
 
-Privacy contact: [PROVIDE A WORKING CONTACT ADDRESS BEFORE PUBLICATION]. Publish the final policy at a stable public URL and keep it aligned with actual app behavior.
+Privacy contact: i@iteplyakov.ru, +79232390866. Publish the final policy at a stable public URL and keep it aligned with actual app behavior.

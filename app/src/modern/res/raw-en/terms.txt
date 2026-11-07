@@ -1,9 +1,9 @@
 DRAFT MONEY ASSISTANT LICENSE AGREEMENT
-Revision: November 1, 2026
+Revision: November 7, 2026
 
-BEFORE PUBLICATION: the rights holder must provide its legal name, contact details and applicable law, and arrange legal review. This draft is not legal advice.
+BEFORE PUBLICATION: the rights holder must specify the country and applicable law, and arrange legal review. This draft is not legal advice.
 
-1. Parties. Rights holder: [LEGAL NAME, COUNTRY, CONTACT]. User: the person installing and using Money Assistant.
+1. Parties. Rights holder: Тепляков Илья Андреевич (Ilya Andreevich Teplyakov); country: [SPECIFY COUNTRY]; email: i@iteplyakov.ru; phone: +79232390866. User: the person installing and using Money Assistant.
 
 2. License. The rights holder grants a limited, non-exclusive, non-transferable right to use the app on the user's devices for its intended features. The app helps split shared expenses. It is not a bank, payment processor, accountant or legal advisor and does not transfer money.
 
@@ -17,4 +17,4 @@ BEFORE PUBLICATION: the rights holder must provide its legal name, contact detai
 
 6. Liability. The app is provided “as is” to the extent allowed by applicable law without limiting mandatory consumer rights. You must verify amounts and agree on payment with the other participants yourself.
 
-7. Contact and applicable law. [PROVIDE RIGHTS HOLDER CONTACT AND APPLICABLE LAW BEFORE PUBLICATION]. Data practices are described in the separate privacy policy.
+7. Contact and applicable law. Contact the rights holder at i@iteplyakov.ru or +79232390866. Applicable law: [SPECIFY APPLICABLE LAW]. Data practices are described in the separate privacy policy.
