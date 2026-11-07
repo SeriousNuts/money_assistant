@@ -41,9 +41,8 @@ if [[ ${1:-} == '--store' ]]; then
     [[ $MONEY_RELEASE_STORE_FILE == /* && -f $MONEY_RELEASE_STORE_FILE ]] || {
         echo 'MONEY_RELEASE_STORE_FILE must point to an existing absolute file path.' >&2; exit 1;
     }
-    [[ ${MONEY_PRIVACY_POLICY_URL:-} =~ ^https://[^[:space:]]+$ &&
-       ${MONEY_ACCOUNT_DELETION_URL:-} =~ ^https://[^[:space:]]+$ ]] || {
-        echo 'Provide public HTTPS MONEY_PRIVACY_POLICY_URL and MONEY_ACCOUNT_DELETION_URL.' >&2; exit 1;
+    [[ ${MONEY_PRIVACY_POLICY_URL:-} =~ ^https://[^[:space:]]+$ ]] || {
+        echo 'Provide a public HTTPS MONEY_PRIVACY_POLICY_URL.' >&2; exit 1;
     }
     if grep -REq '\[(ФИО|УКАЗАТЬ|LEGAL NAME|PROVIDE|SPECIFY)' app/src/modern/res/raw*/{privacy,terms}.txt; then
         echo 'Replace and review legal placeholders before a store release.' >&2; exit 1

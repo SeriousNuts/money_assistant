@@ -1,6 +1,6 @@
 <full-backup-content>
-    <!-- Receipt images are private on-device data, never part of Android cloud backup. -->
-    <exclude domain="file" path="receipts/" />
-    <!-- Encrypted API key stays on this device; its Android Keystore key cannot be restored elsewhere. -->
-    <exclude domain="sharedpref" path="receipt-ai.xml" />
+    <!-- Legacy backup mechanism: no bills, photos, drafts or keys leave this device. -->
+    <exclude domain="root" path="." />
+    <exclude domain="device_root" path="." />
+    <exclude domain="external" path="." />
 </full-backup-content>

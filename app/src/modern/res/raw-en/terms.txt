@@ -9,11 +9,11 @@ BEFORE PUBLICATION: the rights holder must specify the country and applicable la
 
 3. Data. You are responsible for lawful use of other people's names, phone numbers and expenses, and for having a lawful basis before submitting a receipt to an external AI service. Offline OCR and manual entry do not send photos to an AI service. Review all extracted items, prices and calculations before relying on them.
 
-4. Accounts and sync. Sign-in and registration are temporarily disabled. Bills and photos stay on this device and are not synchronized. Data from previously registered accounts is not accessible in this release.
+4. Accounts and sync. This release does not offer accounts, sign-in or registration. Bills and photos stay on this device and are not synchronized.
 
 4.1. Online OCR. The primary OCR runs offline. You can optionally select Google Gemini (Google) or deepseek-ai/DeepSeek-OCR-2 via Cloud.ru (the operator's legal identity must be confirmed against the rights holder's agreement). The RuStore build preselects Cloud.ru for online OCR; the Google Play build preselects Gemini. You can change the selection. Preselection is NOT consent to transmission: a particular photo is sent only after your separate action and confirmation. A reduced photo is sent over HTTPS to foundation-models.api.cloud.ru for Cloud.ru or to Google's API for Gemini. You provide a separate API key for each service; keys are encrypted on your device and used only for requests to the selected provider. Service availability, charges, photo handling and terms are determined by the provider and the key owner's plan. Choosing Cloud.ru does not itself prove that data is stored or processed exclusively in Russia: the actual agreement and service settings must be checked. Do not submit receipts with other people's personal or payment details without a lawful basis.
 
-5. Availability and changes. Camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings. A deletion process for existing cloud accounts must be verified and published before public release.
+5. Availability and changes. Camera and third-party AI features depend on their providers. The rights holder may update the app subject to applicable law. You can stop using the app and remove local data through device settings; Android app backup is disabled.
 
 6. Liability. The app is provided “as is” to the extent allowed by applicable law without limiting mandatory consumer rights. You must verify amounts and agree on payment with the other participants yourself.
 

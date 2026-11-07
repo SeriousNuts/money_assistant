@@ -1,10 +1,13 @@
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="file" path="receipts/" />
-        <exclude domain="sharedpref" path="receipt-ai.xml" />
+        <!-- User bills, drafts, photos and preferences remain on this device. -->
+        <exclude domain="root" path="." />
+        <exclude domain="device_root" path="." />
+        <exclude domain="external" path="." />
     </cloud-backup>
     <device-transfer>
-        <exclude domain="file" path="receipts/" />
-        <exclude domain="sharedpref" path="receipt-ai.xml" />
+        <exclude domain="root" path="." />
+        <exclude domain="device_root" path="." />
+        <exclude domain="external" path="." />
     </device-transfer>
 </data-extraction-rules>

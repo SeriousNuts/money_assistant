@@ -1,19 +1,19 @@
 DRAFT MONEY ASSISTANT PRIVACY POLICY
 Revision: November 7, 2026
 
-BEFORE PUBLICATION: provide the controller's postal address and country, public privacy/deletion-request URLs for existing accounts, retention periods and legal bases for the relevant jurisdictions. Audit actual network traffic and SDK behavior before making Play Data safety declarations.
+BEFORE PUBLICATION: provide the controller's postal address and country, a public privacy-policy URL, legal bases for the relevant jurisdictions and verified provider retention terms for optional online OCR. Audit actual network traffic and SDK behavior before making Play Data safety declarations.
 
 Data controller: Тепляков Илья Андреевич (Ilya Andreevich Teplyakov); address: [SPECIFY ADDRESS]; country: [SPECIFY COUNTRY]; email: i@iteplyakov.ru; phone: +79232390866.
 
 Data handling:
-• Sign-in, registration and cloud sync are disabled in this release. Previously created accounts and their data may remain on Firebase servers; the local version cannot access or delete them.
+• This release does not offer accounts, sign-in or cloud sync. According to the rights holder, no real users had accounts in the earlier experimental Firebase configuration. The rights holder does not receive local bill data on its own server.
 • Names, selected participants' phone numbers, bill titles, amounts, receipt items and payment states are used to split expenses and are stored on the device.
 • Contacts access is requested only when choosing people. Names and phone numbers you select become local bill data. The broad READ_CONTACTS permission and picker need review for Google Play.
 • Receipt photos and offline OCR remain in private on-device storage; photos are not synced to Firestore. If you choose and separately confirm online OCR for a particular photo, a reduced copy is sent over HTTPS to the selected provider: Google Gemini (Google) or deepseek-ai/DeepSeek-OCR-2 via Cloud.ru (foundation-models.api.cloud.ru). The RuStore build preselects Cloud.ru but never sends a photo without separate confirmation. Verify the provider's terms and your lawful basis for transmitting other people's data. Availability, pricing, location, provider use and retention of data require verification; choosing Cloud.ru alone does not prove Russia-only storage or processing. Review all returned items and prices.
-• Separate Gemini and Cloud.ru API keys are encrypted locally using Android Keystore, independently removable and not included in the APK. A key is transmitted over HTTPS only to its selected provider when making a request. Receipt images and keys are excluded from Android backup; other local data may be included when device backup is enabled.
+• Separate Gemini and Cloud.ru API keys are encrypted locally using Android Keystore, independently removable and not included in the APK. A key is transmitted over HTTPS only to its selected provider when making a request. Android app backup and device transfer are disabled for this release; this does not remove previously created backups, if any.
 
 The app does not include its own advertising or analytics SDKs. Firebase remains a dependency but configuration and sign-in are disabled; actual SDK behavior must be checked before completing Play Data safety. Optional Gemini and Cloud.ru transmissions and retention must also be checked. Sharing a bill via Android's Share menu is initiated by you and delivered to the recipient you choose.
 
-Deletion: you may remove on-device data using Android system settings (“Clear storage”). Existing cloud accounts are not accessible in this release; clearing app storage does not delete them from the server. A verified server-side process and an external deletion-request page are needed BEFORE PUBLICATION. Retention periods and request handling: [SPECIFY AFTER IMPLEMENTATION].
+Deletion and local retention: bills and photos stay on your device until you delete them in the app, clear its storage or uninstall it. There are no user accounts in this release, so there is no cloud account to delete. If you opt in to online OCR, the selected provider handles submitted data under its own terms; verify and publish applicable retention periods before release.
 
 Privacy contact: i@iteplyakov.ru, +79232390866. Publish the final policy at a stable public URL and keep it aligned with actual app behavior.
